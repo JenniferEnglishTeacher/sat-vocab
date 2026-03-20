@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 15 — Barron's 1100 SAT Vocabulary Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+  --primary: #1a3a5c;
+  --primary-light: #2a5080;
+  --accent: #c8962e;
+  --accent-light: #f0c060;
+  --correct: #2d7a4f;
+  --correct-bg: #e8f5ee;
+  --wrong: #b53a2f;
+  --wrong-bg: #fdecea;
+  --clue: #fff3a3;
+  --surface: #f5f3ef;
+  --card: #ffffff;
+  --text: #1c1c1c;
+  --muted: #6b7280;
+  --border: #ddd8d0;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 16px rgba(0,0,0,0.10);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text); min-height: 100vh; }
+
+/* ── HEADER ── */
+.header {
+  background: var(--primary);
+  color: #fff;
+  padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.header-logo { font-family: 'Playfair Display', serif; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+.header-logo i { color: var(--accent-light); }
+.score-pill {
+  background: rgba(255,255,255,0.13); border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 20px; padding: 5px 14px; font-size: 0.82rem; font-weight: 500;
+  display: flex; align-items: center; gap: 7px;
+}
+.score-pill span { color: var(--accent-light); font-weight: 700; font-size: 0.95rem; }
+
+/* ── LAYOUT ── */
+.wrap { max-width: 800px; margin: 0 auto; padding: 24px 16px 60px; }
+
+/* ── PROGRESS ── */
+.prog-row { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted); font-weight: 500; margin-bottom: 7px; }
+.prog-track { background: var(--border); border-radius: 99px; height: 5px; margin-bottom: 22px; }
+.prog-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width .4s ease; }
+
+/* ── CARD ── */
+.card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 16px; animation: up .3s ease; }
+@keyframes up { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+
+.card-head {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: #fff; padding: 12px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.q-num { font-family: 'Playfair Display', serif; font-size: 0.9rem; opacity: .9; }
+.tts-btn {
+  background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.28);
+  color: #fff; border-radius: 18px; padding: 5px 12px;
+  font-size: 0.78rem; font-family: 'DM Sans', sans-serif; font-weight: 500;
+  cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background .2s;
+}
+.tts-btn:hover { background: rgba(255,255,255,0.26); }
+.tts-btn.on { background: rgba(200,150,46,0.45); }
+
+.card-body { padding: 22px 22px 18px; }
+
+/* ── WORD HELPER ── */
+.helper {
+  background: #fffbf0; border: 1px solid #f0d080; border-left: 4px solid var(--accent);
+  border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px;
+  font-size: 0.86rem; line-height: 1.5; display: none; animation: fadein .2s;
+}
+.helper.show { display: block; }
+@keyframes fadein { from{opacity:0} to{opacity:1} }
+.helper-word { font-weight: 700; color: var(--accent); font-size: 0.95rem; margin-bottom: 3px; }
+.helper-pos { color: var(--muted); font-style: italic; font-size: 0.8rem; }
+
+/* ── PASSAGE ── */
+.passage { font-size: 1rem; line-height: 1.85; font-weight: 300; margin-bottom: 20px; }
+.passage .w {
+  cursor: pointer; border-bottom: 1px dashed rgba(26,58,92,0.22);
+  border-radius: 2px; padding: 0 1px; transition: color .15s, background .15s;
+}
+.passage .w:hover { color: var(--primary); background: rgba(26,58,92,0.06); border-bottom-color: var(--primary); }
+.passage .blank { font-weight: 700; font-family: 'Playfair Display', serif; color: var(--primary); border-bottom: 2px solid var(--primary); letter-spacing: .04em; cursor: default; padding: 0 2px; }
+.passage .clue { background: var(--clue); border-radius: 3px; padding: 0 3px; border-bottom: none; }
+
+/* ── OPTIONS ── */
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 16px; }
+@media(max-width:480px){ .opts { grid-template-columns: 1fr; } }
+.opt {
+  background: var(--surface); border: 2px solid var(--border);
+  border-radius: var(--radius-sm); padding: 11px 14px;
+  font-size: 0.9rem; font-family: 'DM Sans', sans-serif; font-weight: 500;
+  cursor: pointer; text-align: left; transition: border-color .2s, background .2s, transform .1s;
+  display: flex; align-items: center; gap: 9px; color: var(--text);
+}
+.opt:hover:not(:disabled) { border-color: var(--primary); background: rgba(26,58,92,0.05); transform: translateY(-1px); }
+.opt-lbl { width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 0.72rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.opt.correct { border-color: var(--correct); background: var(--correct-bg); color: var(--correct); }
+.opt.correct .opt-lbl { background: var(--correct); }
+.opt.wrong { border-color: var(--wrong); background: var(--wrong-bg); color: var(--wrong); }
+.opt.wrong .opt-lbl { background: var(--wrong); }
+.opt:disabled { cursor: default; transform: none; }
+
+/* ── FEEDBACK ── */
+.feedback { display: none; border-top: 1px solid var(--border); padding-top: 16px; margin-top: 4px; animation: fadein .3s; }
+.feedback.show { display: block; }
+.fb-title { font-size: 0.76rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; margin-bottom: 10px; }
+.fb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media(max-width:480px){ .fb-grid { grid-template-columns: 1fr; } }
+.fb-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 0.82rem; }
+.fb-item.is-ans { border-color: var(--correct); background: var(--correct-bg); }
+.fb-word { font-weight: 700; font-size: 0.92rem; color: var(--primary); margin-bottom: 2px; display: flex; justify-content: space-between; align-items: center; }
+.fb-tts { background: none; border: none; color: var(--muted); cursor: pointer; padding: 2px; font-size: 0.85rem; transition: color .2s; }
+.fb-tts:hover { color: var(--primary); }
+.fb-en { color: var(--text); margin-bottom: 3px; }
+.fb-cn { color: #6a4c93; font-size: 0.83rem; margin-bottom: 5px; }
+.fb-ex { font-size: 0.78rem; color: var(--muted); font-style: italic; border-top: 1px solid var(--border); padding-top: 5px; margin-top: 3px; display: flex; align-items: flex-start; gap: 5px; }
+.fb-ex-tts { background: none; border: none; color: var(--muted); cursor: pointer; padding: 0; font-size: 0.82rem; flex-shrink: 0; transition: color .2s; }
+.fb-ex-tts:hover { color: var(--accent); }
+
+/* ── NEXT BTN ── */
+.next-btn {
+  display: none; margin-top: 16px; width: 100%;
+  background: var(--primary); color: #fff; border: none;
+  border-radius: var(--radius-sm); padding: 12px 24px;
+  font-size: 0.92rem; font-family: 'DM Sans', sans-serif; font-weight: 600;
+  cursor: pointer; align-items: center; justify-content: center; gap: 7px;
+  transition: background .2s, transform .1s;
+}
+.next-btn.show { display: flex; }
+.next-btn:hover { background: var(--primary-light); transform: translateY(-1px); }
+
+.hint { font-size: 0.75rem; color: var(--muted); text-align: center; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+
+/* ── END SCREEN ── */
+.end { display: none; background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 40px 28px; text-align: center; animation: up .4s ease; }
+.end.show { display: block; }
+.end-icon { font-size: 2.8rem; margin-bottom: 14px; }
+.end-title { font-family: 'Playfair Display', serif; font-size: 1.7rem; color: var(--primary); margin-bottom: 6px; }
+.end-score { font-size: 3.2rem; font-weight: 700; color: var(--accent); line-height: 1; margin: 18px 0 6px; }
+.end-pct { color: var(--muted); font-size: 0.88rem; margin-bottom: 20px; }
+.end-msg { font-size: 0.97rem; margin-bottom: 5px; line-height: 1.6; }
+.end-cn { color: #6a4c93; font-size: 0.93rem; margin-bottom: 28px; }
+
+/* ── WRONG WORDS LIST ── */
+.wrong-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 24px; text-align: left; }
+.wrong-box-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+.wrong-tag { display: inline-block; background: var(--wrong-bg); border: 1px solid #f0c0bb; color: var(--wrong); border-radius: 20px; padding: 3px 11px; font-size: 0.82rem; font-weight: 600; margin: 3px; }
+.correct-note { font-size: 0.82rem; color: var(--correct); font-weight: 500; }
+
+/* ── SUBMIT FORM ── */
+.submit-section { background: #f0f8ff; border: 1px solid #b8d8f0; border-radius: var(--radius-sm); padding: 18px 20px; margin-bottom: 20px; text-align: left; }
+.submit-title { font-weight: 600; color: var(--primary); margin-bottom: 4px; font-size: 0.95rem; }
+.submit-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 14px; }
+.submit-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.submit-input {
+  flex: 1; min-width: 180px; padding: 10px 14px;
+  border: 2px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 0.92rem; font-family: 'DM Sans', sans-serif;
+  color: var(--text); background: #fff; transition: border-color .2s;
+}
+.submit-input:focus { outline: none; border-color: var(--primary); }
+.submit-btn {
+  background: var(--primary); color: #fff; border: none;
+  border-radius: var(--radius-sm); padding: 10px 22px;
+  font-size: 0.92rem; font-family: 'DM Sans', sans-serif; font-weight: 600;
+  cursor: pointer; transition: background .2s; white-space: nowrap;
+  display: flex; align-items: center; gap: 7px;
+}
+.submit-btn:hover:not(:disabled) { background: var(--primary-light); }
+.submit-btn:disabled { opacity: .6; cursor: default; }
+.submit-status { margin-top: 10px; font-size: 0.84rem; display: none; padding: 8px 12px; border-radius: var(--radius-sm); }
+.submit-status.ok { display: block; background: var(--correct-bg); color: var(--correct); border: 1px solid #b0e0c0; }
+.submit-status.err { display: block; background: var(--wrong-bg); color: var(--wrong); border: 1px solid #f0c0bb; }
+
+/* ── RESTART ── */
+.restart-btn {
+  background: var(--primary); color: #fff; border: none; border-radius: var(--radius-sm);
+  padding: 13px 32px; font-size: 0.97rem; font-family: 'DM Sans', sans-serif; font-weight: 600;
+  cursor: pointer; transition: background .2s;
+}
+.restart-btn:hover { background: var(--primary-light); }
+
+/* ── REVIEW WORD CARDS (end screen) ── */
+.review-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 20px; text-align: left; }
+.review-section-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.review-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.review-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; cursor: pointer; transition: border-color .2s, box-shadow .2s; }
+.review-card:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(26,58,92,0.1); }
+.review-card.wrong-card { border-left: 3px solid var(--wrong); }
+.review-card.passage-card { border-left: 3px solid var(--accent); }
+.review-card .rc-word { font-weight: 700; font-size: 0.95rem; color: var(--primary); display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.review-card .rc-pos { font-size: 0.75rem; color: var(--muted); font-style: italic; margin-bottom: 4px; }
+.review-card .rc-en { font-size: 0.82rem; color: var(--text); margin-bottom: 4px; line-height: 1.4; }
+.review-card .rc-cn { font-size: 0.82rem; color: #6a4c93; margin-bottom: 6px; }
+.review-card .rc-ex { font-size: 0.78rem; color: var(--muted); font-style: italic; border-top: 1px solid var(--border); padding-top: 6px; margin-top: 4px; display: flex; align-items: flex-start; gap: 5px; line-height: 1.45; }
+.rc-tts { background: none; border: none; cursor: pointer; color: var(--muted); padding: 2px 4px; font-size: 0.88rem; transition: color .2s; flex-shrink: 0; }
+.rc-tts:hover { color: var(--accent); }
+.review-card .rc-detail { display: none; }
+.review-card.open .rc-detail { display: block; }
+.review-card .rc-toggle { color: var(--accent); font-size: 0.75rem; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     ⚙️  TEACHER SETUP — READ THIS FIRST
+     ══════════════════════════════════════════════
+  STEP 1: Follow the Google Sheets setup guide
+          included with this file to get your
+          GOOGLE_SCRIPT_URL value.
+
+  STEP 2: Paste your URL on the line below
+          replacing the placeholder text.
+
+  STEP 3: Save the file. Done!
+
+  Students' names + scores + wrong words will
+  then appear in your Google Sheet automatically.
+═══════════════════════════════════════════════ -->
+<script>
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwN0JbQwvPmsAphNhq9F0nWY8s5Ttr_NLeVofihnI1BqNU_2L4-aa3SRavPkEyUKC7trg/exec";
+</script>
+
+<header class="header">
+  <div class="header-logo">
+    <i class="fas fa-book-open-reader"></i>
+    Week 15 · Barron's 1100 SAT Vocab
+  </div>
+  <div class="score-pill">
+    <i class="fas fa-star" style="color:var(--accent-light)"></i>
+    Score: <span id="scoreDisp">0</span> / <span id="totalDisp">20</span>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="prog-row">
+    <span id="progLabel">Question 1 of 20</span>
+    <span id="progPct">0%</span>
+  </div>
+  <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+
+  <!-- Quiz area -->
+  <div id="quizArea">
+    <div class="card" id="qCard">
+      <div class="card-head">
+        <div class="q-num" id="qNum">Question 1</div>
+        <button class="tts-btn" id="ttsBtn" onclick="speakPassage()">
+          <i class="fas fa-volume-high"></i> Listen
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="helper" id="helper">
+          <div class="helper-word" id="helperWord"></div>
+          <div class="helper-pos" id="helperPos"></div>
+          <div id="helperDef"></div>
+          <div id="helperCn" style="color:#6a4c93;font-size:0.85rem;margin-top:4px;"></div>
+        </div>
+        <div class="passage" id="passage"></div>
+        <div class="opts" id="opts"></div>
+        <div class="feedback" id="feedback">
+          <div class="fb-title"><i class="fas fa-lightbulb"></i> &nbsp;Vocabulary feedback — all 4 options</div>
+          <div class="fb-grid" id="fbGrid"></div>
+        </div>
+        <button class="next-btn" id="nextBtn" onclick="nextQ()">
+          Next question <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+    <div class="hint"><i class="fas fa-hand-pointer"></i> Tap any word in the passage to look it up</div>
+  </div>
+
+  <!-- End screen -->
+  <div class="end" id="endScreen">
+    <div class="end-icon" id="endIcon">🎓</div>
+    <div class="end-title">Quiz complete!</div>
+    <div class="end-score" id="endScore"></div>
+    <div class="end-pct" id="endPct"></div>
+    <div class="end-msg" id="endMsg"></div>
+    <div class="end-cn" id="endCn"></div>
+
+    <!-- Wrong words summary -->
+    <div id="wrongBox"></div>
+    <!-- Passage words students looked up -->
+    <div id="passageBox"></div>
+
+    <!-- Score submission -->
+    <div class="submit-section" id="submitSection">
+      <div class="submit-title"><i class="fas fa-paper-plane"></i> &nbsp;Send your score to the teacher</div>
+      <div class="submit-sub">Enter your name and tap Submit — your teacher will see your results automatically.</div>
+      <div class="submit-row">
+        <input class="submit-input" id="studentName" type="text" placeholder="Your name (e.g. 王小明)" maxlength="60">
+        <button class="submit-btn" id="submitBtn" onclick="submitScore()">
+          <i class="fas fa-paper-plane"></i> Submit
+        </button>
+      </div>
+      <div class="submit-status" id="submitStatus"></div>
+    </div>
+
+    <button class="restart-btn" onclick="restart()">
+      <i class="fas fa-rotate-right"></i> Try again
+    </button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// VOCABULARY DATA — Week 1 (Barron's 1100)
+// ══════════════════════════════════════════════
+const vocab = {
+  "abrogate": { pos:"v.", en:"To officially abolish or annul:", cn:"廢除；取消", ex:"Abrogate means: To officially abolish or annul." },
+  "access": { pos:"n.", en:"The means or right to approach:", cn:"接近；通道", ex:"Access means: The means or right to approach." },
+  "accomplice": { pos:"n.", en:"A person who helps another commit a crime:", cn:"共犯；幫兇", ex:"Accomplice means: A person who helps another commit a crime." },
+  "alleged": { pos:"adj.", en:"Said to have done something but not proven:", cn:"涉嫌的；據稱的", ex:"Alleged means: Said to have done something but not proven." },
+  "asperity": { pos:"n.", en:"Harshness of manner or tone:", cn:"粗暴；嚴厲", ex:"Asperity means: Harshness of manner or tone." },
+  "complicity": { pos:"n.", en:"Partnership in wrongdoing:", cn:"同謀；共犯關係", ex:"Complicity means: Partnership in wrongdoing." },
+  "controversial": { pos:"adj.", en:"Causing public disagreement:", cn:"有爭議的", ex:"Controversial means: Causing public disagreement." },
+  "culpable": { pos:"adj.", en:"Deserving blame for a fault:", cn:"有罪的；該受譴責的", ex:"Culpable means: Deserving blame for a fault." },
+  "declaim": { pos:"v.", en:"To speak or recite pompously:", cn:"慷慨陳詞；演說", ex:"Declaim means: To speak or recite pompously." },
+  "epithet": { pos:"n.", en:"A descriptive word or phrase, often derogatory:", cn:"綽號；貶稱", ex:"Epithet means: A descriptive word or phrase, often derogatory." },
+  "extrinsic": { pos:"adj.", en:"Coming from outside, not essential:", cn:"外在的；非固有的", ex:"Extrinsic means: Coming from outside, not essential." },
+  "fetter": { pos:"v.", en:"To restrict or restrain:", cn:"束縛；羈絆", ex:"Fetter means: To restrict or restrain." },
+  "invalidate": { pos:"v.", en:"To make legally void or cancel:", cn:"使無效；使作廢", ex:"Invalidate means: To make legally void or cancel." },
+  "landmark": { pos:"adj.", en:"Historically significant, a turning point:", cn:"里程碑；劃時代的", ex:"Landmark means: Historically significant, a turning point." },
+  "liquidation": { pos:"n.", en:"The disposal or destruction of something:", cn:"清算；肅清", ex:"Liquidation means: The disposal or destruction of something." },
+  "nomadic": { pos:"adj.", en:"Roaming from place to place:", cn:"遊牧的；流浪的", ex:"Nomadic means: Roaming from place to place." },
+  "paragon": { pos:"n.", en:"A person regarded as perfect:", cn:"模範；典範", ex:"Paragon means: A person regarded as perfect." },
+  "persevere": { pos:"v.", en:"To continue despite difficulty:", cn:"堅持不懈；不屈不撓", ex:"Persevere means: To continue despite difficulty." },
+  "preclude": { pos:"v.", en:"To prevent or make impossible:", cn:"排除；防止", ex:"Preclude means: To prevent or make impossible." },
+  "recant": { pos:"v.", en:"To withdraw a previous statement:", cn:"撤回(聲明)；放棄(信仰)", ex:"Recant means: To withdraw a previous statement." }
+};
+
+// ══════════════════════════════════════════════
+// 20 MCQ QUESTIONS
+// Answer key: B,C,A,D,B,C,A,D,D,B,A,B,A,D,C,B,C,A,A,D
+// ══════════════════════════════════════════════
+const questions = [
+  { q:"The new administration announced its intention to __________ the treaty within its first hundred days in office, arguing that the agreement had been negotiated under fundamentally different geopolitical conditions that no longer obtained and that continued adherence to its terms was contrary to the national interest.", opts:["recant","abrogate","preclude","fetter"], answer:"abrogate", clues:["administration","announced","intention","treaty","hundred"] },
+  { q:"The landmark ruling established that disabled individuals had a fundamental legal right of __________ to all publicly funded facilities, placing an obligation on local authorities to make reasonable adjustments to physical environments and service delivery systems regardless of the financial costs involved.", opts:["liquidation","complicity","access","accomplice"], answer:"access", clues:["landmark","ruling","established","disabled","individuals"] },
+  { q:"The prosecution contended that although the defendant had not been present at the scene during the actual robbery, her role in providing detailed information about the security arrangements, lending her vehicle for the getaway, and disposing of stolen property afterwards made her an __________ whose culpability was legally equivalent to that of the principal offender.", opts:["accomplice","access","complicity","paragon"], answer:"accomplice", clues:["prosecution","contended","defendant","present","actual"] },
+  { q:"The newspaper\'s decision to name the __________ perpetrator before any charges had been formally filed drew sharp criticism from legal professionals who argued that the publication had effectively denied the suspect the presumption of innocence that remained a cornerstone of the jurisdiction\'s criminal justice system.", opts:["nomadic","extrinsic","controversial","alleged"], answer:"alleged", clues:["newspaper","decision","perpetrator","charges","formally"] },
+  { q:"The chairwoman responded to the repeated interruptions with increasing __________, her initial attempts at measured diplomacy giving way to a crisp directness that made clear she would not tolerate further disruption of proceedings that had already run two hours beyond their scheduled conclusion.", opts:["access","asperity","paragon","complicity"], answer:"asperity", clues:["chairwoman","responded","repeated","interruptions","increasing"] },
+  { q:"The historical inquiry concluded that the institution\'s __________ in the systematic abuse had extended beyond passive failure to act on complaints to active suppression of evidence, reassignment of accused personnel to positions where they retained unsupervised access to vulnerable individuals, and deliberate obstruction of external investigations.", opts:["asperity","accomplice","complicity","liquidation"], answer:"complicity", clues:["historical","inquiry","concluded","institution","systematic"] },
+  { q:"Few policy decisions in the administration\'s history had proved as __________ as the proposal to introduce mandatory national identity cards, which simultaneously attracted support from security-focused conservatives and fierce opposition from civil liberties advocates across the entire political spectrum.", opts:["controversial","nomadic","alleged","extrinsic"], answer:"controversial", clues:["policy","decisions","administration","history","proved"] },
+  { q:"The independent inquiry found all three senior executives __________ for the disaster, concluding that the incident had been caused not by a single catastrophic failure but by a cumulative series of decisions in which each had chosen operational convenience over the safety procedures that the regulatory framework specifically required.", opts:["controversial","nomadic","extrinsic","culpable"], answer:"culpable", clues:["independent","inquiry","senior","executives","disaster"] },
+  { q:"The young politician __________ d his manifesto commitments with an intensity that the audience found initially impressive but ultimately exhausting, his rhetorical style offering no modulation between emphatic declaration and emphatic declaration, a monotony of passion that paradoxically drained rather than amplified his message.", opts:["recant","persevere","abrogate","declaim"], answer:"declaim", clues:["politician","manifesto","commitments","intensity","audience"] },
+  { q:"The __________ that had attached itself to the politician early in her career — initially intended as mockery by her opponents — had been so thoroughly reclaimed and redeployed by her supporters that it had become a badge of honour that she herself now used in campaign materials and public speeches.", opts:["liquidation","epithet","complicity","access"], answer:"epithet", clues:["attached","itself","politician","career","initially"] },
+  { q:"The philosopher argued that the value assigned to artworks by the market represented entirely __________ worth — a function of scarcity, fashion, and investment speculation — rather than any intrinsic aesthetic quality, and that conflating economic value with artistic merit had been one of the defining intellectual confusions of the preceding century.", opts:["extrinsic","alleged","culpable","controversial"], answer:"extrinsic", clues:["philosopher","argued","assigned","artworks","market"] },
+  { q:"The excessively rigid regulatory framework had __________ ed the sector\'s capacity for innovation, imposing compliance requirements so onerous that smaller companies — which typically drove the most significant technological advances — were systematically disadvantaged relative to larger competitors with dedicated regulatory affairs departments.", opts:["invalidate","fetter","preclude","recant"], answer:"fetter", clues:["excessively","regulatory","framework","sector","capacity"] },
+  { q:"The discovery that several key witnesses had been interviewed by investigators before the formal inquiry commenced, in sessions that were neither recorded nor disclosed to the defence, was sufficient to __________ the entire conviction and require a retrial before a differently constituted panel.", opts:["invalidate","fetter","recant","abrogate"], answer:"invalidate", clues:["discovery","witnesses","interviewed","investigators","formal"] },
+  { q:"The __________ ruling represented the most significant expansion of constitutional rights in the country\'s history, establishing for the first time that the protections previously extended only to citizens applied equally to all persons present within the national territory regardless of their immigration status.", opts:["controversial","extrinsic","alleged","landmark"], answer:"landmark", clues:["ruling","represented","significant","expansion","constitutional"] },
+  { q:"The company entered voluntary __________ after it became clear that its liabilities exceeded its assets by a margin that made any rescue plan economically irrational, with the administrator\'s primary responsibility shifting from preserving the business as a going concern to maximising returns for the hierarchy of creditors.", opts:["paragon","asperity","liquidation","epithet"], answer:"liquidation", clues:["company","entered","voluntary","became","liabilities"] },
+  { q:"The __________ lifestyle that technology had made possible — working remotely from different countries for weeks or months at a time — created novel complications for tax authorities, social security systems, and pension administrators, none of which had been designed with the assumption that significant numbers of working-age adults would have no fixed country of residence.", opts:["extrinsic","nomadic","controversial","landmark"], answer:"nomadic", clues:["lifestyle","technology","possible","working","remotely"] },
+  { q:"She had been presented throughout her career as a __________ of professional integrity, which made the revelation of her involvement in the pricing cartel doubly devastating — not merely damaging to her personally but deeply corrosive to public trust in the profession she had come to represent.", opts:["epithet","asperity","paragon","complicity"], answer:"paragon", clues:["presented","throughout","career","professional","integrity"] },
+  { q:"The researcher __________ d through seven years of largely negative experimental results, sustained by a theoretical conviction that the mechanism she was investigating existed even when the evidence consistently failed to confirm it, a persistence that was eventually vindicated by a series of breakthrough findings in the eighth year.", opts:["persevere","fetter","preclude","declaim"], answer:"persevere", clues:["researcher","largely","negative","experimental","results"] },
+  { q:"The existence of a prior contractual agreement between the two parties did not __________ the possibility of additional tort claims arising from the same set of circumstances, the judge ruled, as the damages sought under each legal theory were distinct in nature and non-duplicative in their practical effect.", opts:["preclude","recant","persevere","abrogate"], answer:"preclude", clues:["existence","contractual","agreement","parties","possibility"] },
+  { q:"Under sustained pressure from the ecclesiastical authorities, the astronomer was forced to publicly __________ his heliocentric theory, acknowledging in a formal statement that the Earth was stationary at the centre of the universe — a humiliation that, according to contemporary accounts, he privately described as the most degrading experience of his scientific life.", opts:["persevere","abrogate","preclude","recant"], answer:"recant", clues:["sustained","pressure","ecclesiastical","authorities","astronomer"] }
+];
+
+// ══════════════════════════════════════════════
+// APP STATE
+// ══════════════════════════════════════════════
+let cur = 0, score = 0, answered = false;
+let wrongWords = [];
+let passageClickedWords = [];  // tracks non-vocab words students looked up
+
+// ══════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════
+function render() {
+  const q = questions[cur];
+  answered = false;
+  const pct = Math.round(cur / questions.length * 100);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progLabel').textContent = `Question ${cur+1} of ${questions.length}`;
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('qNum').textContent = `Question ${cur+1}`;
+  document.getElementById('scoreDisp').textContent = score;
+  document.getElementById('totalDisp').textContent = questions.length;
+
+  // helper reset
+  const h = document.getElementById('helper');
+  h.classList.remove('show');
+
+  // passage
+  document.getElementById('passage').innerHTML = buildPassage(q.q);
+
+  // options
+  const labels = ['A','B','C','D'];
+  const grid = document.getElementById('opts');
+  grid.innerHTML = '';
+  q.opts.forEach((word, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="opt-lbl">${labels[i]}</span>${word}`;
+    btn.onclick = () => handleAnswer(word, btn);
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('feedback').classList.remove('show');
+  const nb = document.getElementById('nextBtn');
+  nb.classList.remove('show');
+  nb.style.display = 'none';
+
+  // animate
+  const card = document.getElementById('qCard');
+  card.style.animation = 'none'; void card.offsetWidth;
+  card.style.animation = 'up .3s ease';
+}
+
+function buildPassage(text) {
+  return text.split(/(\s+)/).map(part => {
+    if (/^\s+$/.test(part)) return part;
+    if (part === '__________') return `<span class="blank">__________</span>`;
+    const pre = part.match(/^[^a-zA-Z]*/)[0];
+    const suf = part.match(/[^a-zA-Z]*$/)[0];
+    const core = part.replace(/^[^a-zA-Z]+|[^a-zA-Z]+$/g, '');
+    if (!core) return part;
+    return `${pre}<span class="w" data-w="${core.toLowerCase()}" onclick="lookup(this)">${core}</span>${suf}`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// DICTIONARY LOOKUP
+// ══════════════════════════════════════════════
+async function lookup(el) {
+  const word = el.dataset.w;
+  const h = document.getElementById('helper');
+  h.classList.add('show');
+  document.getElementById('helperWord').textContent = word;
+  document.getElementById('helperCn').textContent = '';
+
+  // Track every word the student clicks during the quiz (for end screen)
+  if (!passageClickedWords.includes(word) && word.length > 2) {
+    passageClickedWords.push(word);
+  }
+
+  // STEP 1: If it's one of our 20 vocab words — show instantly with Chinese
+  if (vocab[word]) {
+    const d = vocab[word];
+    document.getElementById('helperPos').textContent = d.pos;
+    document.getElementById('helperDef').textContent = d.en;
+    document.getElementById('helperCn').textContent = '🇹🇼 ' + d.cn;
+    return;
+  }
+
+  // STEP 2: Other passage words — try free dictionary API
+  document.getElementById('helperPos').textContent = '';
+  document.getElementById('helperDef').innerHTML = '<span style="color:var(--muted);font-style:italic">Looking up “' + word + '”…</span>';
+  try {
+    const res = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + word);
+    if (!res.ok) throw 0;
+    const data = await res.json();
+    const m = data[0]?.meanings?.[0];
+    if (m) {
+      document.getElementById('helperPos').textContent = m.partOfSpeech;
+      document.getElementById('helperDef').textContent = m.definitions[0]?.definition || 'No definition found.';
+    } else throw 0;
+  } catch {
+    document.getElementById('helperDef').innerHTML = '<em style="color:var(--muted)">Definition not found — try another word.</em>';
+  }
+}
+
+// ══════════════════════════════════════════════
+// ANSWER HANDLING
+// ══════════════════════════════════════════════
+function handleAnswer(chosen, btn) {
+  if (answered) return;
+  answered = true;
+  const q = questions[cur];
+  const correct = chosen === q.answer;
+  if (correct) score++; else if (!wrongWords.includes(q.answer)) wrongWords.push(q.answer);
+  document.getElementById('scoreDisp').textContent = score;
+
+  // style buttons
+  document.querySelectorAll('.opt').forEach(b => {
+    b.disabled = true;
+    const word = b.textContent.trim().replace(/^[A-D]/,'').trim();
+    if (word === q.answer) b.classList.add('correct');
+    else if (b === btn && !correct) b.classList.add('wrong');
+  });
+
+  // highlight clues
+  document.querySelectorAll('#passage .w').forEach(s => {
+    if (q.clues.some(c => c.toLowerCase() === s.dataset.w)) s.classList.add('clue');
+  });
+
+  // feedback
+  buildFeedback(q);
+  document.getElementById('feedback').classList.add('show');
+
+  const nb = document.getElementById('nextBtn');
+  nb.style.display = 'flex'; nb.classList.add('show');
+  nb.innerHTML = cur < questions.length-1
+    ? 'Next question <i class="fas fa-arrow-right"></i>'
+    : 'See results <i class="fas fa-flag-checkered"></i>';
+}
+
+function buildFeedback(q) {
+  const grid = document.getElementById('fbGrid');
+  grid.innerHTML = '';
+  q.opts.forEach(word => {
+    const d = vocab[word] || { pos:'', en:'—', cn:'—', ex:'—' };
+    const isAns = word === q.answer;
+    const item = document.createElement('div');
+    item.className = 'fb-item' + (isAns ? ' is-ans' : '');
+    item.innerHTML = `
+      <div class="fb-word">
+        <span>${word}${isAns?' ✓':''}</span>
+        <button class="fb-tts" onclick="say('${word}')"><i class="fas fa-volume-low"></i></button>
+      </div>
+      <div class="fb-en">${d.en}</div>
+      <div class="fb-cn">${d.cn}</div>
+      <div class="fb-ex">
+        <button class="fb-ex-tts" onclick="say('${(d.ex||'').replace(/'/g,"\\'")}')"><i class="fas fa-play-circle"></i></button>
+        <span>${d.ex||''}</span>
+      </div>`;
+    grid.appendChild(item);
+  });
+}
+
+// ══════════════════════════════════════════════
+// TTS
+// ══════════════════════════════════════════════
+function say(text) {
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.9;
+  const vs = speechSynthesis.getVoices();
+  const f = vs.find(v => v.lang==='en-US' && /female|woman|samantha|karen|victoria|zira/i.test(v.name));
+  if (f) u.voice = f;
+  speechSynthesis.speak(u);
+}
+function speakPassage() {
+  const q = questions[cur];
+  const text = q.q.replace(/__________/g, 'blank');
+  const btn = document.getElementById('ttsBtn');
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.86;
+  const vs = speechSynthesis.getVoices();
+  const f = vs.find(v => v.lang==='en-US' && /female|woman|samantha|karen|victoria|zira/i.test(v.name));
+  if (f) u.voice = f;
+  btn.classList.add('on');
+  u.onend = u.onerror = () => btn.classList.remove('on');
+  speechSynthesis.speak(u);
+}
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+function nextQ() {
+  cur++;
+  if (cur >= questions.length) showEnd();
+  else render();
+}
+
+// ══════════════════════════════════════════════
+// REVIEW CARD BUILDER
+// ══════════════════════════════════════════════
+function makeReviewCard(word, cardClass) {
+  const d = vocab[word];
+  const id = 'rc_' + word.replace(/[^a-z]/g,'');
+  if (d) {
+    // Vocab word — full info available
+    return `<div class="review-card ${cardClass}" id="${id}" onclick="toggleCard('${id}')">
+      <div class="rc-word">
+        <span>${word}</span>
+        <span class="rc-toggle"><i class="fas fa-chevron-down"></i></span>
+      </div>
+      <div class="rc-pos">${d.pos}</div>
+      <div class="rc-detail">
+        <div class="rc-en">${d.en}</div>
+        <div class="rc-cn">${d.cn}</div>
+        <div class="rc-ex">
+          <button class="rc-tts" onclick="event.stopPropagation();say('${word}. ${(d.ex||'').replace(/'/g,"\'")}')"><i class="fas fa-volume-high"></i></button>
+          <span>${d.ex || ''}</span>
+        </div>
+      </div>
+    </div>`;
+  } else {
+    // Passage word — fetch definition on expand
+    return `<div class="review-card ${cardClass}" id="${id}" onclick="expandPassageCard('${id}','${word}')">
+      <div class="rc-word">
+        <span>${word}</span>
+        <span class="rc-toggle"><i class="fas fa-chevron-down"></i></span>
+      </div>
+      <div class="rc-detail" id="${id}_detail">
+        <div style="color:var(--muted);font-style:italic;font-size:0.8rem">Click to look up...</div>
+      </div>
+    </div>`;
+  }
+}
+
+// ── TTS HELPERS FOR REVIEW CARDS (avoids quote conflicts) ──
+function rcSpeak(btn) {
+  const word = btn.getAttribute('data-tts');
+  const exSpan = btn.parentElement.querySelector('.rc-ex-text');
+  const ex = exSpan ? exSpan.textContent.trim() : '';
+  const text = ex ? word + '. ' + ex : word;
+  say(text);
+}
+function rcSpeakEl(btn) {
+  const text = btn.getAttribute('data-tts-text') || btn.getAttribute('data-tts') || '';
+  say(text);
+}
+
+function toggleCard(id) {
+  const card = document.getElementById(id);
+  card.classList.toggle('open');
+  const icon = card.querySelector('.rc-toggle i');
+  if (icon) icon.className = card.classList.contains('open') ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+}
+
+async function expandPassageCard(id, word) {
+  const card = document.getElementById(id);
+  const detail = document.getElementById(id + '_detail');
+  if (card.classList.contains('open')) { toggleCard(id); return; }
+  card.classList.add('open');
+  const icon = card.querySelector('.rc-toggle i');
+  if (icon) icon.className = 'fas fa-chevron-up';
+  detail.innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:0.8rem"><i class="fas fa-spinner fa-spin"></i> Looking up...</div>';
+  try {
+    const res = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + word);
+    if (!res.ok) throw 0;
+    const data = await res.json();
+    const m = data[0]?.meanings?.[0];
+    const def = m?.definitions?.[0]?.definition || 'No definition found.';
+    const pos = m?.partOfSpeech || '';
+    const ex = m?.definitions?.[0]?.example || '';
+    const safe = (word + '. ' + def + (ex ? '. ' + ex : '')).replace(/'/g,"\'");
+    detail.innerHTML = `
+      <div class="rc-pos">${pos}</div>
+      <div class="rc-en">${def}</div>
+      ${ex ? `<div class="rc-ex"><button class="rc-tts" data-tts="${word}" onclick="event.stopPropagation();rcSpeak(this)"><i class="fas fa-volume-high"></i></button><span class="rc-ex-text">${ex}</span></div>` : ''}`;
+  } catch {
+    detail.innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:0.8rem">Definition not found.</div>';
+  }
+}
+
+// ══════════════════════════════════════════════
+// END SCREEN
+// ══════════════════════════════════════════════
+function showEnd() {
+  document.getElementById('quizArea').style.display = 'none';
+  const end = document.getElementById('endScreen');
+  end.classList.add('show');
+  document.getElementById('progFill').style.width = '100%';
+  document.getElementById('progLabel').textContent = 'Quiz complete!';
+  document.getElementById('progPct').textContent = '100%';
+
+  const pct = Math.round(score / questions.length * 100);
+  document.getElementById('endScore').textContent = `${score}/${questions.length}`;
+  document.getElementById('endPct').textContent = `${pct}% correct`;
+
+  let icon, msg, cn;
+  if (pct === 100) { icon='🏆'; msg="Perfect score! Absolutely outstanding vocabulary mastery."; cn="滿分！詞彙能力非常出色！"; }
+  else if (pct >= 80) { icon='🌟'; msg="Excellent work! You have a strong command of these SAT words."; cn="表現優異！對這些SAT單字掌握得很好。"; }
+  else if (pct >= 60) { icon='📚'; msg="Good effort! Review the words you missed and try again."; cn="表現不錯！複習答錯的單字再試一次。"; }
+  else { icon='💪'; msg="Keep practising — every attempt builds stronger vocabulary!"; cn="繼續加油！每次練習都能讓詞彙更進步。"; }
+  document.getElementById('endIcon').textContent = icon;
+  document.getElementById('endMsg').textContent = msg;
+  document.getElementById('endCn').textContent = cn;
+
+  // ── WRONG WORDS — rich review cards ──
+  const wb = document.getElementById('wrongBox');
+  if (wrongWords.length === 0) {
+    wb.innerHTML = `<div class="review-section"><div class="review-section-title" style="color:var(--correct)"><i class="fas fa-check-circle"></i> Perfect — no words to review!</div></div>`;
+  } else {
+    const cards = wrongWords.map(w => makeReviewCard(w, 'wrong-card')).join('');
+    wb.innerHTML = `
+      <div class="review-section">
+        <div class="review-section-title">
+          <i class="fas fa-circle-exclamation" style="color:var(--wrong)"></i>
+          Words to review — ${wrongWords.length} missed
+          <span style="font-size:0.75rem;color:var(--muted);font-weight:400;margin-left:4px">(click any word to expand)</span>
+        </div>
+        <div class="review-cards">${cards}</div>
+        <div style="margin-top:10px;font-size:0.78rem;color:var(--muted)">These words are included in your teacher's results report.</div>
+      </div>`;
+  }
+
+  // ── PASSAGE CLICKED WORDS — additional vocab discovered ──
+  const pb = document.getElementById('passageBox');
+  const newWords = passageClickedWords.filter(w => w.length > 2);
+  if (newWords.length > 0) {
+    const cards = newWords.map(w => makeReviewCard(w, 'passage-card')).join('');
+    pb.innerHTML = `
+      <div class="review-section">
+        <div class="review-section-title">
+          <i class="fas fa-magnifying-glass" style="color:var(--accent)"></i>
+          Additional new words found in the passages — ${newWords.length} words
+          <span style="font-size:0.75rem;color:var(--muted);font-weight:400;margin-left:4px">(click any word to expand)</span>
+        </div>
+        <div class="review-cards">${cards}</div>
+      </div>`;
+  } else {
+    pb.innerHTML = '';
+  }
+}
+
+// ══════════════════════════════════════════════
+// SUBMIT SCORE TO GOOGLE SHEETS
+// ══════════════════════════════════════════════
+async function submitScore() {
+  const name = document.getElementById('studentName').value.trim();
+  const statusEl = document.getElementById('submitStatus');
+  if (!name) {
+    statusEl.className = 'submit-status err';
+    statusEl.textContent = '⚠ Please enter your name before submitting.';
+    return;
+  }
+  if (GOOGLE_SCRIPT_URL === "PASTE_YOUR_GOOGLE_SCRIPT_URL_HERE") {
+    statusEl.className = 'submit-status err';
+    statusEl.innerHTML = '⚠ Teacher setup not complete yet. Ask your teacher to configure the score collection link.';
+    return;
+  }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting…';
+  statusEl.className = 'submit-status';
+
+  const payload = {
+    studentName: name,
+    week: 15,
+    score: score,
+    total: questions.length,
+    percent: Math.round(score / questions.length * 100),
+    wrongWords: wrongWords.join(', ') || 'none',
+    passageWords: passageClickedWords.join(', ') || 'none',
+    timestamp: new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })
+  };
+
+  try {
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    statusEl.className = 'submit-status ok';
+    statusEl.innerHTML = `<i class="fas fa-check-circle"></i> Score submitted successfully! Your teacher can now see your results.`;
+    btn.innerHTML = '<i class="fas fa-check"></i> Submitted';
+    document.getElementById('studentName').disabled = true;
+  } catch (e) {
+    statusEl.className = 'submit-status err';
+    statusEl.innerHTML = '⚠ Submission failed. Please check your internet connection and try again.';
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit';
+  }
+}
+
+// ══════════════════════════════════════════════
+// RESTART
+// ══════════════════════════════════════════════
+function restart() {
+  cur = 0; score = 0; wrongWords = []; passageClickedWords = [];
+  document.getElementById('endScreen').classList.remove('show');
+  document.getElementById('quizArea').style.display = 'block';
+  document.getElementById('studentName').value = '';
+  document.getElementById('studentName').disabled = false;
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').innerHTML = '<i class="fas fa-paper-plane"></i> Submit';
+  document.getElementById('submitStatus').className = 'submit-status';
+  render();
+}
+
+// Init
+speechSynthesis.getVoices();
+render();
+</script>
+</body>
+</html>
