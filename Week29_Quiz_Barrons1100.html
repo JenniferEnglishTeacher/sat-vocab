@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 29 — Barron's 1100 SAT Vocabulary Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+  --primary: #1a3a5c;
+  --primary-light: #2a5080;
+  --accent: #c8962e;
+  --accent-light: #f0c060;
+  --correct: #2d7a4f;
+  --correct-bg: #e8f5ee;
+  --wrong: #b53a2f;
+  --wrong-bg: #fdecea;
+  --clue: #fff3a3;
+  --surface: #f5f3ef;
+  --card: #ffffff;
+  --text: #1c1c1c;
+  --muted: #6b7280;
+  --border: #ddd8d0;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 16px rgba(0,0,0,0.10);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text); min-height: 100vh; }
+
+/* ── HEADER ── */
+.header {
+  background: var(--primary);
+  color: #fff;
+  padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.header-logo { font-family: 'Playfair Display', serif; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+.header-logo i { color: var(--accent-light); }
+.score-pill {
+  background: rgba(255,255,255,0.13); border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 20px; padding: 5px 14px; font-size: 0.82rem; font-weight: 500;
+  display: flex; align-items: center; gap: 7px;
+}
+.score-pill span { color: var(--accent-light); font-weight: 700; font-size: 0.95rem; }
+
+/* ── LAYOUT ── */
+.wrap { max-width: 800px; margin: 0 auto; padding: 24px 16px 60px; }
+
+/* ── PROGRESS ── */
+.prog-row { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted); font-weight: 500; margin-bottom: 7px; }
+.prog-track { background: var(--border); border-radius: 99px; height: 5px; margin-bottom: 22px; }
+.prog-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width .4s ease; }
+
+/* ── CARD ── */
+.card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 16px; animation: up .3s ease; }
+@keyframes up { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+
+.card-head {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: #fff; padding: 12px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.q-num { font-family: 'Playfair Display', serif; font-size: 0.9rem; opacity: .9; }
+.tts-btn {
+  background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.28);
+  color: #fff; border-radius: 18px; padding: 5px 12px;
+  font-size: 0.78rem; font-family: 'DM Sans', sans-serif; font-weight: 500;
+  cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background .2s;
+}
+.tts-btn:hover { background: rgba(255,255,255,0.26); }
+.tts-btn.on { background: rgba(200,150,46,0.45); }
+
+.card-body { padding: 22px 22px 18px; }
+
+/* ── WORD HELPER ── */
+.helper {
+  background: #fffbf0; border: 1px solid #f0d080; border-left: 4px solid var(--accent);
+  border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px;
+  font-size: 0.86rem; line-height: 1.5; display: none; animation: fadein .2s;
+}
+.helper.show { display: block; }
+@keyframes fadein { from{opacity:0} to{opacity:1} }
+.helper-word { font-weight: 700; color: var(--accent); font-size: 0.95rem; margin-bottom: 3px; }
+.helper-pos { color: var(--muted); font-style: italic; font-size: 0.8rem; }
+
+/* ── PASSAGE ── */
+.passage { font-size: 1rem; line-height: 1.85; font-weight: 300; margin-bottom: 20px; }
+.passage .w {
+  cursor: pointer; border-bottom: 1px dashed rgba(26,58,92,0.22);
+  border-radius: 2px; padding: 0 1px; transition: color .15s, background .15s;
+}
+.passage .w:hover { color: var(--primary); background: rgba(26,58,92,0.06); border-bottom-color: var(--primary); }
+.passage .blank { font-weight: 700; font-family: 'Playfair Display', serif; color: var(--primary); border-bottom: 2px solid var(--primary); letter-spacing: .04em; cursor: default; padding: 0 2px; }
+.passage .clue { background: var(--clue); border-radius: 3px; padding: 0 3px; border-bottom: none; }
+
+/* ── OPTIONS ── */
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 16px; }
+@media(max-width:480px){ .opts { grid-template-columns: 1fr; } }
+.opt {
+  background: var(--surface); border: 2px solid var(--border);
+  border-radius: var(--radius-sm); padding: 11px 14px;
+  font-size: 0.9rem; font-family: 'DM Sans', sans-serif; font-weight: 500;
+  cursor: pointer; text-align: left; transition: border-color .2s, background .2s, transform .1s;
+  display: flex; align-items: center; gap: 9px; color: var(--text);
+}
+.opt:hover:not(:disabled) { border-color: var(--primary); background: rgba(26,58,92,0.05); transform: translateY(-1px); }
+.opt-lbl { width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 0.72rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.opt.correct { border-color: var(--correct); background: var(--correct-bg); color: var(--correct); }
+.opt.correct .opt-lbl { background: var(--correct); }
+.opt.wrong { border-color: var(--wrong); background: var(--wrong-bg); color: var(--wrong); }
+.opt.wrong .opt-lbl { background: var(--wrong); }
+.opt:disabled { cursor: default; transform: none; }
+
+/* ── FEEDBACK ── */
+.feedback { display: none; border-top: 1px solid var(--border); padding-top: 16px; margin-top: 4px; animation: fadein .3s; }
+.feedback.show { display: block; }
+.fb-title { font-size: 0.76rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; margin-bottom: 10px; }
+.fb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media(max-width:480px){ .fb-grid { grid-template-columns: 1fr; } }
+.fb-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 0.82rem; }
+.fb-item.is-ans { border-color: var(--correct); background: var(--correct-bg); }
+.fb-word { font-weight: 700; font-size: 0.92rem; color: var(--primary); margin-bottom: 2px; display: flex; justify-content: space-between; align-items: center; }
+.fb-tts { background: none; border: none; color: var(--muted); cursor: pointer; padding: 2px; font-size: 0.85rem; transition: color .2s; }
+.fb-tts:hover { color: var(--primary); }
+.fb-en { color: var(--text); margin-bottom: 3px; }
+.fb-cn { color: #6a4c93; font-size: 0.83rem; margin-bottom: 5px; }
+.fb-ex { font-size: 0.78rem; color: var(--muted); font-style: italic; border-top: 1px solid var(--border); padding-top: 5px; margin-top: 3px; display: flex; align-items: flex-start; gap: 5px; }
+.fb-ex-tts { background: none; border: none; color: var(--muted); cursor: pointer; padding: 0; font-size: 0.82rem; flex-shrink: 0; transition: color .2s; }
+.fb-ex-tts:hover { color: var(--accent); }
+
+/* ── NEXT BTN ── */
+.next-btn {
+  display: none; margin-top: 16px; width: 100%;
+  background: var(--primary); color: #fff; border: none;
+  border-radius: var(--radius-sm); padding: 12px 24px;
+  font-size: 0.92rem; font-family: 'DM Sans', sans-serif; font-weight: 600;
+  cursor: pointer; align-items: center; justify-content: center; gap: 7px;
+  transition: background .2s, transform .1s;
+}
+.next-btn.show { display: flex; }
+.next-btn:hover { background: var(--primary-light); transform: translateY(-1px); }
+
+.hint { font-size: 0.75rem; color: var(--muted); text-align: center; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+
+/* ── END SCREEN ── */
+.end { display: none; background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 40px 28px; text-align: center; animation: up .4s ease; }
+.end.show { display: block; }
+.end-icon { font-size: 2.8rem; margin-bottom: 14px; }
+.end-title { font-family: 'Playfair Display', serif; font-size: 1.7rem; color: var(--primary); margin-bottom: 6px; }
+.end-score { font-size: 3.2rem; font-weight: 700; color: var(--accent); line-height: 1; margin: 18px 0 6px; }
+.end-pct { color: var(--muted); font-size: 0.88rem; margin-bottom: 20px; }
+.end-msg { font-size: 0.97rem; margin-bottom: 5px; line-height: 1.6; }
+.end-cn { color: #6a4c93; font-size: 0.93rem; margin-bottom: 28px; }
+
+/* ── WRONG WORDS LIST ── */
+.wrong-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 24px; text-align: left; }
+.wrong-box-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+.wrong-tag { display: inline-block; background: var(--wrong-bg); border: 1px solid #f0c0bb; color: var(--wrong); border-radius: 20px; padding: 3px 11px; font-size: 0.82rem; font-weight: 600; margin: 3px; }
+.correct-note { font-size: 0.82rem; color: var(--correct); font-weight: 500; }
+
+/* ── SUBMIT FORM ── */
+.submit-section { background: #f0f8ff; border: 1px solid #b8d8f0; border-radius: var(--radius-sm); padding: 18px 20px; margin-bottom: 20px; text-align: left; }
+.submit-title { font-weight: 600; color: var(--primary); margin-bottom: 4px; font-size: 0.95rem; }
+.submit-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 14px; }
+.submit-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.submit-input {
+  flex: 1; min-width: 180px; padding: 10px 14px;
+  border: 2px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 0.92rem; font-family: 'DM Sans', sans-serif;
+  color: var(--text); background: #fff; transition: border-color .2s;
+}
+.submit-input:focus { outline: none; border-color: var(--primary); }
+.submit-btn {
+  background: var(--primary); color: #fff; border: none;
+  border-radius: var(--radius-sm); padding: 10px 22px;
+  font-size: 0.92rem; font-family: 'DM Sans', sans-serif; font-weight: 600;
+  cursor: pointer; transition: background .2s; white-space: nowrap;
+  display: flex; align-items: center; gap: 7px;
+}
+.submit-btn:hover:not(:disabled) { background: var(--primary-light); }
+.submit-btn:disabled { opacity: .6; cursor: default; }
+.submit-status { margin-top: 10px; font-size: 0.84rem; display: none; padding: 8px 12px; border-radius: var(--radius-sm); }
+.submit-status.ok { display: block; background: var(--correct-bg); color: var(--correct); border: 1px solid #b0e0c0; }
+.submit-status.err { display: block; background: var(--wrong-bg); color: var(--wrong); border: 1px solid #f0c0bb; }
+
+/* ── RESTART ── */
+.restart-btn {
+  background: var(--primary); color: #fff; border: none; border-radius: var(--radius-sm);
+  padding: 13px 32px; font-size: 0.97rem; font-family: 'DM Sans', sans-serif; font-weight: 600;
+  cursor: pointer; transition: background .2s;
+}
+.restart-btn:hover { background: var(--primary-light); }
+
+/* ── REVIEW WORD CARDS (end screen) ── */
+.review-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 20px; text-align: left; }
+.review-section-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.review-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.review-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; cursor: pointer; transition: border-color .2s, box-shadow .2s; }
+.review-card:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(26,58,92,0.1); }
+.review-card.wrong-card { border-left: 3px solid var(--wrong); }
+.review-card.passage-card { border-left: 3px solid var(--accent); }
+.review-card .rc-word { font-weight: 700; font-size: 0.95rem; color: var(--primary); display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.review-card .rc-pos { font-size: 0.75rem; color: var(--muted); font-style: italic; margin-bottom: 4px; }
+.review-card .rc-en { font-size: 0.82rem; color: var(--text); margin-bottom: 4px; line-height: 1.4; }
+.review-card .rc-cn { font-size: 0.82rem; color: #6a4c93; margin-bottom: 6px; }
+.review-card .rc-ex { font-size: 0.78rem; color: var(--muted); font-style: italic; border-top: 1px solid var(--border); padding-top: 6px; margin-top: 4px; display: flex; align-items: flex-start; gap: 5px; line-height: 1.45; }
+.rc-tts { background: none; border: none; cursor: pointer; color: var(--muted); padding: 2px 4px; font-size: 0.88rem; transition: color .2s; flex-shrink: 0; }
+.rc-tts:hover { color: var(--accent); }
+.review-card .rc-detail { display: none; }
+.review-card.open .rc-detail { display: block; }
+.review-card .rc-toggle { color: var(--accent); font-size: 0.75rem; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     ⚙️  TEACHER SETUP — READ THIS FIRST
+     ══════════════════════════════════════════════
+  STEP 1: Follow the Google Sheets setup guide
+          included with this file to get your
+          GOOGLE_SCRIPT_URL value.
+
+  STEP 2: Paste your URL on the line below
+          replacing the placeholder text.
+
+  STEP 3: Save the file. Done!
+
+  Students' names + scores + wrong words will
+  then appear in your Google Sheet automatically.
+═══════════════════════════════════════════════ -->
+<script>
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwN0JbQwvPmsAphNhq9F0nWY8s5Ttr_NLeVofihnI1BqNU_2L4-aa3SRavPkEyUKC7trg/exec";
+</script>
+
+<header class="header">
+  <div class="header-logo">
+    <i class="fas fa-book-open-reader"></i>
+    Week 29 · Barron’s 1100 SAT Vocab
+  </div>
+  <div class="score-pill">
+    <i class="fas fa-star" style="color:var(--accent-light)"></i>
+    Score: <span id="scoreDisp">0</span> / <span id="totalDisp">20</span>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="prog-row">
+    <span id="progLabel">Question 1 of 20</span>
+    <span id="progPct">0%</span>
+  </div>
+  <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+
+  <!-- Quiz area -->
+  <div id="quizArea">
+    <div class="card" id="qCard">
+      <div class="card-head">
+        <div class="q-num" id="qNum">Question 1</div>
+        <button class="tts-btn" id="ttsBtn" onclick="speakPassage()">
+          <i class="fas fa-volume-high"></i> Listen
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="helper" id="helper">
+          <div class="helper-word" id="helperWord"></div>
+          <div class="helper-pos" id="helperPos"></div>
+          <div id="helperDef"></div>
+          <div id="helperCn" style="color:#6a4c93;font-size:0.85rem;margin-top:4px;"></div>
+        </div>
+        <div class="passage" id="passage"></div>
+        <div class="opts" id="opts"></div>
+        <div class="feedback" id="feedback">
+          <div class="fb-title"><i class="fas fa-lightbulb"></i> &nbsp;Vocabulary feedback — all 4 options</div>
+          <div class="fb-grid" id="fbGrid"></div>
+        </div>
+        <button class="next-btn" id="nextBtn" onclick="nextQ()">
+          Next question <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+    <div class="hint"><i class="fas fa-hand-pointer"></i> Tap any word in the passage to look it up</div>
+  </div>
+
+  <!-- End screen -->
+  <div class="end" id="endScreen">
+    <div class="end-icon" id="endIcon">🎓</div>
+    <div class="end-title">Quiz complete!</div>
+    <div class="end-score" id="endScore"></div>
+    <div class="end-pct" id="endPct"></div>
+    <div class="end-msg" id="endMsg"></div>
+    <div class="end-cn" id="endCn"></div>
+
+    <!-- Wrong words summary -->
+    <div id="wrongBox"></div>
+    <!-- Passage words students looked up -->
+    <div id="passageBox"></div>
+
+    <!-- Score submission -->
+    <div class="submit-section" id="submitSection">
+      <div class="submit-title"><i class="fas fa-paper-plane"></i> &nbsp;Send your score to the teacher</div>
+      <div class="submit-sub">Enter your name and tap Submit — your teacher will see your results automatically.</div>
+      <div class="submit-row">
+        <input class="submit-input" id="studentName" type="text" placeholder="Your name (e.g. 王小明)" maxlength="60">
+        <button class="submit-btn" id="submitBtn" onclick="submitScore()">
+          <i class="fas fa-paper-plane"></i> Submit
+        </button>
+      </div>
+      <div class="submit-status" id="submitStatus"></div>
+    </div>
+
+    <button class="restart-btn" onclick="restart()">
+      <i class="fas fa-rotate-right"></i> Try again
+    </button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// VOCABULARY DATA — Week 1 (Barron's 1100)
+// ══════════════════════════════════════════════
+const vocab = {
+  "laconic": { pos:"adj.", en:"Expressing much in few words", cn:"簡潔的；言簡意賅的", ex:"Laconic means: Expressing much in few words" },
+  "throng": { pos:"n.", en:"A crowd; great number of people", cn:"人群；群眾", ex:"Throng means: A crowd; great number of people" },
+  "intrepid": { pos:"adj.", en:"Brave, fearless in the face of danger", cn:"無畏的；勇敢的", ex:"Intrepid means: Brave, fearless in the face of danger" },
+  "accost": { pos:"v.", en:"To approach and speak to boldly or aggressively", cn:"搭訕；攔住說話", ex:"Accost means: To approach and speak to boldly or aggressively" },
+  "reticent": { pos:"adj.", en:"Inclined to be reserved or silent", cn:"沉默寡言的；保守的", ex:"Reticent means: Inclined to be reserved or silent" },
+  "furtive": { pos:"adj.", en:"Secret, stealthy, done surreptitiously", cn:"偷偷摸摸的；鬼鬼祟祟的", ex:"Furtive means: Secret, stealthy, done surreptitiously" },
+  "felon": { pos:"n.", en:"A person guilty of a serious crime", cn:"重罪犯", ex:"Felon means: A person guilty of a serious crime" },
+  "plethora": { pos:"n.", en:"An excess or overabundance", cn:"過多；大量", ex:"Plethora means: An excess or overabundance" },
+  "hapless": { pos:"adj.", en:"Unfortunate, unlucky, deserving of pity", cn:"倒霉的；不幸的", ex:"Hapless means: Unfortunate, unlucky, deserving of pity" },
+  "irate": { pos:"adj.", en:"Angry, incensed, extremely upset", cn:"暴怒的；憤慨的", ex:"Irate means: Angry, incensed, extremely upset" },
+  "pretext": { pos:"n.", en:"A false reason given to justify an action", cn:"藉口；托辭", ex:"Pretext means: A false reason given to justify an action" },
+  "fabricate": { pos:"v.", en:"To invent or construct something false", cn:"捏造；偽造", ex:"Fabricate means: To invent or construct something false" },
+  "adroit": { pos:"adj.", en:"Skillful, clever, dexterous", cn:"熟練的；機敏的", ex:"Adroit means: Skillful, clever, dexterous" },
+  "gesticulate": { pos:"v.", en:"To move the arms energetically while speaking", cn:"打手勢；揮動手臂", ex:"Gesticulate means: To move the arms energetically while speaking" },
+  "vigilant": { pos:"adj.", en:"Watchful, alert, on the lookout", cn:"警惕的；警覺的", ex:"Vigilant means: Watchful, alert, on the lookout" },
+  "avid": { pos:"adj.", en:"Eager, enthusiastic, deeply interested", cn:"渴望的；熱切的", ex:"Avid means: Eager, enthusiastic, deeply interested" },
+  "cajole": { pos:"v.", en:"To coax, persuade using flattery", cn:"哄騙；用甜言蜜語說服", ex:"Cajole means: To coax, persuade using flattery" },
+  "rudimentary": { pos:"adj.", en:"Elementary, basic, undeveloped", cn:"基本的；初步的", ex:"Rudimentary means: Elementary, basic, undeveloped" },
+  "enhance": { pos:"v.", en:"To intensify, improve, heighten", cn:"提高；增強；改善", ex:"Enhance means: To intensify, improve, heighten" },
+  "nuance": { pos:"n.", en:"A slight variation in meaning, tone, or colour", cn:"細微差別；微妙之處", ex:"Nuance means: A slight variation in meaning, tone, or colour" },
+  "bristle": { pos:"v.", en:"To stiffen with anger or become irritated", cn:"發怒；豎起", ex:"Bristle means: To stiffen with anger or become irritated" },
+  "caustic": { pos:"adj.", en:"Sarcastic, biting, corrosive", cn:"刻薄的；腐蝕性的", ex:"Caustic means: Sarcastic, biting, corrosive" },
+  "cessation": { pos:"n.", en:"A stopping, end, or pause", cn:"停止；中止", ex:"Cessation means: A stopping, end, or pause" },
+  "condolence": { pos:"n.", en:"An expression of sympathy for grief", cn:"哀悼；慰問", ex:"Condolence means: An expression of sympathy for grief" },
+  "dupe": { pos:"n.", en:"A person easily tricked or deceived", cn:"易受騙的人；被欺騙者", ex:"Dupe means: A person easily tricked or deceived" },
+  "euphemism": { pos:"n.", en:"A mild or indirect expression used instead of a harsh one", cn:"委婉語；婉轉說法", ex:"Euphemism means: A mild or indirect expression used instead of a harsh one" },
+  "inadvertent": { pos:"adj.", en:"Unintentional, accidental", cn:"無意的；非故意的", ex:"Inadvertent means: Unintentional, accidental" },
+  "incipient": { pos:"adj.", en:"Just beginning to exist or appear", cn:"初期的；開始的", ex:"Incipient means: Just beginning to exist or appear" },
+  "incongruous": { pos:"adj.", en:"Out of place, not fitting the surroundings", cn:"不協調的；不相稱的", ex:"Incongruous means: Out of place, not fitting the surroundings" },
+  "infamous": { pos:"adj.", en:"Having a terrible reputation", cn:"臭名昭著的；聲名狼藉的", ex:"Infamous means: Having a terrible reputation" },
+  "jostle": { pos:"v.", en:"To push, bump, or elbow roughly", cn:"推擠；碰撞", ex:"Jostle means: To push, bump, or elbow roughly" },
+  "lackluster": { pos:"adj.", en:"Lacking brilliance or vitality, dull", cn:"缺乏光澤的；平淡的", ex:"Lackluster means: Lacking brilliance or vitality, dull" },
+  "loathe": { pos:"v.", en:"To hate, detest intensely", cn:"厭惡；憎恨", ex:"Loathe means: To hate, detest intensely" },
+  "mundane": { pos:"adj.", en:"Ordinary, of the world, lacking excitement", cn:"平凡的；世俗的", ex:"Mundane means: Ordinary, of the world, lacking excitement" },
+  "ominous": { pos:"adj.", en:"Threatening, suggesting something bad", cn:"不祥的；凶兆的", ex:"Ominous means: Threatening, suggesting something bad" },
+  "reprimand": { pos:"v.", en:"To sharply disapprove or criticise officially", cn:"譴責；申斥", ex:"Reprimand means: To sharply disapprove or criticise officially" },
+  "repudiate": { pos:"v.", en:"To reject, refuse, or disown", cn:"拒絕；否認；與…斷絕關係", ex:"Repudiate means: To reject, refuse, or disown" },
+  "stipulate": { pos:"v.", en:"To specify as a required condition", cn:"規定；約定", ex:"Stipulate means: To specify as a required condition" },
+  "tremulous": { pos:"adj.", en:"Quivering, shaking, timid", cn:"顫抖的；膽怯的", ex:"Tremulous means: Quivering, shaking, timid" },
+  "wrest": { pos:"v.", en:"To take away by force, to twist", cn:"奪取；費力取得", ex:"Wrest means: To take away by force, to twist" },
+  "alacrity": { pos:"n.", en:"Brisk and cheerful readiness", cn:"敏捷；活潑；欣然", ex:"Alacrity means: Brisk and cheerful readiness" },
+  "aspirant": { pos:"n.", en:"A person who eagerly seeks advancement", cn:"渴望者；有志者", ex:"Aspirant means: A person who eagerly seeks advancement" },
+  "belligerent": { pos:"adj.", en:"Hostile, aggressive, eager to fight", cn:"好戰的；好鬥的", ex:"Belligerent means: Hostile, aggressive, eager to fight" },
+  "belittle": { pos:"v.", en:"To make seem less important, to dismiss", cn:"貶低；輕視", ex:"Belittle means: To make seem less important, to dismiss" },
+  "brash": { pos:"adj.", en:"Impudent, bold, overconfident", cn:"傲慢的；魯莽的", ex:"Brash means: Impudent, bold, overconfident" },
+  "castigate": { pos:"v.", en:"To punish or criticise harshly", cn:"嚴懲；苛評", ex:"Castigate means: To punish or criticise harshly" },
+  "disdain": { pos:"n.", en:"Contempt, scorn for something beneath one", cn:"蔑視；輕蔑", ex:"Disdain means: Contempt, scorn for something beneath one" },
+  "dregs": { pos:"n.", en:"The most worthless part, the residue", cn:"渣滓；糟粕", ex:"Dregs means: The most worthless part, the residue" },
+  "feint": { pos:"n.", en:"A false attack intended to deceive", cn:"佯攻；假動作", ex:"Feint means: A false attack intended to deceive" },
+  "frenzy": { pos:"n.", en:"Wild excitement or uncontrolled activity", cn:"狂熱；狂暴", ex:"Frenzy means: Wild excitement or uncontrolled activity" },
+  "intimidate": { pos:"v.", en:"To overawe, frighten into submission", cn:"恐嚇；威嚇", ex:"Intimidate means: To overawe, frighten into submission" },
+  "laceration": { pos:"n.", en:"A jagged wound or tear", cn:"撕裂傷；裂傷", ex:"Laceration means: A jagged wound or tear" },
+  "octogenarian": { pos:"n.", en:"A person in their eighties", cn:"八十多歲的人", ex:"Octogenarian means: A person in their eighties" },
+  "promulgate": { pos:"v.", en:"To make known officially, to announce", cn:"公布；頒布", ex:"Promulgate means: To make known officially, to announce" },
+  "pugnacious": { pos:"adj.", en:"Eager to fight, quarrelsome", cn:"好鬥的；爭強好勝的", ex:"Pugnacious means: Eager to fight, quarrelsome" },
+  "scoff": { pos:"v.", en:"To speak with contempt or mock", cn:"嘲笑；嘲弄", ex:"Scoff means: To speak with contempt or mock" },
+  "scurrilous": { pos:"adj.", en:"Coarse, vulgar, abusive", cn:"粗俗的；下流的", ex:"Scurrilous means: Coarse, vulgar, abusive" },
+  "solace": { pos:"n.", en:"Comfort or consolation in distress", cn:"安慰；慰藉", ex:"Solace means: Comfort or consolation in distress" },
+  "sordid": { pos:"adj.", en:"Dirty, base, morally degraded", cn:"骯髒的；卑鄙的", ex:"Sordid means: Dirty, base, morally degraded" },
+  "tangible": { pos:"adj.", en:"Having actual form, concrete, real", cn:"有形的；實體的；可感知的", ex:"Tangible means: Having actual form, concrete, real" },
+  "acrimonious": { pos:"adj.", en:"Bitter, sharp, harsh in manner", cn:"嚴厲的；辛辣的", ex:"Acrimonious means: Bitter, sharp, harsh in manner" },
+  "admonish": { pos:"v.", en:"To warn or reprove gently but seriously", cn:"警告；勸誡", ex:"Admonish means: To warn or reprove gently but seriously" },
+  "clandestine": { pos:"adj.", en:"Secret, undercover, kept hidden", cn:"秘密的；暗中的", ex:"Clandestine means: Secret, undercover, kept hidden" },
+  "concur": { pos:"v.", en:"To agree, to act in harmony", cn:"同意；一致", ex:"Concur means: To agree, to act in harmony" },
+  "construe": { pos:"v.", en:"To make a deduction, to interpret", cn:"解釋；推斷", ex:"Construe means: To make a deduction, to interpret" },
+  "culprit": { pos:"n.", en:"The person guilty of an offence", cn:"罪犯；肇事者", ex:"Culprit means: The person guilty of an offence" },
+  "distraught": { pos:"adj.", en:"Confused and upset, deeply distressed", cn:"心煩意亂的；極度苦惱的", ex:"Distraught means: Confused and upset, deeply distressed" },
+  "duplicity": { pos:"n.", en:"Cunning deception, double-dealing", cn:"表裡不一；欺騙", ex:"Duplicity means: Cunning deception, double-dealing" },
+  "duress": { pos:"n.", en:"Compulsion by threat, forcible restraint", cn:"脅迫；強制", ex:"Duress means: Compulsion by threat, forcible restraint" },
+  "egregious": { pos:"adj.", en:"Remarkably bad, outstandingly offensive", cn:"極壞的；令人震驚的", ex:"Egregious means: Remarkably bad, outstandingly offensive" },
+  "elicit": { pos:"v.", en:"To draw forth or bring out", cn:"引出；引起", ex:"Elicit means: To draw forth or bring out" },
+  "ethics": { pos:"n.", en:"The moral principles governing conduct", cn:"道德規範；倫理", ex:"Ethics means: The moral principles governing conduct" },
+  "flagrant": { pos:"adj.", en:"Outrageous, conspicuously bad", cn:"公然的；惡名昭彰的", ex:"Flagrant means: Outrageous, conspicuously bad" },
+  "impunity": { pos:"n.", en:"Freedom from punishment or consequences", cn:"免受懲罰；不受制裁", ex:"Impunity means: Freedom from punishment or consequences" },
+  "inane": { pos:"adj.", en:"Silly, empty of intelligence or meaning", cn:"愚蠢的；無意義的", ex:"Inane means: Silly, empty of intelligence or meaning" },
+  "inexorable": { pos:"adj.", en:"Inflexible, impossible to stop", cn:"無情的；不可阻擋的", ex:"Inexorable means: Inflexible, impossible to stop" },
+  "paucity": { pos:"n.", en:"Scarcity, a lack or shortage", cn:"缺乏；不足", ex:"Paucity means: Scarcity, a lack or shortage" },
+  "pernicious": { pos:"adj.", en:"Harmful, causing subtle damage", cn:"有害的；致命的", ex:"Pernicious means: Harmful, causing subtle damage" },
+  "rampant": { pos:"adj.", en:"Going unchecked, widespread, unrestrained", cn:"猖獗的；盛行的", ex:"Rampant means: Going unchecked, widespread, unrestrained" },
+  "tolerate": { pos:"v.", en:"To put up with, allow, bear", cn:"容忍；忍受", ex:"Tolerate means: To put up with, allow, bear" },
+  "affluent": { pos:"adj.", en:"Rich, having abundant wealth", cn:"富裕的", ex:"Affluent means: Rich, having abundant wealth" },
+  "chagrin": { pos:"n.", en:"A feeling of disappointment or humiliation", cn:"懊惱；羞愧", ex:"Chagrin means: A feeling of disappointment or humiliation" },
+  "confidant": { pos:"n.", en:"A person trusted with private matters", cn:"知己；心腹", ex:"Confidant means: A person trusted with private matters" },
+  "consternation": { pos:"n.", en:"Dismay, astonishment causing anxiety", cn:"驚愕；震驚", ex:"Consternation means: Dismay, astonishment causing anxiety" },
+  "deride": { pos:"v.", en:"To ridicule, scoff at, mock", cn:"嘲笑；嘲弄", ex:"Deride means: To ridicule, scoff at, mock" },
+  "discern": { pos:"v.", en:"To perceive, distinguish, or recognise", cn:"辨別；識別", ex:"Discern means: To perceive, distinguish, or recognise" },
+  "disparage": { pos:"v.", en:"To discredit or belittle someone", cn:"貶低；詆毀", ex:"Disparage means: To discredit or belittle someone" },
+  "dubious": { pos:"adj.", en:"Doubtful, uncertain, suspect", cn:"可疑的；不確定的", ex:"Dubious means: Doubtful, uncertain, suspect" },
+  "eschew": { pos:"v.", en:"To avoid, abstain from deliberately", cn:"避開；戒除", ex:"Eschew means: To avoid, abstain from deliberately" },
+  "feasible": { pos:"adj.", en:"Possible, capable of being done", cn:"可行的；可能的", ex:"Feasible means: Possible, capable of being done" },
+  "fiasco": { pos:"n.", en:"A complete and humiliating failure", cn:"慘敗；大失敗", ex:"Fiasco means: A complete and humiliating failure" },
+  "laudable": { pos:"adj.", en:"Deserving praise, commendable", cn:"值得讚賞的；可嘉的", ex:"Laudable means: Deserving praise, commendable" },
+  "masticate": { pos:"v.", en:"To chew food thoroughly", cn:"咀嚼", ex:"Masticate means: To chew food thoroughly" },
+  "obsolescence": { pos:"n.", en:"The process of becoming outdated", cn:"荒廢；淘汰", ex:"Obsolescence means: The process of becoming outdated" },
+  "perfunctory": { pos:"adj.", en:"Done without care, superficially", cn:"敷衍的；馬虎的", ex:"Perfunctory means: Done without care, superficially" },
+  "perverse": { pos:"adj.", en:"Contrary, persistent in error, wrongheaded", cn:"固執錯誤的；乖戾的", ex:"Perverse means: Contrary, persistent in error, wrongheaded" },
+  "precocious": { pos:"adj.", en:"Reaching maturity or development early", cn:"早熟的", ex:"Precocious means: Reaching maturity or development early" },
+  "quell": { pos:"v.", en:"To put an end to, suppress", cn:"平息；鎮壓", ex:"Quell means: To put an end to, suppress" },
+  "sally": { pos:"v.", en:"To suddenly rush out", cn:"突圍；出發", ex:"Sally means: To suddenly rush out" },
+  "verbose": { pos:"adj.", en:"Using too many words, wordy", cn:"囉嗦的；冗長的", ex:"Verbose means: Using too many words, wordy" },
+  "arbitrary": { pos:"adj.", en:"Based on random choice or personal whim", cn:"任意的；武斷的", ex:"Arbitrary means: Based on random choice or personal whim" },
+  "cognizant": { pos:"adj.", en:"Aware of, having knowledge of", cn:"認識到的；知曉的", ex:"Cognizant means: Aware of, having knowledge of" },
+  "effigy": { pos:"n.", en:"A likeness, usually of a disliked person", cn:"雕像；假人像", ex:"Effigy means: A likeness, usually of a disliked person" },
+  "exacerbate": { pos:"v.", en:"To make worse, to irritate", cn:"惡化；激怒", ex:"Exacerbate means: To make worse, to irritate" },
+  "flout": { pos:"v.", en:"To disregard openly, to mock", cn:"嘲弄；無視規則", ex:"Flout means: To disregard openly, to mock" },
+  "forthwith": { pos:"adv.", en:"Immediately, without delay", cn:"立即；馬上", ex:"Forthwith means: Immediately, without delay" },
+  "fray": { pos:"n.", en:"A fight, conflict, or noisy quarrel", cn:"爭吵；打鬥", ex:"Fray means: A fight, conflict, or noisy quarrel" },
+  "harass": { pos:"v.", en:"To trouble, torment, or intimidate repeatedly", cn:"騷擾；煩擾", ex:"Harass means: To trouble, torment, or intimidate repeatedly" },
+  "implacable": { pos:"adj.", en:"Cannot be calmed, relentless", cn:"難以平息的；不屈不撓的", ex:"Implacable means: Cannot be calmed, relentless" },
+  "indigent": { pos:"adj.", en:"Poor, needy, lacking basic necessities", cn:"貧困的；窮困的", ex:"Indigent means: Poor, needy, lacking basic necessities" },
+  "jurisdiction": { pos:"n.", en:"The power or range of legal authority", cn:"司法權；管轄範圍", ex:"Jurisdiction means: The power or range of legal authority" },
+  "monolithic": { pos:"adj.", en:"Massively solid, uniform, inflexible", cn:"巨大而單一的；整體的", ex:"Monolithic means: Massively solid, uniform, inflexible" },
+  "oust": { pos:"v.", en:"To drive out, eject, or force from power", cn:"驅逐；罷免", ex:"Oust means: To drive out, eject, or force from power" },
+  "paroxysm": { pos:"n.", en:"A sudden fit or outburst", cn:"陣發；突發", ex:"Paroxysm means: A sudden fit or outburst" },
+  "revert": { pos:"v.", en:"To return to a previous condition", cn:"恢復；重返", ex:"Revert means: To return to a previous condition" },
+  "skirmish": { pos:"n.", en:"A small fight or brief encounter", cn:"小衝突；小規模戰鬥", ex:"Skirmish means: A small fight or brief encounter" },
+  "stymie": { pos:"v.", en:"To hinder or prevent from proceeding", cn:"阻礙；妨礙", ex:"Stymie means: To hinder or prevent from proceeding" },
+  "terminate": { pos:"v.", en:"To bring to an end", cn:"終止；結束", ex:"Terminate means: To bring to an end" },
+  "turbulent": { pos:"adj.", en:"Unruly, agitated, causing unrest", cn:"動盪的；混亂的", ex:"Turbulent means: Unruly, agitated, causing unrest" },
+  "untoward": { pos:"adj.", en:"Unfortunate, improper, unfavourable", cn:"不適當的；不幸的", ex:"Untoward means: Unfortunate, improper, unfavourable" },
+  "afflict": { pos:"v.", en:"To trouble greatly, cause distress", cn:"折磨；使痛苦", ex:"Afflict means: To trouble greatly, cause distress" },
+  "ascend": { pos:"v.", en:"To rise, climb upward", cn:"上升；攀登", ex:"Ascend means: To rise, climb upward" },
+  "besiege": { pos:"v.", en:"To surround and hem in", cn:"圍攻；包圍", ex:"Besiege means: To surround and hem in" },
+  "emaciated": { pos:"adj.", en:"Abnormally thin, wasted away", cn:"憔悴的；極度消瘦的", ex:"Emaciated means: Abnormally thin, wasted away" },
+  "excruciating": { pos:"adj.", en:"Agonizing, extremely painful", cn:"極痛苦的；難以忍受的", ex:"Excruciating means: Agonizing, extremely painful" },
+  "fretful": { pos:"adj.", en:"Worrisome, irritable, anxious", cn:"煩躁的；焦躁不安的", ex:"Fretful means: Worrisome, irritable, anxious" },
+  "harbinger": { pos:"n.", en:"A forerunner or advance sign", cn:"先兆；前兆", ex:"Harbinger means: A forerunner or advance sign" },
+  "malignant": { pos:"adj.", en:"Destructive, deadly, deeply harmful", cn:"惡性的；致命的", ex:"Malignant means: Destructive, deadly, deeply harmful" },
+  "malnutrition": { pos:"n.", en:"Faulty or inadequate diet causing ill-health", cn:"營養不良", ex:"Malnutrition means: Faulty or inadequate diet causing ill-health" },
+  "privation": { pos:"n.", en:"Lack of basic necessities", cn:"匱乏；艱苦", ex:"Privation means: Lack of basic necessities" },
+  "remote": { pos:"adj.", en:"Distant, hidden away, unlikely", cn:"遙遠的；偏僻的", ex:"Remote means: Distant, hidden away, unlikely" },
+  "respite": { pos:"n.", en:"A short period of relief from difficulty", cn:"喘息；暫緩", ex:"Respite means: A short period of relief from difficulty" },
+  "reverberating": { pos:"adj.", en:"Echoing, resounding persistently", cn:"迴盪的；持續回響的", ex:"Reverberating means: Echoing, resounding persistently" },
+  "sanctuary": { pos:"n.", en:"A place of shelter and protection", cn:"避難所；庇護所", ex:"Sanctuary means: A place of shelter and protection" },
+  "sinister": { pos:"adj.", en:"Evil, ominous, threatening harm", cn:"邪惡的；不祥的", ex:"Sinister means: Evil, ominous, threatening harm" },
+  "succumb": { pos:"v.", en:"To give way, yield to a force", cn:"屈服；死於", ex:"Succumb means: To give way, yield to a force" },
+  "surge": { pos:"v.", en:"To rush suddenly, to increase sharply", cn:"湧動；急增", ex:"Surge means: To rush suddenly, to increase sharply" },
+  "thwart": { pos:"v.", en:"To hinder, prevent, frustrate", cn:"阻撓；妨礙", ex:"Thwart means: To hinder, prevent, frustrate" },
+  "tranquil": { pos:"adj.", en:"Quiet, peaceful, calm", cn:"寧靜的；平靜的", ex:"Tranquil means: Quiet, peaceful, calm" },
+  "ubiquitous": { pos:"adj.", en:"Present or found everywhere", cn:"無所不在的；普遍的", ex:"Ubiquitous means: Present or found everywhere" },
+  "adverse": { pos:"adj.", en:"Unfavourable, harmful, contrary", cn:"不利的；有害的", ex:"Adverse means: Unfavourable, harmful, contrary" },
+  "advocate": { pos:"v.", en:"To support, speak in favour of", cn:"提倡；支持", ex:"Advocate means: To support, speak in favour of" },
+  "amicable": { pos:"adj.", en:"Friendly, done in a peaceable spirit", cn:"友好的；和睦的", ex:"Amicable means: Friendly, done in a peaceable spirit" },
+  "asset": { pos:"n.", en:"A valuable or useful thing", cn:"資產；有價值之物", ex:"Asset means: A valuable or useful thing" },
+  "astute": { pos:"adj.", en:"Keen, shrewd, clever in practical matters", cn:"機敏的；精明的", ex:"Astute means: Keen, shrewd, clever in practical matters" },
+  "bigot": { pos:"n.", en:"A narrow-minded, prejudiced person", cn:"偏執者；頑固者", ex:"Bigot means: A narrow-minded, prejudiced person" },
+  "blatant": { pos:"adj.", en:"Obvious, conspicuously bad", cn:"明目張膽的；公然的", ex:"Blatant means: Obvious, conspicuously bad" },
+  "entourage": { pos:"n.", en:"A group of attendants or associates", cn:"隨從；隨行人員", ex:"Entourage means: A group of attendants or associates" },
+  "extortion": { pos:"n.", en:"Getting money or favours through threats", cn:"勒索；敲詐", ex:"Extortion means: Getting money or favours through threats" },
+  "impresario": { pos:"n.", en:"An organiser of entertainment", cn:"演出經紀人；主辦人", ex:"Impresario means: An organiser of entertainment" },
+  "ineffectual": { pos:"adj.", en:"Unable to accomplish anything, weak", cn:"無效的；軟弱無能的", ex:"Ineffectual means: Unable to accomplish anything, weak" },
+  "loath": { pos:"adj.", en:"Unwilling, reluctant", cn:"不情願的；勉強的", ex:"Loath means: Unwilling, reluctant" },
+  "malady": { pos:"n.", en:"A disease or disorder", cn:"疾病；弊病", ex:"Malady means: A disease or disorder" },
+  "nefarious": { pos:"adj.", en:"Wicked, villainous, criminal", cn:"邪惡的；罪惡的", ex:"Nefarious means: Wicked, villainous, criminal" },
+  "scrutinize": { pos:"v.", en:"To examine closely and critically", cn:"仔細檢查；審查", ex:"Scrutinize means: To examine closely and critically" },
+  "solicit": { pos:"v.", en:"To beg, seek, or ask for", cn:"懇求；徵求", ex:"Solicit means: To beg, seek, or ask for" },
+  "spew": { pos:"v.", en:"To pour out, eject forcefully", cn:"噴出；大量湧出", ex:"Spew means: To pour out, eject forcefully" },
+  "venom": { pos:"n.", en:"Poison, malice, spite", cn:"毒液；惡意", ex:"Venom means: Poison, malice, spite" },
+  "vexatious": { pos:"adj.", en:"Causing annoyance, troublesome", cn:"令人煩惱的；惱人的", ex:"Vexatious means: Causing annoyance, troublesome" },
+  "virulent": { pos:"adj.", en:"Full of hatred, extremely harmful", cn:"劇毒的；惡毒的", ex:"Virulent means: Full of hatred, extremely harmful" },
+  "desist": { pos:"v.", en:"To cease, stop an activity", cn:"停止；終止", ex:"Desist means: To cease, stop an activity" },
+  "doleful": { pos:"adj.", en:"Sad, melancholy, expressing grief", cn:"悲哀的；憂鬱的", ex:"Doleful means: Sad, melancholy, expressing grief" },
+  "elusive": { pos:"adj.", en:"Hard to grasp, pin down, or find", cn:"難以捉摸的；難以獲得的", ex:"Elusive means: Hard to grasp, pin down, or find" },
+  "engrossed": { pos:"adj.", en:"Fully absorbed, completely occupied", cn:"全神貫注的；專心致志的", ex:"Engrossed means: Fully absorbed, completely occupied" },
+  "frustrate": { pos:"v.", en:"To foil, prevent from achieving", cn:"挫敗；使沮喪", ex:"Frustrate means: To foil, prevent from achieving" },
+  "histrionics": { pos:"n.", en:"Exaggerated theatrical behaviour", cn:"裝腔作勢；誇張表演", ex:"Histrionics means: Exaggerated theatrical behaviour" },
+  "imminent": { pos:"adj.", en:"About to happen, threatening", cn:"迫近的；即將發生的", ex:"Imminent means: About to happen, threatening" },
+  "inclement": { pos:"adj.", en:"Unfavourable, stormy, harsh", cn:"惡劣的；嚴酷的", ex:"Inclement means: Unfavourable, stormy, harsh" },
+  "inert": { pos:"adj.", en:"Without power to move, sluggish", cn:"遲鈍的；惰性的", ex:"Inert means: Without power to move, sluggish" },
+  "interject": { pos:"v.", en:"To interrupt with a comment", cn:"插嘴；打斷", ex:"Interject means: To interrupt with a comment" },
+  "mastiff": { pos:"n.", en:"A large, powerful breed of dog", cn:"獒犬；大型猛犬", ex:"Mastiff means: A large, powerful breed of dog" },
+  "obsess": { pos:"v.", en:"To haunt, preoccupy the mind of", cn:"迷住；使困擾", ex:"Obsess means: To haunt, preoccupy the mind of" },
+  "pertinent": { pos:"adj.", en:"Relevant, appropriate to the situation", cn:"相關的；貼切的", ex:"Pertinent means: Relevant, appropriate to the situation" },
+  "peruse": { pos:"v.", en:"To read carefully and thoroughly", cn:"仔細閱讀；審閱", ex:"Peruse means: To read carefully and thoroughly" },
+  "premonition": { pos:"n.", en:"A forewarning or feeling of what is to come", cn:"預感；預兆", ex:"Premonition means: A forewarning or feeling of what is to come" },
+  "recoil": { pos:"v.", en:"To draw back, shrink from in disgust", cn:"退縮；畏縮", ex:"Recoil means: To draw back, shrink from in disgust" },
+  "salient": { pos:"adj.", en:"Most important, prominent, noticeable", cn:"顯著的；突出的", ex:"Salient means: Most important, prominent, noticeable" },
+  "squeamish": { pos:"adj.", en:"Easily nauseated or shocked", cn:"易受驚的；神經質的", ex:"Squeamish means: Easily nauseated or shocked" },
+  "symptomatic": { pos:"adj.", en:"Indicative of something deeper", cn:"有症狀的；象徵性的", ex:"Symptomatic means: Indicative of something deeper" },
+  "wan": { pos:"adj.", en:"Sickly pale, lacking colour or vitality", cn:"蒼白的；無精打采的", ex:"Wan means: Sickly pale, lacking colour or vitality" },
+  "poignant": { pos:"adj.", en:"Moving, painful to the feelings", cn:"辛酸的；感人的", ex:"Poignant means: Moving, painful to the feelings" },
+  "inundate": { pos:"v.", en:"To flood, overwhelm with a great quantity", cn:"淹沒；泛濫", ex:"Inundate means: To flood, overwhelm with a great quantity" },
+  "fruitless": { pos:"adj.", en:"Producing no result, useless", cn:"徒勞的；無結果的", ex:"Fruitless means: Producing no result, useless" },
+  "garbled": { pos:"adj.", en:"Confused, mixed up, distorted", cn:"混淆的；含糊不清的", ex:"Garbled means: Confused, mixed up, distorted" },
+  "sanguine": { pos:"adj.", en:"Optimistic, confidently hopeful", cn:"樂觀的；充滿希望的", ex:"Sanguine means: Optimistic, confidently hopeful" },
+  "phlegmatic": { pos:"adj.", en:"Calm, hard to rouse to action", cn:"冷靜的；遲鈍的", ex:"Phlegmatic means: Calm, hard to rouse to action" },
+  "corroborate": { pos:"v.", en:"To confirm or support with evidence", cn:"證實；確證", ex:"Corroborate means: To confirm or support with evidence" },
+  "comprehensive": { pos:"adj.", en:"Thorough, covering all aspects", cn:"廣泛的；綜合的", ex:"Comprehensive means: Thorough, covering all aspects" },
+  "zealous": { pos:"adj.", en:"Fervently enthusiastic, intensely devoted", cn:"熱心的；狂熱的", ex:"Zealous means: Fervently enthusiastic, intensely devoted" },
+  "coerce": { pos:"v.", en:"To force or compel by pressure", cn:"強制；脅迫", ex:"Coerce means: To force or compel by pressure" },
+  "elapse": { pos:"v.", en:"To slip by, pass (of time)", cn:"(時間)流逝", ex:"Elapse means: To slip by, pass (of time)" },
+  "meticulous": { pos:"adj.", en:"Taking extreme care over details", cn:"一絲不苟的；細心的", ex:"Meticulous means: Taking extreme care over details" },
+  "domicile": { pos:"n.", en:"A place of permanent residence", cn:"住所；住宅", ex:"Domicile means: A place of permanent residence" },
+  "lax": { pos:"adj.", en:"Careless, not strict or firm", cn:"鬆懈的；馬虎的", ex:"Lax means: Careless, not strict or firm" },
+  "sporadic": { pos:"adj.", en:"Occurring occasionally, scattered", cn:"偶爾的；零星的", ex:"Sporadic means: Occurring occasionally, scattered" },
+  "rash": { pos:"adj.", en:"Too hasty, reckless, impetuous", cn:"魯莽的；輕率的", ex:"Rash means: Too hasty, reckless, impetuous" },
+  "conjecture": { pos:"n.", en:"A guess or inference without proof", cn:"推測；猜測", ex:"Conjecture means: A guess or inference without proof" },
+  "obviate": { pos:"v.", en:"To do away with or eliminate a difficulty", cn:"消除；排除", ex:"Obviate means: To do away with or eliminate a difficulty" },
+  "lurid": { pos:"adj.", en:"Sensational, shocking, ghastly", cn:"駭人聽聞的；耀眼的", ex:"Lurid means: Sensational, shocking, ghastly" },
+  "quip": { pos:"v.", en:"To say something clever or amusing", cn:"嘲弄；說俏皮話", ex:"Quip means: To say something clever or amusing" },
+  "diatribe": { pos:"n.", en:"A bitter verbal attack or criticism", cn:"抨擊；誹謗", ex:"Diatribe means: A bitter verbal attack or criticism" },
+  "inhibition": { pos:"n.", en:"A restraint on behaviour or impulse", cn:"抑制；禁忌", ex:"Inhibition means: A restraint on behaviour or impulse" },
+  "fortuitous": { pos:"adj.", en:"Lucky, happening by fortunate chance", cn:"偶然的；幸運的", ex:"Fortuitous means: Lucky, happening by fortunate chance" },
+  "incoherent": { pos:"adj.", en:"Unable to speak clearly, disjointed", cn:"語無倫次的；不連貫的", ex:"Incoherent means: Unable to speak clearly, disjointed" },
+  "ilk": { pos:"n.", en:"A type, kind, or sort", cn:"種類；同類", ex:"Ilk means: A type, kind, or sort" },
+  "prestigious": { pos:"adj.", en:"Having a high reputation, respected", cn:"享有聲望的", ex:"Prestigious means: Having a high reputation, respected" },
+  "placard": { pos:"n.", en:"A notice or sign for public display", cn:"海報；標語牌", ex:"Placard means: A notice or sign for public display" },
+  "integral": { pos:"adj.", en:"Essential, forming a necessary part", cn:"不可或缺的；整體的", ex:"Integral means: Essential, forming a necessary part" },
+  "remuneration": { pos:"n.", en:"Payment or compensation for work", cn:"報酬；酬勞", ex:"Remuneration means: Payment or compensation for work" },
+  "nominal": { pos:"adj.", en:"In name only, very small", cn:"名義上的；微不足道的", ex:"Nominal means: In name only, very small" },
+  "expunge": { pos:"v.", en:"To erase or remove completely", cn:"抹去；刪除", ex:"Expunge means: To erase or remove completely" },
+  "flamboyant": { pos:"adj.", en:"Showy, extravagant, colourful", cn:"艷麗的；炫耀的", ex:"Flamboyant means: Showy, extravagant, colourful" },
+  "anathema": { pos:"n.", en:"Something greatly detested or loathed", cn:"令人厭惡的事物；詛咒", ex:"Anathema means: Something greatly detested or loathed" },
+  "schism": { pos:"n.", en:"A division or split within a group", cn:"分裂；派系", ex:"Schism means: A division or split within a group" },
+  "utopia": { pos:"n.", en:"An imagined place of perfection", cn:"烏托邦；理想國", ex:"Utopia means: An imagined place of perfection" },
+  "timorous": { pos:"adj.", en:"Fearful, easily frightened", cn:"膽怯的；怯懦的", ex:"Timorous means: Fearful, easily frightened" },
+  "truncated": { pos:"adj.", en:"Shortened, cut off abruptly", cn:"截短的；縮短的", ex:"Truncated means: Shortened, cut off abruptly" },
+  "jaunty": { pos:"adj.", en:"Lively, cheerful, self-confident", cn:"輕鬆活潑的", ex:"Jaunty means: Lively, cheerful, self-confident" },
+  "fractious": { pos:"adj.", en:"Quarrelsome, easily irritated", cn:"易怒的；好爭吵的", ex:"Fractious means: Quarrelsome, easily irritated" },
+  "ostentatious": { pos:"adj.", en:"Showy, designed to impress", cn:"炫耀的；賣弄的", ex:"Ostentatious means: Showy, designed to impress" },
+  "importune": { pos:"v.", en:"To ask urgently and persistently", cn:"強求；胡纏", ex:"Importune means: To ask urgently and persistently" },
+  "incontrovertible": { pos:"adj.", en:"Not able to be denied or disputed", cn:"無可辯駁的；不容置疑的", ex:"Incontrovertible means: Not able to be denied or disputed" },
+  "surreptitious": { pos:"adj.", en:"Done secretly, stealthy", cn:"鬼鬼祟祟的；暗中的", ex:"Surreptitious means: Done secretly, stealthy" },
+  "haven": { pos:"n.", en:"A place of safety and shelter", cn:"避難所；港口", ex:"Haven means: A place of safety and shelter" },
+  "subjugate": { pos:"v.", en:"To conquer and bring under control", cn:"征服；降伏", ex:"Subjugate means: To conquer and bring under control" },
+  "ultimate": { pos:"adj.", en:"Final, most extreme, fundamental", cn:"最終的；極限的", ex:"Ultimate means: Final, most extreme, fundamental" },
+  "eventuate": { pos:"v.", en:"To result in, to end in", cn:"最終導致；結果是", ex:"Eventuate means: To result in, to end in" },
+  "emit": { pos:"v.", en:"To send out, give off", cn:"發出；散發", ex:"Emit means: To send out, give off" },
+  "subterranean": { pos:"adj.", en:"Existing or occurring underground", cn:"地下的；隱蔽的", ex:"Subterranean means: Existing or occurring underground" },
+  "viable": { pos:"adj.", en:"Practicable, capable of working", cn:"切實可行的；能存活的", ex:"Viable means: Practicable, capable of working" },
+  "premise": { pos:"n.", en:"A proposition from which a conclusion is drawn", cn:"前提；假設", ex:"Premise means: A proposition from which a conclusion is drawn" },
+  "jeopardize": { pos:"v.", en:"To put in danger, threaten", cn:"危害；使受危險", ex:"Jeopardize means: To put in danger, threaten" },
+  "incredulous": { pos:"adj.", en:"Unwilling or unable to believe", cn:"懷疑的；不輕信的", ex:"Incredulous means: Unwilling or unable to believe" },
+  "permeate": { pos:"v.", en:"To spread throughout, penetrate", cn:"彌漫；滲透", ex:"Permeate means: To spread throughout, penetrate" },
+  "propitious": { pos:"adj.", en:"Giving or indicating a good chance of success", cn:"吉利的；有利的", ex:"Propitious means: Giving or indicating a good chance of success" },
+  "surmise": { pos:"v.", en:"To guess or infer without firm evidence", cn:"猜測；臆測", ex:"Surmise means: To guess or infer without firm evidence" },
+  "curtail": { pos:"v.", en:"To reduce or impose a restriction on", cn:"縮減；剝奪", ex:"Curtail means: To reduce or impose a restriction on" },
+  "repress": { pos:"v.", en:"To hold back, suppress forcibly", cn:"壓抑；鎮壓", ex:"Repress means: To hold back, suppress forcibly" },
+  "cryptic": { pos:"adj.", en:"Having a hidden meaning, puzzling", cn:"神秘的；隱晦的", ex:"Cryptic means: Having a hidden meaning, puzzling" },
+  "inchoate": { pos:"adj.", en:"Just beginning, not fully formed", cn:"早期的；未成形的", ex:"Inchoate means: Just beginning, not fully formed" },
+  "aspire": { pos:"v.", en:"To strive for something great", cn:"渴望；立志", ex:"Aspire means: To strive for something great" },
+  "inveigh": { pos:"v.", en:"To protest strongly, attack verbally", cn:"猛烈抨擊；痛罵", ex:"Inveigh means: To protest strongly, attack verbally" },
+  "nettle": { pos:"v.", en:"To irritate or annoy", cn:"惹怒；激怒", ex:"Nettle means: To irritate or annoy" },
+  "overt": { pos:"adj.", en:"Done openly, not concealed", cn:"公開的；明顯的", ex:"Overt means: Done openly, not concealed" },
+  "relegate": { pos:"v.", en:"To assign to an inferior position", cn:"降級；貶謫", ex:"Relegate means: To assign to an inferior position" },
+  "supine": { pos:"adj.", en:"Lying face upward, passive and inactive", cn:"仰臥的；軟弱的", ex:"Supine means: Lying face upward, passive and inactive" },
+  "mammoth": { pos:"adj.", en:"Huge, of very great size", cn:"巨大的；龐大的", ex:"Mammoth means: Huge, of very great size" },
+  "repulse": { pos:"v.", en:"To drive back, reject firmly", cn:"擊退；拒絕", ex:"Repulse means: To drive back, reject firmly" },
+  "havoc": { pos:"n.", en:"Great damage and disorder", cn:"大破壞；浩劫", ex:"Havoc means: Great damage and disorder" },
+  "raze": { pos:"v.", en:"To completely destroy a building", cn:"夷為平地；破壞", ex:"Raze means: To completely destroy a building" },
+  "lethal": { pos:"adj.", en:"Sufficient to cause death", cn:"致命的；致死的", ex:"Lethal means: Sufficient to cause death" },
+  "scurry": { pos:"v.", en:"To move quickly with short steps", cn:"急跑；碎步快跑", ex:"Scurry means: To move quickly with short steps" },
+  "incisive": { pos:"adj.", en:"Intelligently analytical and clear", cn:"敏銳的；深刻的", ex:"Incisive means: Intelligently analytical and clear" },
+  "precipitate": { pos:"v.", en:"To cause suddenly or prematurely", cn:"促成；使沉澱", ex:"Precipitate means: To cause suddenly or prematurely" },
+  "stereotype": { pos:"n.", en:"An oversimplified fixed idea about a group", cn:"刻板印象；成見", ex:"Stereotype means: An oversimplified fixed idea about a group" },
+  "stentorian": { pos:"adj.", en:"Very loud and powerful", cn:"聲音洪亮的", ex:"Stentorian means: Very loud and powerful" },
+  "singular": { pos:"adj.", en:"Remarkably unusual or extraordinary", cn:"異常的；單一的", ex:"Singular means: Remarkably unusual or extraordinary" },
+  "valor": { pos:"n.", en:"Courage in the face of danger", cn:"英勇；勇氣", ex:"Valor means: Courage in the face of danger" },
+  "bias": { pos:"n.", en:"A prejudice in favour of or against something", cn:"偏見；斜紋", ex:"Bias means: A prejudice in favour of or against something" },
+  "sinecure": { pos:"n.", en:"A position requiring little work but giving payment", cn:"掛名差事；閒職", ex:"Sinecure means: A position requiring little work but giving payment" },
+  "abrogate": { pos:"v.", en:"To officially abolish or annul", cn:"廢除；取消", ex:"Abrogate means: To officially abolish or annul" },
+  "access": { pos:"n.", en:"The means or right to approach", cn:"接近；通道", ex:"Access means: The means or right to approach" },
+  "accomplice": { pos:"n.", en:"A person who helps another commit a crime", cn:"共犯；幫兇", ex:"Accomplice means: A person who helps another commit a crime" },
+  "alleged": { pos:"adj.", en:"Said to have done something but not proven", cn:"涉嫌的；據稱的", ex:"Alleged means: Said to have done something but not proven" },
+  "asperity": { pos:"n.", en:"Harshness of manner or tone", cn:"粗暴；嚴厲", ex:"Asperity means: Harshness of manner or tone" },
+  "complicity": { pos:"n.", en:"Partnership in wrongdoing", cn:"同謀；共犯關係", ex:"Complicity means: Partnership in wrongdoing" },
+  "controversial": { pos:"adj.", en:"Causing public disagreement", cn:"有爭議的", ex:"Controversial means: Causing public disagreement" },
+  "culpable": { pos:"adj.", en:"Deserving blame for a fault", cn:"有罪的；該受譴責的", ex:"Culpable means: Deserving blame for a fault" },
+  "declaim": { pos:"v.", en:"To speak or recite pompously", cn:"慷慨陳詞；演說", ex:"Declaim means: To speak or recite pompously" },
+  "epithet": { pos:"n.", en:"A descriptive word or phrase, often derogatory", cn:"綽號；貶稱", ex:"Epithet means: A descriptive word or phrase, often derogatory" },
+  "extrinsic": { pos:"adj.", en:"Coming from outside, not essential", cn:"外在的；非固有的", ex:"Extrinsic means: Coming from outside, not essential" },
+  "fetter": { pos:"v.", en:"To restrict or restrain", cn:"束縛；羈絆", ex:"Fetter means: To restrict or restrain" },
+  "invalidate": { pos:"v.", en:"To make legally void or cancel", cn:"使無效；使作廢", ex:"Invalidate means: To make legally void or cancel" },
+  "landmark": { pos:"adj.", en:"Historically significant, a turning point", cn:"里程碑；劃時代的", ex:"Landmark means: Historically significant, a turning point" },
+  "liquidation": { pos:"n.", en:"The disposal or destruction of something", cn:"清算；肅清", ex:"Liquidation means: The disposal or destruction of something" },
+  "nomadic": { pos:"adj.", en:"Roaming from place to place", cn:"遊牧的；流浪的", ex:"Nomadic means: Roaming from place to place" },
+  "paragon": { pos:"n.", en:"A person regarded as perfect", cn:"模範；典範", ex:"Paragon means: A person regarded as perfect" },
+  "persevere": { pos:"v.", en:"To continue despite difficulty", cn:"堅持不懈；不屈不撓", ex:"Persevere means: To continue despite difficulty" },
+  "preclude": { pos:"v.", en:"To prevent or make impossible", cn:"排除；防止", ex:"Preclude means: To prevent or make impossible" },
+  "recant": { pos:"v.", en:"To withdraw a previous statement", cn:"撤回(聲明)；放棄(信仰)", ex:"Recant means: To withdraw a previous statement" },
+  "altruistic": { pos:"adj.", en:"Showing unselfish concern for others", cn:"利他的；無私的", ex:"Altruistic means: Showing unselfish concern for others" },
+  "amorous": { pos:"adj.", en:"Showing sexual desire, relating to love", cn:"多情的；戀愛的", ex:"Amorous means: Showing sexual desire, relating to love" },
+  "antithesis": { pos:"n.", en:"The exact opposite of something", cn:"對立面；對照", ex:"Antithesis means: The exact opposite of something" },
+  "bulwark": { pos:"n.", en:"A defensive wall or protection", cn:"堡壘；保障", ex:"Bulwark means: A defensive wall or protection" },
+  "cache": { pos:"n.", en:"A secret hiding place for storing things", cn:"隱藏處；儲藏物", ex:"Cache means: A secret hiding place for storing things" },
+  "coterie": { pos:"n.", en:"A small group sharing a common interest", cn:"小圈子；同夥", ex:"Coterie means: A small group sharing a common interest" },
+  "cupidity": { pos:"n.", en:"Greed for money or possessions", cn:"貪婪；貪財", ex:"Cupidity means: Greed for money or possessions" },
+  "cursory": { pos:"adj.", en:"Hasty and superficial", cn:"粗略的；草率的", ex:"Cursory means: Hasty and superficial" },
+  "embellish": { pos:"v.", en:"To make more attractive by decoration", cn:"裝飾；潤飾", ex:"Embellish means: To make more attractive by decoration" },
+  "frugal": { pos:"adj.", en:"Sparing with money or food, thrifty", cn:"節儉的；樸素的", ex:"Frugal means: Sparing with money or food, thrifty" },
+  "gregarious": { pos:"adj.", en:"Fond of company, sociable", cn:"群居的；社交的", ex:"Gregarious means: Fond of company, sociable" },
+  "habitat": { pos:"n.", en:"The natural environment of an organism", cn:"棲息地；產地", ex:"Habitat means: The natural environment of an organism" },
+  "indigenous": { pos:"adj.", en:"Originating naturally in a region", cn:"本土的；土生土長的", ex:"Indigenous means: Originating naturally in a region" },
+  "interloper": { pos:"n.", en:"A person who intrudes without permission", cn:"闖入者；干涉者", ex:"Interloper means: A person who intrudes without permission" },
+  "progeny": { pos:"n.", en:"A person\'s descendants or offspring", cn:"後代；子孫", ex:"Progeny means: A person\'s descendants or offspring" },
+  "prolific": { pos:"adj.", en:"Producing many works or offspring", cn:"多產的；高產的", ex:"Prolific means: Producing many works or offspring" },
+  "saturate": { pos:"v.", en:"To fill completely, soak thoroughly", cn:"浸透；使飽和", ex:"Saturate means: To fill completely, soak thoroughly" },
+  "sedentary": { pos:"adj.", en:"Tending to sit or remain inactive", cn:"久坐的；定棲的", ex:"Sedentary means: Tending to sit or remain inactive" },
+  "temerity": { pos:"n.", en:"Excessive confidence, reckless boldness", cn:"魯莽；冒失", ex:"Temerity means: Excessive confidence, reckless boldness" },
+  "virtuosity": { pos:"n.", en:"Technical skill of the highest level", cn:"精湛技藝", ex:"Virtuosity means: Technical skill of the highest level" },
+  "assiduous": { pos:"adj.", en:"Showing great care and effort", cn:"勤勉的；刻苦的", ex:"Assiduous means: Showing great care and effort" },
+  "attest": { pos:"v.", en:"To declare or certify as true", cn:"證明；證實", ex:"Attest means: To declare or certify as true" },
+  "component": { pos:"n.", en:"A part or element of a larger whole", cn:"零件；成分", ex:"Component means: A part or element of a larger whole" },
+  "concoct": { pos:"v.", en:"To devise or invent a story", cn:"捏造；調製", ex:"Concoct means: To devise or invent a story" },
+  "consummate": { pos:"adj.", en:"Showing great skill, complete", cn:"圓滿的；技藝高超的", ex:"Consummate means: Showing great skill, complete" },
+  "deploy": { pos:"v.", en:"To position strategically for use", cn:"部署；展開", ex:"Deploy means: To position strategically for use" },
+  "enigma": { pos:"n.", en:"A puzzling or mysterious person or thing", cn:"謎；難以理解的事物", ex:"Enigma means: A puzzling or mysterious person or thing" },
+  "evaluate": { pos:"v.", en:"To assess the value or importance of", cn:"評估；評價", ex:"Evaluate means: To assess the value or importance of" },
+  "exult": { pos:"v.", en:"To be joyfully triumphant", cn:"歡欣鼓舞；狂喜", ex:"Exult means: To be joyfully triumphant" },
+  "fallacious": { pos:"adj.", en:"Based on a false belief, misleading", cn:"謬誤的；欺騙性的", ex:"Fallacious means: Based on a false belief, misleading" },
+  "fraught": { pos:"adj.", en:"Filled with, causing anxiety", cn:"充滿的；令人憂慮的", ex:"Fraught means: Filled with, causing anxiety" },
+  "gullible": { pos:"adj.", en:"Easily persuaded to believe something", cn:"易受騙的；輕信的", ex:"Gullible means: Easily persuaded to believe something" },
+  "hoax": { pos:"n.", en:"A deceptive trick or false story", cn:"騙局；惡作劇", ex:"Hoax means: A deceptive trick or false story" },
+  "impeccable": { pos:"adj.", en:"In accordance with the highest standards", cn:"無懈可擊的；無缺點的", ex:"Impeccable means: In accordance with the highest standards" },
+  "labyrinth": { pos:"n.", en:"A complicated network of paths", cn:"迷宮；錯綜複雜的事物", ex:"Labyrinth means: A complicated network of paths" },
+  "manifold": { pos:"adj.", en:"Many and various, multiple", cn:"多種多樣的；繁多的", ex:"Manifold means: Many and various, multiple" },
+  "murky": { pos:"adj.", en:"Dark and gloomy, not clear", cn:"昏暗的；陰晦的", ex:"Murky means: Dark and gloomy, not clear" },
+  "perpetrate": { pos:"v.", en:"To commit a harmful act", cn:"犯(罪)；做(壞事)", ex:"Perpetrate means: To commit a harmful act" },
+  "resourceful": { pos:"adj.", en:"Having the ability to find solutions", cn:"足智多謀的；機智的", ex:"Resourceful means: Having the ability to find solutions" },
+  "subterfuge": { pos:"n.", en:"Deception to achieve a goal", cn:"詭計；遁詞", ex:"Subterfuge means: Deception to achieve a goal" },
+  "abortive": { pos:"adj.", en:"Failing to produce the intended result", cn:"失敗的；夭折的", ex:"Abortive means: Failing to produce the intended result" },
+  "accommodate": { pos:"v.", en:"To make fit, to provide for", cn:"容納；適應", ex:"Accommodate means: To make fit, to provide for" },
+  "barometer": { pos:"n.", en:"An instrument or indicator of change", cn:"晴雨表；氣壓計", ex:"Barometer means: An instrument or indicator of change" },
+  "buff": { pos:"n.", en:"An enthusiastic fan or expert", cn:"愛好者；迷", ex:"Buff means: An enthusiastic fan or expert" },
+  "conjugal": { pos:"adj.", en:"Relating to marriage or the relationship between married people", cn:"婚姻的；夫妻的", ex:"Conjugal means: Relating to marriage or the relationship between married people" },
+  "crave": { pos:"v.", en:"To desire urgently, to long for", cn:"渴望；懇求", ex:"Crave means: To desire urgently, to long for" },
+  "deem": { pos:"v.", en:"To regard or consider in a particular way", cn:"認為；視為", ex:"Deem means: To regard or consider in a particular way" },
+  "inherent": { pos:"adj.", en:"Existing naturally as a permanent quality", cn:"固有的；與生俱來的", ex:"Inherent means: Existing naturally as a permanent quality" },
+  "innate": { pos:"adj.", en:"Inborn, possessed from birth", cn:"天生的；先天的", ex:"Innate means: Inborn, possessed from birth" },
+  "irrelevant": { pos:"adj.", en:"Not connected with the matter in hand", cn:"不相關的；不切題的", ex:"Irrelevant means: Not connected with the matter in hand" },
+  "itinerant": { pos:"adj.", en:"Travelling from place to place", cn:"巡迴的；流動的", ex:"Itinerant means: Travelling from place to place" },
+  "latent": { pos:"adj.", en:"Existing but not yet developed", cn:"潛在的；隱伏的", ex:"Latent means: Existing but not yet developed" },
+  "modify": { pos:"v.", en:"To change partially", cn:"修改；修飾", ex:"Modify means: To change partially" },
+  "myriad": { pos:"adj.", en:"Countless in number", cn:"無數的；極大量的", ex:"Myriad means: Countless in number" },
+  "peregrination": { pos:"n.", en:"A journey, especially a long one", cn:"旅程；遊歷", ex:"Peregrination means: A journey, especially a long one" },
+  "romp": { pos:"v.", en:"To move in a lively, boisterous way", cn:"嬉鬧；喧鬧地玩耍", ex:"Romp means: To move in a lively, boisterous way" },
+  "spontaneous": { pos:"adj.", en:"Done without being planned", cn:"自發的；自然的", ex:"Spontaneous means: Done without being planned" },
+  "tortuous": { pos:"adj.", en:"Full of twists and turns", cn:"彎曲的；曲折的", ex:"Tortuous means: Full of twists and turns" },
+  "urbane": { pos:"adj.", en:"Suave, confident and sophisticated", cn:"溫文爾雅的；都市化的", ex:"Urbane means: Suave, confident and sophisticated" },
+  "veneer": { pos:"n.", en:"A thin covering to hide what is underneath", cn:"飾面；虛飾", ex:"Veneer means: A thin covering to hide what is underneath" },
+  "amnesty": { pos:"n.", en:"A general pardon for offences", cn:"大赦；特赦", ex:"Amnesty means: A general pardon for offences" },
+  "balk": { pos:"v.", en:"To be unwilling to proceed", cn:"畏縮；猶豫", ex:"Balk means: To be unwilling to proceed" },
+  "blunt": { pos:"adj.", en:"Plainspoken, lacking in subtlety", cn:"直率的；遲鈍的", ex:"Blunt means: Plainspoken, lacking in subtlety" },
+  "coup": { pos:"n.", en:"A sudden successful seizure of power", cn:"政變；出乎意料的成功", ex:"Coup means: A sudden successful seizure of power" },
+  "dismantle": { pos:"v.", en:"To take apart piece by piece", cn:"拆除；解散", ex:"Dismantle means: To take apart piece by piece" },
+  "exonerate": { pos:"v.", en:"To officially absolve from blame", cn:"免除責任；宣佈無罪", ex:"Exonerate means: To officially absolve from blame" },
+  "expatriate": { pos:"n.", en:"A person living outside their native country", cn:"移居國外者；流放者", ex:"Expatriate means: A person living outside their native country" },
+  "fiat": { pos:"n.", en:"An official order or decree", cn:"命令；法令", ex:"Fiat means: An official order or decree" },
+  "legion": { pos:"adj.", en:"Vast in number", cn:"眾多的；軍團", ex:"Legion means: Vast in number" },
+  "megalomania": { pos:"n.", en:"An obsessive desire for power or wealth", cn:"狂妄自大；自大狂", ex:"Megalomania means: An obsessive desire for power or wealth" },
+  "mendacious": { pos:"adj.", en:"Not telling the truth, lying", cn:"虛假的；撒謊的", ex:"Mendacious means: Not telling the truth, lying" },
+  "nostalgia": { pos:"n.", en:"A longing for the past", cn:"懷舊；思鄉病", ex:"Nostalgia means: A longing for the past" },
+  "parsimonious": { pos:"adj.", en:"Very unwilling to spend money", cn:"吝嗇的；極度節儉的", ex:"Parsimonious means: Very unwilling to spend money" },
+  "pecuniary": { pos:"adj.", en:"Relating to or involving money", cn:"金錢的；金錢上的", ex:"Pecuniary means: Relating to or involving money" },
+  "profligate": { pos:"adj.", en:"Recklessly extravagant or wasteful", cn:"揮霍的；放蕩的", ex:"Profligate means: Recklessly extravagant or wasteful" },
+  "restrictive": { pos:"adj.", en:"Imposing limitations", cn:"限制性的；約束的", ex:"Restrictive means: Imposing limitations" },
+  "rife": { pos:"adj.", en:"Widespread, full of", cn:"普遍的；盛傳的", ex:"Rife means: Widespread, full of" },
+  "strife": { pos:"n.", en:"Angry or violent disagreement", cn:"衝突；爭吵", ex:"Strife means: Angry or violent disagreement" },
+  "sumptuous": { pos:"adj.", en:"Splendid and expensive-looking", cn:"奢華的；豪華的", ex:"Sumptuous means: Splendid and expensive-looking" },
+  "underwrite": { pos:"v.", en:"To provide financial support for", cn:"承保；提供資金", ex:"Underwrite means: To provide financial support for" },
+  "abstemious": { pos:"adj.", en:"Restrained in eating and drinking", cn:"飲食有節制的", ex:"Abstemious means: Restrained in eating and drinking" },
+  "derogatory": { pos:"adj.", en:"Showing a critical or disrespectful attitude", cn:"貶低的；誹謗的", ex:"Derogatory means: Showing a critical or disrespectful attitude" },
+  "disparate": { pos:"adj.", en:"Essentially different in kind", cn:"迥然不同的；無法比較的", ex:"Disparate means: Essentially different in kind" },
+  "edifice": { pos:"n.", en:"A large imposing building", cn:"宏偉的建築；大廈", ex:"Edifice means: A large imposing building" },
+  "extant": { pos:"adj.", en:"Still in existence", cn:"現存的；尚存的", ex:"Extant means: Still in existence" },
+  "indict": { pos:"v.", en:"To formally accuse of a crime", cn:"控告；起訴", ex:"Indict means: To formally accuse of a crime" },
+  "levity": { pos:"n.", en:"Treating something seriously with humour", cn:"輕浮；輕率", ex:"Levity means: Treating something seriously with humour" },
+  "lugubrious": { pos:"adj.", en:"Looking or sounding sad and dismal", cn:"悲哀的；令人傷心的", ex:"Lugubrious means: Looking or sounding sad and dismal" },
+  "maudlin": { pos:"adj.", en:"Sentimental in a foolish or weak way", cn:"傷感流淚的；感情脆弱的", ex:"Maudlin means: Sentimental in a foolish or weak way" },
+  "nebulous": { pos:"adj.", en:"Not clear, hazy, vague", cn:"朦朧的；模糊的", ex:"Nebulous means: Not clear, hazy, vague" },
+  "omnivorous": { pos:"adj.", en:"Eating both plants and animals", cn:"雜食的；無所不吃的", ex:"Omnivorous means: Eating both plants and animals" },
+  "pesky": { pos:"adj.", en:"Causing irritation", cn:"討厭的；煩人的", ex:"Pesky means: Causing irritation" },
+  "puissant": { pos:"adj.", en:"Having great power or influence", cn:"強大的；有權力的", ex:"Puissant means: Having great power or influence" },
+  "redolent": { pos:"adj.", en:"Strongly suggestive of, fragrant", cn:"芬芳的；使人想起...的", ex:"Redolent means: Strongly suggestive of, fragrant" },
+  "repose": { pos:"n.", en:"A state of rest or tranquillity", cn:"休息；睡眠", ex:"Repose means: A state of rest or tranquillity" },
+  "reviled": { pos:"adj.", en:"Hated and criticised", cn:"辱罵；斥責", ex:"Reviled means: Hated and criticised" },
+  "sultry": { pos:"adj.", en:"Oppressively hot and humid", cn:"悶熱的；風騷的", ex:"Sultry means: Oppressively hot and humid" },
+  "trenchant": { pos:"adj.", en:"Vigorous or incisive in expression", cn:"銳利的；一針見血的", ex:"Trenchant means: Vigorous or incisive in expression" },
+  "unabated": { pos:"adj.", en:"Without any reduction in intensity", cn:"不減退的；未減弱的", ex:"Unabated means: Without any reduction in intensity" },
+  "vicissitudes": { pos:"n.", en:"Changes in circumstances, especially difficulties", cn:"變遷；興衰", ex:"Vicissitudes means: Changes in circumstances, especially difficulties" },
+  "voracious": { pos:"adj.", en:"Desiring or consuming great quantities.", cn:"貪婪的；貪得無厭的", ex:"The voracious reader finished three novels in a week." },
+  "indiscriminate": { pos:"adj.", en:"Choosing at random without careful selection.", cn:"不加選擇的；任意的", ex:"Indiscriminate logging has devastated the local ecosystem." },
+  "eminent": { pos:"adj.", en:"Of high reputation; outstanding.", cn:"傑出的；卓越的", ex:"The eminent scholar was awarded an honorary degree." },
+  "steeped": { pos:"adj.", en:"Soaked, drenched, or saturated; deeply immersed.", cn:"浸泡的；沉浸於…的", ex:"The city is steeped in centuries of cultural tradition." },
+  "replete": { pos:"adj.", en:"Completely filled or well-supplied with.", cn:"充滿的；飽足的", ex:"The library was replete with rare manuscripts and first editions." },
+  "abound": { pos:"v.", en:"To exist in great numbers or amounts.", cn:"充滿；大量存在", ex:"Opportunities abound for those willing to work hard." },
+  "technology": { pos:"n.", en:"Branch of knowledge dealing with engineering and applied science.", cn:"技術；科技", ex:"Modern technology has transformed every aspect of daily life." },
+  "prognosticate": { pos:"v.", en:"To predict or foretell a future event.", cn:"預言；預測", ex:"Analysts prognosticate a sharp rise in consumer spending next quarter." },
+  "abode": { pos:"n.", en:"A place where one lives; a home or dwelling.", cn:"住所；居所", ex:"The explorer\'s humble abode was a tent pitched beside a glacier." },
+  "automaton": { pos:"n.", en:"A machine that operates like a person; a robot.", cn:"自動機器人；機械般行動的人", ex:"Workers feared being replaced by automatons on the factory floor." },
+  "paradox": { pos:"n.", en:"A statement that seems absurd yet may prove true.", cn:"悖論；矛盾說法", ex:"It is a paradox that the busiest people often find time to help others." },
+  "realm": { pos:"n.", en:"A special field or domain; a kingdom.", cn:"領域；王國", ex:"In the realm of quantum physics, ordinary logic often breaks down." },
+  "annals": { pos:"n.", en:"Historical records arranged by year.", cn:"編年史；歷史記錄", ex:"This victory will be remembered in the annals of sporting history." },
+  "compound": { pos:"v.", en:"To increase or add to; to make worse.", cn:"使增加；混合；加重", ex:"His reckless decisions only served to compound the existing crisis." },
+  "tinge": { pos:"n.", en:"A trace, slight degree, or faint colour.", cn:"一絲；淡淡的色彩", ex:"There was a tinge of regret in her voice as she said goodbye." },
+  "badger": { pos:"v.", en:"To pester or nag persistently.", cn:"糾纏；煩擾", ex:"The journalists continued to badger the spokesperson for a direct answer." },
+  "implore": { pos:"v.", en:"To plead urgently for aid or mercy.", cn:"懇求；哀求", ex:"She implored the committee to reconsider the funding decision." },
+  "drudgery": { pos:"n.", en:"Unpleasant, dull, or exhausting hard work.", cn:"苦工；枯燥乏味的工作", ex:"Filing endless paperwork was sheer drudgery for the ambitious intern." },
+  "interminable": { pos:"adj.", en:"Unending; seemingly without a conclusion.", cn:"無休止的；冗長的", ex:"The interminable delays made the entire journey an ordeal." },
+  "perceive": { pos:"v.", en:"To understand, know, or become aware of.", cn:"察覺；感知；理解", ex:"Students must learn to perceive subtle differences in tone and register." },
+  "scion": { pos:"n.", en:"A young member of a noble family; a descendant", cn:"子孫；後代", ex:"Scion means: A young member of a noble family; a descendant" },
+  "indoctrinate": { pos:"v.", en:"To teach a person to accept a set of beliefs", cn:"灌輸；教導", ex:"Indoctrinate means: To teach a person to accept a set of beliefs" },
+  "opulence": { pos:"n.", en:"Great wealth and luxuriousness", cn:"財富；富裕", ex:"Opulence means: Great wealth and luxuriousness" },
+  "obsequious": { pos:"adj.", en:"Excessively eager to please or obey", cn:"諂媚的；奉承的", ex:"Obsequious means: Excessively eager to please or obey" },
+  "fulsome": { pos:"adj.", en:"Excessively complimentary, insincere", cn:"過度誇張的；令人作嘔的", ex:"Fulsome means: Excessively complimentary, insincere" },
+  "lush": { pos:"adj.", en:"Luxuriously rich, elaborate, or profuse", cn:"茂盛的；奢華的", ex:"Lush means: Luxuriously rich, elaborate, or profuse" },
+  "destitution": { pos:"n.", en:"The state of extreme poverty", cn:"貧困；赤貧", ex:"Destitution means: The state of extreme poverty" },
+  "ponder": { pos:"v.", en:"To think carefully and seriously", cn:"仔細考慮", ex:"Ponder means: To think carefully and seriously" },
+  "supplication": { pos:"n.", en:"An earnest request or prayer", cn:"懇求；祈求", ex:"Supplication means: An earnest request or prayer" },
+  "decadence": { pos:"n.", en:"Moral or cultural decline and self-indulgence", cn:"墮落；衰退", ex:"Decadence means: Moral or cultural decline and self-indulgence" },
+  "penance": { pos:"n.", en:"Voluntary self-punishment to atone for a fault", cn:"懺悔；贖罪", ex:"Penance means: Voluntary self-punishment to atone for a fault" },
+  "ascetic": { pos:"n.", en:"A person who practises severe self-discipline", cn:"苦行的；禁慾者", ex:"Ascetic means: A person who practises severe self-discipline" },
+  "desultory": { pos:"adj.", en:"Lacking purpose, disconnected, random", cn:"散漫的；斷斷續續的", ex:"Desultory means: Lacking purpose, disconnected, random" },
+  "disciple": { pos:"n.", en:"A follower of a teacher or leader", cn:"門徒；信徒", ex:"Disciple means: A follower of a teacher or leader" },
+  "metamorphosis": { pos:"n.", en:"A dramatic change in form or nature", cn:"變態；蛻變", ex:"Metamorphosis means: A dramatic change in form or nature" },
+  "bona fide": { pos:"adj.", en:"Genuine, real, done in good faith", cn:"真實的；真誠的", ex:"Bona fide means: Genuine, real, done in good faith" },
+  "salvation": { pos:"n.", en:"Deliverance from danger or ruin", cn:"拯救；救贖", ex:"Salvation means: Deliverance from danger or ruin" },
+  "materialism": { pos:"n.", en:"A tendency to consider material things more important than spiritual values", cn:"物質主義", ex:"Materialism means: A tendency to consider material things more important than spiritual values" },
+  "nurture": { pos:"v.", en:"To care for and encourage growth", cn:"養育；培育", ex:"Nurture means: To care for and encourage growth" },
+  "nirvana": { pos:"n.", en:"A state of perfect peace and happiness", cn:"涅槃；解脫", ex:"Nirvana means: A state of perfect peace and happiness" },
+  "juxtapose": { pos:"v.", en:"To place side by side for contrast", cn:"並列", ex:"Juxtapose means: To place side by side for contrast" },
+  "plight": { pos:"n.", en:"A dangerous or difficult situation", cn:"困境；苦境", ex:"Plight means: A dangerous or difficult situation" },
+  "covert": { pos:"adj.", en:"Not openly acknowledged, hidden", cn:"隱蔽的；秘密的", ex:"Covert means: Not openly acknowledged, hidden" },
+  "cope": { pos:"v.", en:"To deal effectively with something difficult", cn:"應付；處理", ex:"Cope means: To deal effectively with something difficult" },
+  "incompatibility": { pos:"n.", en:"A state of being unable to work together harmoniously", cn:"不相容；不協調", ex:"Incompatibility means: A state of being unable to work together harmoniously" },
+  "incapacitated": { pos:"adj.", en:"Deprived of the ability to function", cn:"失去能力的", ex:"Incapacitated means: Deprived of the ability to function" },
+  "connubial": { pos:"adj.", en:"Of or relating to marriage", cn:"婚姻的", ex:"Connubial means: Of or relating to marriage" },
+  "demur": { pos:"v.", en:"To raise objections, hesitate", cn:"反對；抗議", ex:"Demur means: To raise objections, hesitate" },
+  "appellation": { pos:"n.", en:"A name or title", cn:"名稱；稱呼", ex:"Appellation means: A name or title" },
+  "escalation": { pos:"n.", en:"A rapid increase in intensity", cn:"逐步升級", ex:"Escalation means: A rapid increase in intensity" },
+  "indifference": { pos:"n.", en:"A lack of interest or concern", cn:"漠不關心", ex:"Indifference means: A lack of interest or concern" },
+  "potential": { pos:"adj.", en:"Possible, having latent capability", cn:"潛在的", ex:"Potential means: Possible, having latent capability" },
+  "cumulative": { pos:"adj.", en:"Increasing by successive additions", cn:"累積的", ex:"Cumulative means: Increasing by successive additions" },
+  "recondite": { pos:"adj.", en:"Not known by many, obscure, hidden", cn:"深奧的；隱蔽的", ex:"Recondite means: Not known by many, obscure, hidden" },
+  "palliate": { pos:"v.", en:"To alleviate without curing, to excuse", cn:"減輕；掩飾", ex:"Palliate means: To alleviate without curing, to excuse" },
+  "delude": { pos:"v.", en:"To cause to believe something false", cn:"欺騙；蠱惑", ex:"Delude means: To cause to believe something false" },
+  "prelude": { pos:"n.", en:"An introduction or preliminary action", cn:"序幕；前奏", ex:"Prelude means: An introduction or preliminary action" },
+  "chimerical": { pos:"adj.", en:"Imaginary, fantastically improbable", cn:"荒唐的；空想的", ex:"Chimerical means: Imaginary, fantastically improbable" },
+  "acknowledge": { pos:"v.", en:"To admit or accept the truth of", cn:"承認；答謝", ex:"Acknowledge means: To admit or accept the truth of" },
+  "analogous": { pos:"adj.", en:"Comparable in certain respects", cn:"類似的；可類比的", ex:"Analogous means: Comparable in certain respects" },
+  "catastrophic": { pos:"adj.", en:"Involving or causing sudden disaster", cn:"災難性的", ex:"Catastrophic means: Involving or causing sudden disaster" },
+  "compensatory": { pos:"adj.", en:"Intended to make amends for a loss", cn:"補償的", ex:"Compensatory means: Intended to make amends for a loss" },
+  "decade": { pos:"n.", en:"A period of ten years", cn:"十年", ex:"Decade means: A period of ten years" },
+  "enunciate": { pos:"v.", en:"To express or state precisely; to articulate clearly", cn:"闡明；清晰發音", ex:"Enunciate means: To express or state precisely; to articulate clearly" },
+  "gamut": { pos:"n.", en:"The complete range of something", cn:"全音階；全部範圍", ex:"Gamut means: The complete range of something" },
+  "heterogeneous": { pos:"adj.", en:"Diverse in character or content", cn:"異質的", ex:"Heterogeneous means: Diverse in character or content" },
+  "inordinate": { pos:"adj.", en:"Exceeding reasonable limits, excessive", cn:"過度的；無節制的", ex:"Inordinate means: Exceeding reasonable limits, excessive" },
+  "introspective": { pos:"adj.", en:"Examining one\'s own thoughts and feelings", cn:"內省的；反省的", ex:"Introspective means: Examining one\'s own thoughts and feelings" },
+  "irascible": { pos:"adj.", en:"Having a tendency to become angry easily", cn:"易怒的", ex:"Irascible means: Having a tendency to become angry easily" },
+  "maladjusted": { pos:"adj.", en:"Failing to cope with the demands of a normal social environment", cn:"適應不良的", ex:"Maladjusted means: Failing to cope with the demands of a normal social environment" },
+  "mandate": { pos:"n.", en:"An authoritative command or instruction", cn:"命令；授權", ex:"Mandate means: An authoritative command or instruction" },
+  "mortality": { pos:"n.", en:"The state of being subject to death; death rate", cn:"死亡率；必死性", ex:"Mortality means: The state of being subject to death; death rate" },
+  "neurotic": { pos:"adj.", en:"Affected by neurosis, abnormally anxious", cn:"神經質的", ex:"Neurotic means: Affected by neurosis, abnormally anxious" },
+  "neutralize": { pos:"v.", en:"To make ineffective by countering with equal force", cn:"抵銷；中和", ex:"Neutralize means: To make ineffective by countering with equal force" },
+  "pedagogue": { pos:"n.", en:"A teacher, especially a strict one", cn:"教師；教育者", ex:"Pedagogue means: A teacher, especially a strict one" },
+  "perpetuate": { pos:"v.", en:"To make something continue indefinitely", cn:"使不朽；使持續", ex:"Perpetuate means: To make something continue indefinitely" },
+  "perspicacious": { pos:"adj.", en:"Having a ready insight, shrewd", cn:"有洞察力的", ex:"Perspicacious means: Having a ready insight, shrewd" },
+  "phenomenon": { pos:"n.", en:"A fact or event observed to occur", cn:"現象", ex:"Phenomenon means: A fact or event observed to occur" },
+  "susceptible": { pos:"adj.", en:"Likely to be influenced or affected", cn:"易受影響的", ex:"Susceptible means: Likely to be influenced or affected" },
+  "abhorrent": { pos:"adj.", en:"Inspiring disgust and loathing", cn:"令人厭惡的", ex:"Abhorrent means: Inspiring disgust and loathing" },
+  "absurd": { pos:"adj.", en:"Wildly unreasonable, illogical", cn:"荒謬的", ex:"Absurd means: Wildly unreasonable, illogical" },
+  "anthropologist": { pos:"n.", en:"An expert in the study of human societies", cn:"人類學家", ex:"Anthropologist means: An expert in the study of human societies" },
+  "artifact": { pos:"n.", en:"An object made by human craft", cn:"人工製品", ex:"Artifact means: An object made by human craft" },
+  "bizarre": { pos:"adj.", en:"Very strange or unusual", cn:"奇異的", ex:"Bizarre means: Very strange or unusual" },
+  "contemptuous": { pos:"adj.", en:"Showing contempt, scornful", cn:"蔑視的", ex:"Contemptuous means: Showing contempt, scornful" },
+  "entreaty": { pos:"n.", en:"An earnest or humble request", cn:"懇求；乞求", ex:"Entreaty means: An earnest or humble request" },
+  "fetish": { pos:"n.", en:"An object believed to have magical powers; an obsessive fixation", cn:"迷信物；戀物", ex:"Fetish means: An object believed to have magical powers; an obsessive fixation" },
+  "imperative": { pos:"adj.", en:"Of vital importance, essential", cn:"必要的；命令的", ex:"Imperative means: Of vital importance, essential" },
+  "imprudent": { pos:"adj.", en:"Not showing care, unwise", cn:"輕率的；不智的", ex:"Imprudent means: Not showing care, unwise" },
+  "inanimate": { pos:"adj.", en:"Not alive, lacking consciousness", cn:"無生命的", ex:"Inanimate means: Not alive, lacking consciousness" },
+  "inviolable": { pos:"adj.", en:"Never to be broken or dishonoured", cn:"不可侵犯的", ex:"Inviolable means: Never to be broken or dishonoured" },
+  "originate": { pos:"v.", en:"To have a beginning, arise from", cn:"發源；創立", ex:"Originate means: To have a beginning, arise from" },
+  "prohibition": { pos:"n.", en:"The act of forbidding something", cn:"禁止", ex:"Prohibition means: The act of forbidding something" },
+  "superstition": { pos:"n.", en:"A belief not based on reason or knowledge", cn:"迷信", ex:"Superstition means: A belief not based on reason or knowledge" },
+  "taboo": { pos:"n.", en:"A social or religious custom prohibiting action", cn:"禁忌", ex:"Taboo means: A social or religious custom prohibiting action" },
+  "taint": { pos:"n.", en:"A trace of a bad quality or substance", cn:"污點；感染", ex:"Taint means: A trace of a bad quality or substance" },
+  "tradition": { pos:"n.", en:"A long-established custom or belief", cn:"傳統", ex:"Tradition means: A long-established custom or belief" },
+  "universal": { pos:"adj.", en:"Applicable to all cases, general", cn:"普遍的；宇宙的", ex:"Universal means: Applicable to all cases, general" },
+  "vulnerable": { pos:"adj.", en:"Susceptible to attack or harm", cn:"易受傷的；脆弱的", ex:"Vulnerable means: Susceptible to attack or harm" },
+  "aegis": { pos:"n.", en:"Protection or support from a powerful source", cn:"庇護；贊助", ex:"Aegis means: Protection or support from a powerful source" },
+  "awesome": { pos:"adj.", en:"Inspiring great admiration or fear", cn:"令人敬畏的", ex:"Awesome means: Inspiring great admiration or fear" },
+  "conflagration": { pos:"n.", en:"An extensive destructive fire", cn:"大火災", ex:"Conflagration means: An extensive destructive fire" },
+  "congenial": { pos:"adj.", en:"Pleasant because suited to one\'s character", cn:"意氣相投的", ex:"Congenial means: Pleasant because suited to one\'s character" },
+  "debris": { pos:"n.", en:"Scattered pieces of rubbish or remains", cn:"碎片；殘骸", ex:"Debris means: Scattered pieces of rubbish or remains" },
+  "deplorable": { pos:"adj.", en:"Deserving strong condemnation", cn:"可悲的；應受譴責的", ex:"Deplorable means: Deserving strong condemnation" },
+  "detriment": { pos:"n.", en:"A cause of harm or damage", cn:"損害；危害", ex:"Detriment means: A cause of harm or damage" },
+  "dispersed": { pos:"adj.", en:"Scattered over a wide area", cn:"被驅散的", ex:"Dispersed means: Scattered over a wide area" },
+  "doddering": { pos:"adj.", en:"Trembling or tottering due to old age", cn:"蹣跚的；老態龍鍾的", ex:"Doddering means: Trembling or tottering due to old age" },
+  "eruption": { pos:"n.", en:"A sudden violent outburst", cn:"爆發", ex:"Eruption means: A sudden violent outburst" },
+  "hoard": { pos:"v.", en:"To accumulate and store secretly", cn:"囤積；貯藏", ex:"Hoard means: To accumulate and store secretly" },
+  "imbibe": { pos:"v.", en:"To drink or absorb", cn:"飲；吸收", ex:"Imbibe means: To drink or absorb" },
+  "initiate": { pos:"v.", en:"To cause something to begin", cn:"開始；發起", ex:"Initiate means: To cause something to begin" },
+  "longevity": { pos:"n.", en:"Long life; the fact of lasting for a long time", cn:"長壽", ex:"Longevity means: Long life; the fact of lasting for a long time" },
+  "obliterate": { pos:"v.", en:"To destroy utterly, wipe out", cn:"抹去；清除", ex:"Obliterate means: To destroy utterly, wipe out" },
+  "puny": { pos:"adj.", en:"Small and weak", cn:"微小的；弱小的", ex:"Puny means: Small and weak" },
+  "rue": { pos:"v.", en:"To bitterly regret", cn:"後悔；悲傷", ex:"Rue means: To bitterly regret" },
+  "sage": { pos:"adj.", en:"Having profound wisdom", cn:"睿智的；聖人", ex:"Sage means: Having profound wisdom" },
+  "senile": { pos:"adj.", en:"Having or showing the weakness of old age", cn:"衰老的；老態龍鍾的", ex:"Senile means: Having or showing the weakness of old age" },
+  "virile": { pos:"adj.", en:"Having strength and energy, manly", cn:"有男子氣概的", ex:"Virile means: Having strength and energy, manly" },
+  "acute": { pos:"adj.", en:"Present or experienced to a severe degree", cn:"敏銳的；急性的", ex:"Acute means: Present or experienced to a severe degree" },
+  "aversion": { pos:"n.", en:"A strong dislike or disinclination", cn:"厭惡；反感", ex:"Aversion means: A strong dislike or disinclination" },
+  "cogent": { pos:"adj.", en:"Clear, logical, and convincing", cn:"令人信服的", ex:"Cogent means: Clear, logical, and convincing" },
+  "evince": { pos:"v.", en:"To show or reveal a quality", cn:"表明；顯示", ex:"Evince means: To show or reveal a quality" },
+  "gist": { pos:"n.", en:"The substance or main point", cn:"主旨；要點", ex:"Gist means: The substance or main point" },
+  "hostile": { pos:"adj.", en:"Opposed and aggressive", cn:"敵對的", ex:"Hostile means: Opposed and aggressive" },
+  "inevitable": { pos:"adj.", en:"Certain to happen, unavoidable", cn:"不可避免的", ex:"Inevitable means: Certain to happen, unavoidable" },
+  "intrinsic": { pos:"adj.", en:"Belonging naturally, essential", cn:"固有的；內在的", ex:"Intrinsic means: Belonging naturally, essential" },
+  "jettison": { pos:"v.", en:"To throw or drop from an aircraft or ship", cn:"拋棄；丟棄", ex:"Jettison means: To throw or drop from an aircraft or ship" },
+  "lethargic": { pos:"adj.", en:"Affected by lethargy, sluggish", cn:"昏睡的；遲鈍的", ex:"Lethargic means: Affected by lethargy, sluggish" },
+  "lucrative": { pos:"adj.", en:"Producing a great deal of profit", cn:"有利可圖的", ex:"Lucrative means: Producing a great deal of profit" },
+  "paramount": { pos:"adj.", en:"More important than anything else", cn:"首要的；至高無上的", ex:"Paramount means: More important than anything else" },
+  "prevalent": { pos:"adj.", en:"Widespread, common in a particular area", cn:"普遍的；盛行的", ex:"Prevalent means: Widespread, common in a particular area" },
+  "rebuke": { pos:"v.", en:"To express sharp disapproval", cn:"斥責；指責", ex:"Rebuke means: To express sharp disapproval" },
+  "remiss": { pos:"adj.", en:"Lacking care or attention to duty", cn:"怠忽職守的", ex:"Remiss means: Lacking care or attention to duty" },
+  "superficial": { pos:"adj.", en:"Appearing to be true only until examined", cn:"表面的；膚淺的", ex:"Superficial means: Appearing to be true only until examined" },
+  "terse": { pos:"adj.", en:"Sparing in the use of words, brief", cn:"簡潔的；扼要的", ex:"Terse means: Sparing in the use of words, brief" },
+  "transient": { pos:"adj.", en:"Lasting only for a short time", cn:"短暫的；瞬息的", ex:"Transient means: Lasting only for a short time" },
+  "tussle": { pos:"n.", en:"A vigorous struggle or scuffle", cn:"扭打；爭執", ex:"Tussle means: A vigorous struggle or scuffle" },
+  "vogue": { pos:"n.", en:"The prevailing fashion at a particular time", cn:"流行；時尚", ex:"Vogue means: The prevailing fashion at a particular time" },
+  "adamant": { pos:"adj.", en:"Refusing to be persuaded or to change", cn:"固執的；堅定不移的", ex:"Adamant means: Refusing to be persuaded or to change" },
+  "ardent": { pos:"adj.", en:"Very enthusiastic or passionate", cn:"熱烈的；激情的", ex:"Ardent means: Very enthusiastic or passionate" },
+  "array": { pos:"n.", en:"An impressive display or collection", cn:"陣列；打扮", ex:"Array means: An impressive display or collection" },
+  "bereft": { pos:"adj.", en:"Lacking something or feeling a great loss", cn:"喪失的；被剝奪的", ex:"Bereft means: Lacking something or feeling a great loss" },
+  "besmirch": { pos:"v.", en:"To damage or tarnish a reputation", cn:"玷污；毀謗", ex:"Besmirch means: To damage or tarnish a reputation" },
+  "constrict": { pos:"v.", en:"To make or become narrow or tight", cn:"壓縮；束緊", ex:"Constrict means: To make or become narrow or tight" },
+  "culminate": { pos:"v.", en:"To reach a climax or point of highest development", cn:"達到頂點", ex:"Culminate means: To reach a climax or point of highest development" },
+  "egotist": { pos:"n.", en:"A person excessively absorbed in themselves", cn:"利己主義者；自大狂", ex:"Egotist means: A person excessively absorbed in themselves" },
+  "exultation": { pos:"n.", en:"A feeling of triumphant joy", cn:"狂喜；歡躍", ex:"Exultation means: A feeling of triumphant joy" },
+  "falter": { pos:"v.", en:"To lose strength or momentum", cn:"蹣跚；動搖", ex:"Falter means: To lose strength or momentum" },
+  "humility": { pos:"n.", en:"A modest view of one\'s own importance", cn:"謙卑；謙遜", ex:"Humility means: A modest view of one\'s own importance" },
+  "invective": { pos:"n.", en:"Insulting, abusive, or highly critical language", cn:"辱罵；猛烈抨擊", ex:"Invective means: Insulting, abusive, or highly critical language" },
+  "inveterate": { pos:"adj.", en:"Having a particular habit or activity for a long time", cn:"根深蒂固的；積習的", ex:"Inveterate means: Having a particular habit or activity for a long time" },
+  "obscure": { pos:"adj.", en:"Not well known or hard to understand", cn:"模糊的；默默無聞的", ex:"Obscure means: Not well known or hard to understand" },
+  "pinnacle": { pos:"n.", en:"The most successful point, the peak", cn:"頂點；巔峰", ex:"Pinnacle means: The most successful point, the peak" },
+  "prodigy": { pos:"n.", en:"A person with exceptional talents", cn:"神童；奇蹟", ex:"Prodigy means: A person with exceptional talents" },
+  "pungent": { pos:"adj.", en:"Having a sharply strong taste or smell", cn:"辛辣的；刺鼻的", ex:"Pungent means: Having a sharply strong taste or smell" },
+  "retrospect": { pos:"n.", en:"A survey of past time or events", cn:"回顧；追溯", ex:"Retrospect means: A survey of past time or events" },
+  "vitriolic": { pos:"adj.", en:"Filled with bitter criticism", cn:"刻薄的；惡意的", ex:"Vitriolic means: Filled with bitter criticism" },
+  "voluminous": { pos:"adj.", en:"Occupying or containing much space", cn:"卷帙浩繁的；龐大的", ex:"Voluminous means: Occupying or containing much space" },
+  "avarice": { pos:"n.", en:"Extreme greed for wealth", cn:"貪婪", ex:"Avarice means: Extreme greed for wealth" },
+  "bedlam": { pos:"n.", en:"A scene of uproar and confusion", cn:"混亂；喧鬧", ex:"Bedlam means: A scene of uproar and confusion" },
+  "cacophony": { pos:"n.", en:"A harsh mixture of sounds", cn:"刺耳的聲音", ex:"Cacophony means: A harsh mixture of sounds" },
+  "compatible": { pos:"adj.", en:"Able to exist or work together", cn:"相容的；和諧的", ex:"Compatible means: Able to exist or work together" },
+  "disgruntled": { pos:"adj.", en:"Angry or dissatisfied", cn:"不滿的", ex:"Disgruntled means: Angry or dissatisfied" },
+  "equanimity": { pos:"n.", en:"Mental calmness in difficult situations", cn:"平靜；鎮定", ex:"Equanimity means: Mental calmness in difficult situations" },
+  "eradicate": { pos:"v.", en:"To destroy completely, put an end to", cn:"根除；消滅", ex:"Eradicate means: To destroy completely, put an end to" },
+  "exploit": { pos:"v.", en:"To make use of, utilise fully", cn:"開發；剝削", ex:"Exploit means: To make use of, utilise fully" },
+  "impede": { pos:"v.", en:"To delay or prevent by obstructing", cn:"阻礙；妨礙", ex:"Impede means: To delay or prevent by obstructing" },
+  "infallible": { pos:"adj.", en:"Incapable of making mistakes or being wrong", cn:"絕對正確的", ex:"Infallible means: Incapable of making mistakes or being wrong" },
+  "insatiable": { pos:"adj.", en:"Impossible to satisfy", cn:"貪得無厭的", ex:"Insatiable means: Impossible to satisfy" },
+  "irrational": { pos:"adj.", en:"Not logical or reasonable", cn:"不理智的", ex:"Irrational means: Not logical or reasonable" },
+  "moribund": { pos:"adj.", en:"At the point of death; lacking vitality", cn:"垂死的", ex:"Moribund means: At the point of death; lacking vitality" },
+  "nadir": { pos:"n.", en:"The lowest or most unsuccessful point", cn:"最低點", ex:"Nadir means: The lowest or most unsuccessful point" },
+  "panacea": { pos:"n.", en:"A solution to all problems", cn:"萬靈藥", ex:"Panacea means: A solution to all problems" },
+  "propinquity": { pos:"n.", en:"Nearness in place, time, or relationship", cn:"接近；鄰近", ex:"Propinquity means: Nearness in place, time, or relationship" },
+  "revere": { pos:"v.", en:"To feel deep respect or admiration for", cn:"尊崇；敬畏", ex:"Revere means: To feel deep respect or admiration for" },
+  "sedate": { pos:"adj.", en:"Calm, dignified, unhurried", cn:"安詳的；莊重的", ex:"Sedate means: Calm, dignified, unhurried" },
+  "serenity": { pos:"n.", en:"The state of being calm and peaceful", cn:"寧靜；平靜", ex:"Serenity means: The state of being calm and peaceful" },
+  "adherent": { pos:"n.", en:"A person who supports a cause", cn:"擁護者；信徒", ex:"Adherent means: A person who supports a cause" },
+  "adversary": { pos:"n.", en:"A person\'s opponent in a contest", cn:"對手；敵手", ex:"Adversary means: A person\'s opponent in a contest" },
+  "apathy": { pos:"n.", en:"Lack of interest or enthusiasm", cn:"冷漠；無興趣", ex:"Apathy means: Lack of interest or enthusiasm" },
+  "atypical": { pos:"adj.", en:"Not representative of a type", cn:"非典型的", ex:"Atypical means: Not representative of a type" },
+  "banal": { pos:"adj.", en:"Lacking originality, obvious and dull", cn:"平庸的；陳腐的", ex:"Banal means: Lacking originality, obvious and dull" },
+  "bliss": { pos:"n.", en:"Perfect happiness, great joy", cn:"極樂；狂喜", ex:"Bliss means: Perfect happiness, great joy" },
+  "burly": { pos:"adj.", en:"Large and strong, heavily built", cn:"魁梧的", ex:"Burly means: Large and strong, heavily built" },
+  "dilettante": { pos:"n.", en:"A person with a superficial interest", cn:"業餘愛好者；半吊子", ex:"Dilettante means: A person with a superficial interest" },
+  "exhort": { pos:"v.", en:"To strongly encourage or urge", cn:"敦促；告誡", ex:"Exhort means: To strongly encourage or urge" },
+  "forlorn": { pos:"adj.", en:"Pitifully sad and abandoned", cn:"孤苦伶仃的；絕望的", ex:"Forlorn means: Pitifully sad and abandoned" },
+  "fracas": { pos:"n.", en:"A noisy disturbance or quarrel", cn:"喧鬧的打鬥", ex:"Fracas means: A noisy disturbance or quarrel" },
+  "garrulous": { pos:"adj.", en:"Excessively talkative about trivial matters", cn:"喋喋不休的", ex:"Garrulous means: Excessively talkative about trivial matters" },
+  "gusto": { pos:"n.", en:"Enthusiasm and energy in doing something", cn:"熱情；津津有味", ex:"Gusto means: Enthusiasm and energy in doing something" },
+  "indolent": { pos:"adj.", en:"Wanting to avoid activity or effort", cn:"懶惰的", ex:"Indolent means: Wanting to avoid activity or effort" },
+  "inebriated": { pos:"adj.", en:"Drunk, intoxicated", cn:"醉酒的", ex:"Inebriated means: Drunk, intoxicated" },
+  "lithe": { pos:"adj.", en:"Thin, supple, and graceful", cn:"柔軟的；輕盈的", ex:"Lithe means: Thin, supple, and graceful" },
+  "nondescript": { pos:"adj.", en:"Lacking distinctive or interesting features", cn:"難以形容的；普通的", ex:"Nondescript means: Lacking distinctive or interesting features" },
+  "pique": { pos:"n.", en:"A feeling of irritation at being slighted", cn:"生氣；怨恨", ex:"Pique means: A feeling of irritation at being slighted" },
+  "platitude": { pos:"n.", en:"A remark that is overused and unoriginal", cn:"陳腔濫調", ex:"Platitude means: A remark that is overused and unoriginal" },
+  "wane": { pos:"n.", en:"A gradual decrease", cn:"衰退；減弱", ex:"Wane means: A gradual decrease" },
+  "candor": { pos:"n.", en:"The quality of being open and honest", cn:"坦率；真誠", ex:"Candor means: The quality of being open and honest" },
+  "charlatan": { pos:"n.", en:"A person who falsely claims to have skill", cn:"江湖郎中；騙子", ex:"Charlatan means: A person who falsely claims to have skill" },
+  "condescend": { pos:"v.", en:"To act as if one is superior", cn:"屈尊；俯就", ex:"Condescend means: To act as if one is superior" },
+  "decorum": { pos:"n.", en:"Behaviour in keeping with good taste", cn:"端莊；得體", ex:"Decorum means: Behaviour in keeping with good taste" },
+  "encumbrance": { pos:"n.", en:"A burden or impediment", cn:"累贅；妨礙", ex:"Encumbrance means: A burden or impediment" },
+  "extinct": { pos:"adj.", en:"No longer in existence", cn:"滅絕的", ex:"Extinct means: No longer in existence" },
+  "fledgling": { pos:"n.", en:"A person or organisation that is new and inexperienced", cn:"無經驗的人；幼鳥", ex:"Fledgling means: A person or organisation that is new and inexperienced" },
+  "galvanize": { pos:"v.", en:"To shock or excite into taking action", cn:"激勵；刺激", ex:"Galvanize means: To shock or excite into taking action" },
+  "gaudy": { pos:"adj.", en:"Extravagantly bright or showy", cn:"俗麗的", ex:"Gaudy means: Extravagantly bright or showy" },
+  "idyllic": { pos:"adj.", en:"Like an idyll, peaceful and happy", cn:"田園詩般的", ex:"Idyllic means: Like an idyll, peaceful and happy" },
+  "jocose": { pos:"adj.", en:"Fond of or characterised by joking", cn:"詼諧的；開玩笑的", ex:"Jocose means: Fond of or characterised by joking" },
+  "jubilant": { pos:"adj.", en:"Feeling or expressing great happiness", cn:"歡呼的；喜悅的", ex:"Jubilant means: Feeling or expressing great happiness" },
+  "malign": { pos:"v.", en:"To speak about in an unfairly critical way", cn:"誹謗；中傷", ex:"Malign means: To speak about in an unfairly critical way" },
+  "mortify": { pos:"v.", en:"To cause great embarrassment", cn:"使屈辱；使窘迫", ex:"Mortify means: To cause great embarrassment" },
+  "omnipotent": { pos:"adj.", en:"Having unlimited power", cn:"全能的", ex:"Omnipotent means: Having unlimited power" },
+  "peremptory": { pos:"adj.", en:"Insisting on immediate obedience", cn:"專橫的；不容反抗的", ex:"Peremptory means: Insisting on immediate obedience" },
+  "precedent": { pos:"n.", en:"An earlier event used as a guide", cn:"先例；前例", ex:"Precedent means: An earlier event used as a guide" },
+  "rustic": { pos:"adj.", en:"Having a simple and unsophisticated character", cn:"鄉村的；質樸的", ex:"Rustic means: Having a simple and unsophisticated character" },
+  "wheedle": { pos:"v.", en:"To use flattery or coaxing to persuade", cn:"哄騙；誘騙", ex:"Wheedle means: To use flattery or coaxing to persuade" },
+  "zenith": { pos:"n.", en:"The time at which something is most powerful", cn:"頂點；鼎盛時期", ex:"Zenith means: The time at which something is most powerful" }
+};
+
+// ══════════════════════════════════════════════
+// 20 MCQ QUESTIONS
+// Answer key: B,C,A,D,B,C,A,D,D,B,A,B,A,D,C,B,C,A,A,D
+// ══════════════════════════════════════════════
+const questions = [
+  { q:"The movement\'s most ardent __________ s had remained loyal through years of nadir and adversity — a serenity in the face of setback that the most disgruntled critics could not credibly attribute to irrationality, since the depth of commitment clearly rested on cogent philosophical foundations rather than mere avarice or self-interest.", opts:["pique","adherent","bliss","platitude"], answer:"adherent", clues:["movement","ardent","remained","adversity","serenity"] },
+  { q:"The most effective __________ is not one who merely opposes but one who forces genuine intellectual engagement — a vitriolic critic whose pungent objections are sufficiently cogent to compel the refinement of arguments that might otherwise remain unexamined, serving paradoxically as an agent of intellectual improvement.", opts:["platitude","dilettante","adversary","fracas"], answer:"adversary", clues:["effective","merely","opposes","forces","genuine"] },
+  { q:"The __________ that had come to characterise public engagement with the political process was not, the political scientist argued, an inherent feature of democratic societies but the predictable consequence of years of mendacious political communication — a rational disengagement from institutions that had demonstrably failed to evince the candour that trust required.", opts:["apathy","adversary","adherent","fracas"], answer:"apathy", clues:["characterise","public","engagement","political","process"] },
+  { q:"The case was __________ in so many respects that the precedents typically cited by adherents of the conventional approach were essentially inapplicable — a recondite set of circumstances that required not the inveterate application of established doctrine but a genuinely creative legal analysis.", opts:["garrulous","lithe","nondescript","atypical"], answer:"atypical", clues:["respects","precedents","typically","adherents","conventional"] },
+  { q:"The critique was not wrong in its substance but so __________ in its formulation that it failed to make any impression on an audience that had heard identical objections articulated with greater force and originality on numerous previous occasions — a pedagogical failure that the most perspicacious students immediately recognised.", opts:["nondescript","banal","garrulous","burly"], answer:"banal", clues:["critique","substance","formulation","failed","impression"] },
+  { q:"The __________ of the discovery\'s first moment — that pure exultation of incontrovertible confirmation after years of ardent pursuit — was, she later reflected, entirely incompatible with equanimity, the serenity she normally prized dissolving instantly into an ecstatic cacophony of relief, vindication, and wonder.", opts:["fracas","pique","bliss","adherent"], answer:"bliss", clues:["discovery","moment","exultation","incontrovertible","confirmation"] },
+  { q:"The __________ security officer\'s imposing physique proved far less relevant to his effectiveness than his remarkable equanimity in difficult situations — his sedate demeanour under the most acute provocation consistently defusing bedlam that his more reactive colleagues would have inadvertently escalated.", opts:["burly","atypical","nondescript","garrulous"], answer:"burly", clues:["security","officer","imposing","physique","proved"] },
+  { q:"The __________ \'s superficial engagement with the subject — evident in the banal observations he offered and the inveterate avoidance of any recondite detail that might reveal the limits of his preparation — stood in acute contrast to the genuine mastery that the programme\'s most assiduous participants had clearly cultivated.", opts:["platitude","pique","fracas","dilettante"], answer:"dilettante", clues:["superficial","engagement","subject","evident","observations"] },
+  { q:"The celebrated mentor would __________ her students to embrace the most intimidating intellectual challenges rather than retreating to the familiar — not through vitriolic criticism of caution but through the ardent and congenial modelling of intellectual courage that had characterised her own distinguished career.", opts:["pique","banal","dilettante","exhort"], answer:"exhort", clues:["celebrated","mentor","students","embrace","intimidating"] },
+  { q:"The __________ figure of the exhorted but ultimately ignored whistleblower — bereft of institutional protection, abandoned by erstwhile colleagues, and facing the acute detriment of professional isolation — represented precisely the kind of vulnerability that robust legal safeguards were specifically designed to prevent.", opts:["burly","forlorn","inebriated","atypical"], answer:"forlorn", clues:["figure","exhorted","ultimately","ignored","whistleblower"] },
+  { q:"The __________ that erupted outside the committee room — two __________ groups of adherents from opposed factions engaged in progressively more vitriolic exchanges — was swiftly __________ d by security personnel before it could escalate into the kind of bedlam that the media presence would have amplified into a reputational catastrophe.", opts:["fracas","apathy","platitude","bliss"], answer:"fracas", clues:["erupted","committee","groups","adherents","opposed"] },
+  { q:"The contrast between the __________ sociability she displayed at public events and the taciturn focus of her private working hours reflected not duplicity but a genuine compartmentalisation — the ardent engagement with ideas that her voluminous published output attested requiring an equivalent degree of protected solitude.", opts:["indolent","garrulous","banal","lithe"], answer:"garrulous", clues:["contrast","sociability","displayed","public","events"] },
+  { q:"She approached even the most labyrinthine administrative challenges with a __________ that her more lethargic colleagues found both enviable and faintly exasperating — the same ardent energy she brought to intellectual work apparently extending, apparently inexhaustibly, into every dimension of her professional activity.", opts:["gusto","pique","fracas","adversary"], answer:"gusto", clues:["approached","labyrinthine","administrative","challenges","lethargic"] },
+  { q:"The __________ management style that had prevailed during the organisation\'s most comfortable years had produced a workforce so accustomed to minimal challenge that the demands of genuine crisis management proved acutely disorienting — the sudden imperative for ardent effort exposing the atrophy that decades of comfortable stagnation had generated.", opts:["burly","lithe","forlorn","indolent"], answer:"indolent", clues:["management","prevailed","organisation","comfortable","produced"] },
+  { q:"The banal explanation that the incident had been precipitated by an __________ participant failed to satisfy investigators who had corroborated through multiple independent sources that the sequence of events reflected a pattern of inveterate institutional dysfunction rather than the aberrant behaviour of a single individual on a single occasion.", opts:["burly","indolent","inebriated","nondescript"], answer:"inebriated", clues:["explanation","incident","precipitated","participant","failed"] },
+  { q:"The __________ precision with which she navigated the most complex procedural terrain — moving through institutional constraints with a fluency that suggested deep familiarity with both the explicit rules and the recondite informal conventions that governed them — marked her as an adroit operator of exceptional calibre.", opts:["burly","lithe","indolent","banal"], answer:"lithe", clues:["precision","navigated","complex","procedural","terrain"] },
+  { q:"The __________ exterior of the building gave no indication of the extraordinary intellectual activity it contained — a deliberate architectural choice that the institute\'s founders had considered paramount in an era when the organisation\'s most inveterate adversaries were actively seeking to identify and impede its operations.", opts:["garrulous","burly","nondescript","indolent"], answer:"nondescript", clues:["exterior","building","indication","extraordinary","intellectual"] },
+  { q:"The __________ she felt at being excluded from the key deliberation was understandable — she was, by any cogent assessment, the most qualified person in the organisation to contribute to the discussion, and the slight was sufficiently overt to constitute a blatant disregard for both her expertise and her institutional standing.", opts:["pique","fracas","bliss","dilettante"], answer:"pique", clues:["excluded","deliberation","understandable","cogent","assessment"] },
+  { q:"The response was so replete with __________ s that even the most indolent observer could perceive the absence of any genuine analytical engagement — the verbal equivalent of the nondescript facade that some institutions deploy to obscure the inertia that has replaced the ardent purposefulness of their founding years.", opts:["platitude","bliss","gusto","dilettante"], answer:"platitude", clues:["response","replete","indolent","observer","perceive"] },
+  { q:"The __________ of public confidence in the institution had proceeded with the same inexorable momentum as its rise — a gradual erosion over years of banal communication, platitudinous leadership responses to genuine crises, and the indolent failure to initiate the reforms that more perspicacious observers had been exhorting for the better part of a decade.", opts:["fracas","apathy","gusto","wane"], answer:"wane", clues:["public","confidence","institution","proceeded","inexorable"] }
+];
+
+// ══════════════════════════════════════════════
+// APP STATE
+// ══════════════════════════════════════════════
+let cur = 0, score = 0, answered = false;
+let wrongWords = [];
+let passageClickedWords = [];  // tracks non-vocab words students looked up
+
+// ══════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════
+function render() {
+  const q = questions[cur];
+  answered = false;
+  const pct = Math.round(cur / questions.length * 100);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progLabel').textContent = `Question ${cur+1} of ${questions.length}`;
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('qNum').textContent = `Question ${cur+1}`;
+  document.getElementById('scoreDisp').textContent = score;
+  document.getElementById('totalDisp').textContent = questions.length;
+
+  // helper reset
+  const h = document.getElementById('helper');
+  h.classList.remove('show');
+
+  // passage
+  document.getElementById('passage').innerHTML = buildPassage(q.q);
+
+  // options
+  const labels = ['A','B','C','D'];
+  const grid = document.getElementById('opts');
+  grid.innerHTML = '';
+  q.opts.forEach((word, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="opt-lbl">${labels[i]}</span>${word}`;
+    btn.onclick = () => handleAnswer(word, btn);
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('feedback').classList.remove('show');
+  const nb = document.getElementById('nextBtn');
+  nb.classList.remove('show');
+  nb.style.display = 'none';
+
+  // animate
+  const card = document.getElementById('qCard');
+  card.style.animation = 'none'; void card.offsetWidth;
+  card.style.animation = 'up .3s ease';
+}
+
+function buildPassage(text) {
+  return text.split(/(\s+)/).map(part => {
+    if (/^\s+$/.test(part)) return part;
+    if (part === '__________') return `<span class="blank">__________</span>`;
+    const pre = part.match(/^[^a-zA-Z]*/)[0];
+    const suf = part.match(/[^a-zA-Z]*$/)[0];
+    const core = part.replace(/^[^a-zA-Z]+|[^a-zA-Z]+$/g, '');
+    if (!core) return part;
+    return `${pre}<span class="w" data-w="${core.toLowerCase()}" onclick="lookup(this)">${core}</span>${suf}`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// DICTIONARY LOOKUP
+// ══════════════════════════════════════════════
+async function lookup(el) {
+  const word = el.dataset.w;
+  const h = document.getElementById('helper');
+  h.classList.add('show');
+  document.getElementById('helperWord').textContent = word;
+  document.getElementById('helperCn').textContent = '';
+
+  // Track every word the student clicks during the quiz (for end screen)
+  if (!passageClickedWords.includes(word) && word.length > 2) {
+    passageClickedWords.push(word);
+  }
+
+  // STEP 1: If it's one of our 20 vocab words — show instantly with Chinese
+  if (vocab[word]) {
+    const d = vocab[word];
+    document.getElementById('helperPos').textContent = d.pos;
+    document.getElementById('helperDef').textContent = d.en;
+    document.getElementById('helperCn').textContent = '🇹🇼 ' + d.cn;
+    return;
+  }
+
+  // STEP 2: Other passage words — try free dictionary API
+  document.getElementById('helperPos').textContent = '';
+  document.getElementById('helperDef').innerHTML = '<span style="color:var(--muted);font-style:italic">Looking up “' + word + '”…</span>';
+  try {
+    const res = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + word);
+    if (!res.ok) throw 0;
+    const data = await res.json();
+    const m = data[0]?.meanings?.[0];
+    if (m) {
+      document.getElementById('helperPos').textContent = m.partOfSpeech;
+      document.getElementById('helperDef').textContent = m.definitions[0]?.definition || 'No definition found.';
+    } else throw 0;
+  } catch {
+    document.getElementById('helperDef').innerHTML = '<em style="color:var(--muted)">Definition not found — try another word.</em>';
+  }
+}
+
+// ══════════════════════════════════════════════
+// ANSWER HANDLING
+// ══════════════════════════════════════════════
+function handleAnswer(chosen, btn) {
+  if (answered) return;
+  answered = true;
+  const q = questions[cur];
+  const correct = chosen === q.answer;
+  if (correct) score++; else if (!wrongWords.includes(q.answer)) wrongWords.push(q.answer);
+  document.getElementById('scoreDisp').textContent = score;
+
+  // style buttons
+  document.querySelectorAll('.opt').forEach(b => {
+    b.disabled = true;
+    const word = b.textContent.trim().replace(/^[A-D]/,'').trim();
+    if (word === q.answer) b.classList.add('correct');
+    else if (b === btn && !correct) b.classList.add('wrong');
+  });
+
+  // highlight clues
+  document.querySelectorAll('#passage .w').forEach(s => {
+    if (q.clues.some(c => c.toLowerCase() === s.dataset.w)) s.classList.add('clue');
+  });
+
+  // feedback
+  buildFeedback(q);
+  document.getElementById('feedback').classList.add('show');
+
+  const nb = document.getElementById('nextBtn');
+  nb.style.display = 'flex'; nb.classList.add('show');
+  nb.innerHTML = cur < questions.length-1
+    ? 'Next question <i class="fas fa-arrow-right"></i>'
+    : 'See results <i class="fas fa-flag-checkered"></i>';
+}
+
+function buildFeedback(q) {
+  const grid = document.getElementById('fbGrid');
+  grid.innerHTML = '';
+  q.opts.forEach(word => {
+    const d = vocab[word] || { pos:'', en:'—', cn:'—', ex:'—' };
+    const isAns = word === q.answer;
+    const item = document.createElement('div');
+    item.className = 'fb-item' + (isAns ? ' is-ans' : '');
+    item.innerHTML = `
+      <div class="fb-word">
+        <span>${word}${isAns?' ✓':''}</span>
+        <button class="fb-tts" onclick="say('${word}')"><i class="fas fa-volume-low"></i></button>
+      </div>
+      <div class="fb-en">${d.en}</div>
+      <div class="fb-cn">${d.cn}</div>
+      <div class="fb-ex">
+        <button class="fb-ex-tts" onclick="say('${(d.ex||'').replace(/'/g,"\\'")}')"><i class="fas fa-play-circle"></i></button>
+        <span>${d.ex||''}</span>
+      </div>`;
+    grid.appendChild(item);
+  });
+}
+
+// ══════════════════════════════════════════════
+// TTS
+// ══════════════════════════════════════════════
+function say(text) {
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.9;
+  const vs = speechSynthesis.getVoices();
+  const f = vs.find(v => v.lang==='en-US' && /female|woman|samantha|karen|victoria|zira/i.test(v.name));
+  if (f) u.voice = f;
+  speechSynthesis.speak(u);
+}
+function speakPassage() {
+  const q = questions[cur];
+  const text = q.q.replace(/__________/g, 'blank');
+  const btn = document.getElementById('ttsBtn');
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.86;
+  const vs = speechSynthesis.getVoices();
+  const f = vs.find(v => v.lang==='en-US' && /female|woman|samantha|karen|victoria|zira/i.test(v.name));
+  if (f) u.voice = f;
+  btn.classList.add('on');
+  u.onend = u.onerror = () => btn.classList.remove('on');
+  speechSynthesis.speak(u);
+}
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+function nextQ() {
+  cur++;
+  if (cur >= questions.length) showEnd();
+  else render();
+}
+
+// ══════════════════════════════════════════════
+// REVIEW CARD BUILDER
+// ══════════════════════════════════════════════
+function makeReviewCard(word, cardClass) {
+  const d = vocab[word];
+  const id = 'rc_' + word.replace(/[^a-z]/g,'');
+  if (d) {
+    // Vocab word — full info available
+    return `<div class="review-card ${cardClass}" id="${id}" onclick="toggleCard('${id}')">
+      <div class="rc-word">
+        <span>${word}</span>
+        <span class="rc-toggle"><i class="fas fa-chevron-down"></i></span>
+      </div>
+      <div class="rc-pos">${d.pos}</div>
+      <div class="rc-detail">
+        <div class="rc-en">${d.en}</div>
+        <div class="rc-cn">${d.cn}</div>
+        <div class="rc-ex">
+          <button class="rc-tts" onclick="event.stopPropagation();say('${word}. ${(d.ex||'').replace(/'/g,"\'")}')"><i class="fas fa-volume-high"></i></button>
+          <span>${d.ex || ''}</span>
+        </div>
+      </div>
+    </div>`;
+  } else {
+    // Passage word — fetch definition on expand
+    return `<div class="review-card ${cardClass}" id="${id}" onclick="expandPassageCard('${id}','${word}')">
+      <div class="rc-word">
+        <span>${word}</span>
+        <span class="rc-toggle"><i class="fas fa-chevron-down"></i></span>
+      </div>
+      <div class="rc-detail" id="${id}_detail">
+        <div style="color:var(--muted);font-style:italic;font-size:0.8rem">Click to look up...</div>
+      </div>
+    </div>`;
+  }
+}
+
+// ── TTS HELPERS FOR REVIEW CARDS (avoids quote conflicts) ──
+function rcSpeak(btn) {
+  const word = btn.getAttribute('data-tts');
+  const exSpan = btn.parentElement.querySelector('.rc-ex-text');
+  const ex = exSpan ? exSpan.textContent.trim() : '';
+  const text = ex ? word + '. ' + ex : word;
+  say(text);
+}
+function rcSpeakEl(btn) {
+  const text = btn.getAttribute('data-tts-text') || btn.getAttribute('data-tts') || '';
+  say(text);
+}
+
+function toggleCard(id) {
+  const card = document.getElementById(id);
+  card.classList.toggle('open');
+  const icon = card.querySelector('.rc-toggle i');
+  if (icon) icon.className = card.classList.contains('open') ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+}
+
+async function expandPassageCard(id, word) {
+  const card = document.getElementById(id);
+  const detail = document.getElementById(id + '_detail');
+  if (card.classList.contains('open')) { toggleCard(id); return; }
+  card.classList.add('open');
+  const icon = card.querySelector('.rc-toggle i');
+  if (icon) icon.className = 'fas fa-chevron-up';
+  detail.innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:0.8rem"><i class="fas fa-spinner fa-spin"></i> Looking up...</div>';
+  try {
+    const res = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + word);
+    if (!res.ok) throw 0;
+    const data = await res.json();
+    const m = data[0]?.meanings?.[0];
+    const def = m?.definitions?.[0]?.definition || 'No definition found.';
+    const pos = m?.partOfSpeech || '';
+    const ex = m?.definitions?.[0]?.example || '';
+    const safe = (word + '. ' + def + (ex ? '. ' + ex : '')).replace(/'/g,"\'");
+    detail.innerHTML = `
+      <div class="rc-pos">${pos}</div>
+      <div class="rc-en">${def}</div>
+      ${ex ? `<div class="rc-ex"><button class="rc-tts" data-tts="${word}" onclick="event.stopPropagation();rcSpeak(this)"><i class="fas fa-volume-high"></i></button><span class="rc-ex-text">${ex}</span></div>` : ''}`;
+  } catch {
+    detail.innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:0.8rem">Definition not found.</div>';
+  }
+}
+
+// ══════════════════════════════════════════════
+// END SCREEN
+// ══════════════════════════════════════════════
+function showEnd() {
+  document.getElementById('quizArea').style.display = 'none';
+  const end = document.getElementById('endScreen');
+  end.classList.add('show');
+  document.getElementById('progFill').style.width = '100%';
+  document.getElementById('progLabel').textContent = 'Quiz complete!';
+  document.getElementById('progPct').textContent = '100%';
+
+  const pct = Math.round(score / questions.length * 100);
+  document.getElementById('endScore').textContent = `${score}/${questions.length}`;
+  document.getElementById('endPct').textContent = `${pct}% correct`;
+
+  let icon, msg, cn;
+  if (pct === 100) { icon='🏆'; msg="Perfect score! Absolutely outstanding vocabulary mastery."; cn="滿分！詞彙能力非常出色！"; }
+  else if (pct >= 80) { icon='🌟'; msg="Excellent work! You have a strong command of these SAT words."; cn="表現優異！對這些SAT單字掌握得很好。"; }
+  else if (pct >= 60) { icon='📚'; msg="Good effort! Review the words you missed and try again."; cn="表現不錯！複習答錯的單字再試一次。"; }
+  else { icon='💪'; msg="Keep practising — every attempt builds stronger vocabulary!"; cn="繼續加油！每次練習都能讓詞彙更進步。"; }
+  document.getElementById('endIcon').textContent = icon;
+  document.getElementById('endMsg').textContent = msg;
+  document.getElementById('endCn').textContent = cn;
+
+  // ── WRONG WORDS — rich review cards ──
+  const wb = document.getElementById('wrongBox');
+  if (wrongWords.length === 0) {
+    wb.innerHTML = `<div class="review-section"><div class="review-section-title" style="color:var(--correct)"><i class="fas fa-check-circle"></i> Perfect — no words to review!</div></div>`;
+  } else {
+    const cards = wrongWords.map(w => makeReviewCard(w, 'wrong-card')).join('');
+    wb.innerHTML = `
+      <div class="review-section">
+        <div class="review-section-title">
+          <i class="fas fa-circle-exclamation" style="color:var(--wrong)"></i>
+          Words to review — ${wrongWords.length} missed
+          <span style="font-size:0.75rem;color:var(--muted);font-weight:400;margin-left:4px">(click any word to expand)</span>
+        </div>
+        <div class="review-cards">${cards}</div>
+        <div style="margin-top:10px;font-size:0.78rem;color:var(--muted)">These words are included in your teacher's results report.</div>
+      </div>`;
+  }
+
+  // ── PASSAGE CLICKED WORDS — additional vocab discovered ──
+  const pb = document.getElementById('passageBox');
+  const newWords = passageClickedWords.filter(w => w.length > 2);
+  if (newWords.length > 0) {
+    const cards = newWords.map(w => makeReviewCard(w, 'passage-card')).join('');
+    pb.innerHTML = `
+      <div class="review-section">
+        <div class="review-section-title">
+          <i class="fas fa-magnifying-glass" style="color:var(--accent)"></i>
+          Additional new words found in the passages — ${newWords.length} words
+          <span style="font-size:0.75rem;color:var(--muted);font-weight:400;margin-left:4px">(click any word to expand)</span>
+        </div>
+        <div class="review-cards">${cards}</div>
+      </div>`;
+  } else {
+    pb.innerHTML = '';
+  }
+}
+
+// ══════════════════════════════════════════════
+// SUBMIT SCORE TO GOOGLE SHEETS
+// ══════════════════════════════════════════════
+async function submitScore() {
+  const name = document.getElementById('studentName').value.trim();
+  const statusEl = document.getElementById('submitStatus');
+  if (!name) {
+    statusEl.className = 'submit-status err';
+    statusEl.textContent = '⚠ Please enter your name before submitting.';
+    return;
+  }
+  if (GOOGLE_SCRIPT_URL === "PASTE_YOUR_GOOGLE_SCRIPT_URL_HERE") {
+    statusEl.className = 'submit-status err';
+    statusEl.innerHTML = '⚠ Teacher setup not complete yet. Ask your teacher to configure the score collection link.';
+    return;
+  }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting…';
+  statusEl.className = 'submit-status';
+
+  const payload = {
+    studentName: name,
+    week: 29,
+    score: score,
+    total: questions.length,
+    percent: Math.round(score / questions.length * 100),
+    wrongWords: wrongWords.join(', ') || 'none',
+    passageWords: passageClickedWords.join(', ') || 'none',
+    timestamp: new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })
+  };
+
+  try {
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    statusEl.className = 'submit-status ok';
+    statusEl.innerHTML = `<i class="fas fa-check-circle"></i> Score submitted successfully! Your teacher can now see your results.`;
+    btn.innerHTML = '<i class="fas fa-check"></i> Submitted';
+    document.getElementById('studentName').disabled = true;
+  } catch (e) {
+    statusEl.className = 'submit-status err';
+    statusEl.innerHTML = '⚠ Submission failed. Please check your internet connection and try again.';
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit';
+  }
+}
+
+// ══════════════════════════════════════════════
+// RESTART
+// ══════════════════════════════════════════════
+function restart() {
+  cur = 0; score = 0; wrongWords = []; passageClickedWords = [];
+  document.getElementById('endScreen').classList.remove('show');
+  document.getElementById('quizArea').style.display = 'block';
+  document.getElementById('studentName').value = '';
+  document.getElementById('studentName').disabled = false;
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').innerHTML = '<i class="fas fa-paper-plane"></i> Submit';
+  document.getElementById('submitStatus').className = 'submit-status';
+  render();
+}
+
+// Init
+speechSynthesis.getVoices();
+render();
+</script>
+</body>
+</html>
