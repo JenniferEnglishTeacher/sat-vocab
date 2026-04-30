@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 37 Interactive Quiz — Barron's 1100 Words</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-body: 'DM Sans', 'Segoe UI', sans-serif;
+    --color-primary: #1a3a5c;
+    --color-accent: #c8962e;
+    --color-correct: #2d7a4f;
+    --color-incorrect: #b53a2f;
+    --color-clue: #fff3a3;
+    --color-surface: #faf8f5;
+    --color-card: #ffffff;
+    --color-border: #e0d8cc;
+    --color-text: #2c2c2c;
+    --color-muted: #7a7065;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); background: var(--color-surface); color: var(--color-text); min-height: 100vh; }
+  .quiz-header { background: linear-gradient(135deg, var(--color-primary) 0%, #2a5a8c 100%); color: white; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
+  .quiz-header h1 { font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; }
+  .quiz-header .subtitle { font-size: 0.82rem; opacity: 0.8; margin-top: 3px; }
+  .score-counter { background: rgba(255,255,255,0.15); border-radius: 12px; padding: 8px 16px; text-align: center; }
+  .score-counter .score-num { font-family: var(--font-heading); font-size: 1.6rem; font-weight: 700; }
+  .score-counter .score-label { font-size: 0.72rem; opacity: 0.8; }
+  .progress-bar-wrap { background: #e0d8cc; height: 6px; }
+  .progress-bar { height: 6px; background: var(--color-accent); transition: width 0.4s ease; }
+  .progress-text { text-align: center; font-size: 0.82rem; color: var(--color-muted); padding: 8px; background: var(--color-surface); }
+  .quiz-card { max-width: 780px; margin: 24px auto; padding: 0 16px 40px; }
+  .card { background: var(--color-card); border-radius: 16px; box-shadow: 0 4px 20px rgba(26,58,92,0.1); overflow: hidden; }
+  .passage-wrap { padding: 24px 28px 16px; border-bottom: 1px solid var(--color-border); }
+  .passage-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .q-number { font-size: 0.8rem; color: var(--color-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .tts-btn { background: none; border: 1px solid var(--color-border); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 0.82rem; color: var(--color-primary); transition: all 0.2s; }
+  .tts-btn:hover { background: var(--color-primary); color: white; }
+  .passage-text { font-size: 1.02rem; line-height: 1.75; color: var(--color-text); }
+  .passage-text span.word { cursor: pointer; border-bottom: 1px dotted var(--color-muted); transition: background 0.15s; border-radius: 2px; }
+  .passage-text span.word:hover { background: #e8f0f7; }
+  .passage-text span.clue-highlight { background: var(--color-clue); border-radius: 3px; padding: 0 2px; }
+  .blank { font-weight: 700; color: var(--color-primary); letter-spacing: 0.1em; }
+  .word-helper { margin: 0 28px 8px; padding: 10px 14px; background: #eef4f8; border-left: 3px solid var(--color-accent); border-radius: 4px; font-size: 0.88rem; color: var(--color-text); display: none; }
+  .word-helper.visible { display: block; }
+  .word-helper .wh-word { font-weight: 700; color: var(--color-primary); margin-bottom: 3px; }
+  .word-helper .wh-def { color: var(--color-muted); }
+  .options-wrap { padding: 16px 28px 20px; }
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media(max-width: 560px) { .options-grid { grid-template-columns: 1fr; } }
+  .option-btn { padding: 12px 18px; background: #f4f0eb; border: 2px solid var(--color-border); border-radius: 10px; cursor: pointer; font-family: var(--font-body); font-size: 0.95rem; text-align: left; transition: all 0.2s; color: var(--color-text); font-weight: 500; }
+  .option-btn:hover:not(:disabled) { border-color: var(--color-primary); background: #eef4f8; }
+  .option-btn.correct { background: #e8f5ee; border-color: var(--color-correct); color: var(--color-correct); }
+  .option-btn.incorrect { background: #fceaea; border-color: var(--color-incorrect); color: var(--color-incorrect); }
+  .option-btn:disabled { cursor: default; }
+  .option-label { display: inline-block; width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: white; font-size: 0.75rem; font-weight: 700; text-align: center; line-height: 22px; margin-right: 8px; flex-shrink: 0; }
+  .option-btn.correct .option-label { background: var(--color-correct); }
+  .option-btn.incorrect .option-label { background: var(--color-incorrect); }
+  .feedback-box { margin: 0 28px 20px; display: none; }
+  .feedback-box.visible { display: block; }
+  .feedback-title { font-weight: 700; font-size: 0.88rem; color: var(--color-primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .feedback-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media(max-width: 560px) { .feedback-grid { grid-template-columns: 1fr; } }
+  .feedback-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; padding: 10px 12px; }
+  .feedback-card.is-answer { border-color: var(--color-correct); background: #e8f5ee; }
+  .fc-word { font-weight: 700; font-size: 0.92rem; color: var(--color-primary); }
+  .fc-en { font-size: 0.82rem; color: var(--color-muted); margin: 2px 0; }
+  .fc-cn { font-size: 0.85rem; color: var(--color-text); }
+  .fc-sentence { font-size: 0.78rem; color: var(--color-muted); margin-top: 4px; font-style: italic; }
+  .fc-tts { background: none; border: none; color: var(--color-accent); cursor: pointer; font-size: 0.85rem; padding: 2px 4px; }
+  .nav-wrap { padding: 0 28px 24px; display: flex; justify-content: flex-end; }
+  .next-btn { background: var(--color-primary); color: white; border: none; border-radius: 10px; padding: 12px 28px; font-family: var(--font-body); font-size: 0.95rem; font-weight: 600; cursor: pointer; display: none; transition: background 0.2s; }
+  .next-btn.visible { display: block; }
+  .next-btn:hover { background: #2a5a8c; }
+  .final-screen { display: none; max-width: 560px; margin: 40px auto; text-align: center; padding: 0 16px; }
+  .final-screen.visible { display: block; }
+  .final-score { font-family: var(--font-heading); font-size: 4rem; color: var(--color-primary); }
+  .final-percent { font-size: 1.2rem; color: var(--color-accent); font-weight: 600; margin-bottom: 12px; }
+  .final-msg { font-size: 1rem; color: var(--color-muted); margin-bottom: 8px; }
+  .final-cn { font-size: 0.92rem; color: var(--color-muted); }
+  .restart-btn { margin-top: 28px; background: var(--color-primary); color: white; border: none; border-radius: 10px; padding: 14px 36px; font-family: var(--font-body); font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .restart-btn:hover { background: #2a5a8c; }
+  .start-screen { max-width: 560px; margin: 60px auto; text-align: center; padding: 0 16px; }
+  .start-screen h2 { font-family: var(--font-heading); font-size: 2rem; color: var(--color-primary); margin-bottom: 12px; }
+  .start-screen p { color: var(--color-muted); margin-bottom: 28px; font-size: 0.97rem; }
+  .start-btn { background: var(--color-primary); color: white; border: none; border-radius: 10px; padding: 14px 42px; font-family: var(--font-body); font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .start-btn:hover { background: #2a5a8c; }
+</style>
+</head>
+<body>
+<div class="quiz-header">
+  <div>
+    <h1>Unit 37 — Barron's 1100 Words</h1>
+    <div class="subtitle">EFL SAT Vocabulary Interactive Quiz</div>
+  </div>
+  <div class="score-counter">
+    <div class="score-num" id="scoreNum">0</div>
+    <div class="score-label">Score</div>
+  </div>
+</div>
+<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+<div class="progress-text" id="progressText">Question 1 of 20</div>
+<div class="start-screen" id="startScreen">
+  <h2>Unit 37 Quiz</h2>
+  <p>20 SAT-style reading questions using this unit's vocabulary words.<br>Click each word in the passage to look it up. Press 🔊 to listen.</p>
+  <button class="start-btn" onclick="startQuiz()">Start Quiz →</button>
+</div>
+<div class="quiz-card" id="quizCard" style="display:none">
+  <div class="card">
+    <div class="passage-wrap">
+      <div class="passage-meta">
+        <span class="q-number" id="qNum">Question 1</span>
+        <button class="tts-btn" onclick="speakPassage()"><i class="fa fa-volume-up"></i> Listen</button>
+      </div>
+      <div class="passage-text" id="passageText"></div>
+    </div>
+    <div class="word-helper" id="wordHelper">
+      <div class="wh-word" id="whWord"></div>
+      <div class="wh-def" id="whDef"></div>
+    </div>
+    <div class="options-wrap">
+      <div class="options-grid" id="optionsGrid"></div>
+    </div>
+    <div class="feedback-box" id="feedbackBox">
+      <div class="feedback-title">All Options Explained</div>
+      <div class="feedback-grid" id="feedbackGrid"></div>
+    </div>
+    <div class="nav-wrap">
+      <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+    </div>
+  </div>
+</div>
+<div class="final-screen" id="finalScreen">
+  <div class="final-score" id="finalScore">0/20</div>
+  <div class="final-percent" id="finalPercent"></div>
+  <div class="final-msg" id="finalMsg"></div>
+  <div class="final-cn" id="finalCn"></div>
+  <button class="restart-btn" onclick="restartQuiz()">Try Again ↺</button>
+</div>
+<script>
+const questions = [
+  {
+    "q": "The young trader's __________ decision to double his position without consulting risk management protocols resulted in catastrophic losses when the market moved sharply against his projection. Senior traders who reviewed the incident noted that emotional overconfidence following a recent success had overridden the systematic decision-making discipline that effective risk management fundamentally required in volatile trading conditions.",
+    "options": [
+      "impenitent",
+      "impetuous",
+      "impiety",
+      "implausible"
+    ],
+    "answer": "impetuous",
+    "clues": [
+      "impulsive",
+      "rash",
+      "hasty",
+      "overconfidence"
+    ]
+  },
+  {
+    "q": "The consultant's __________ assessment of the organization's operational inefficiencies identified root causes that internal management had been unable to articulate despite years of awareness that something was fundamentally wrong. Her analytical clarity and willingness to state uncomfortable conclusions directly enabled the leadership team to implement targeted interventions that produced measurable improvements within a single financial quarter.",
+    "options": [
+      "inadvertent",
+      "inimical",
+      "incisive",
+      "indolent"
+    ],
+    "answer": "incisive",
+    "clues": [
+      "sharp",
+      "analytical",
+      "penetrating",
+      "clarity"
+    ]
+  },
+  {
+    "q": "The disciplinary committee was particularly troubled by the employee's __________ attitude during the formal review, noting that his complete absence of remorse and tendency to reframe each documented violation as a reasonable response to unreasonable institutional constraints suggested insufficient commitment to the behavioral change that continued employment would require.",
+    "options": [
+      "impenitent",
+      "importune",
+      "impudent",
+      "impugn"
+    ],
+    "answer": "impenitent",
+    "clues": [
+      "unrepentant",
+      "remorse",
+      "unapologetic",
+      "attitude"
+    ]
+  },
+  {
+    "q": "The conference keynote address disappointed an audience that had anticipated substantive engagement with current research challenges, instead delivering a thoroughly __________ overview of developments that specialists had absorbed years earlier, presented without original analysis, provocative framing, or any acknowledgment of the significant ongoing debates that made the field genuinely dynamic and intellectually alive.",
+    "options": [
+      "inert",
+      "infallible",
+      "ingenuous",
+      "insipid"
+    ],
+    "answer": "insipid",
+    "clues": [
+      "bland",
+      "vapid",
+      "tedious",
+      "without"
+    ]
+  },
+  {
+    "q": "The programmer's __________ introduction of a security vulnerability during routine maintenance—overlooking a single boundary-checking condition in a heavily interdependent codebase—created an exposure that sophisticated attackers exploited within hours of the update's deployment. The incident reinforced arguments for mandatory independent security review of all production changes, regardless of their apparently limited scope.",
+    "options": [
+      "incorrigible",
+      "inadvertent",
+      "inimical",
+      "inept"
+    ],
+    "answer": "inadvertent",
+    "clues": [
+      "accidental",
+      "unintentional",
+      "overlooking",
+      "unwitting"
+    ]
+  },
+  {
+    "q": "The defendant's explanation for his presence at the location struck investigators as fundamentally __________, requiring coincidences of timing and geography that statistical analysis suggested were essentially impossible under ordinary circumstances. The prosecution built its case largely on the cumulative improbability of his stated account rather than relying on any single piece of directly incriminating physical evidence.",
+    "options": [
+      "impiety",
+      "importune",
+      "implausible",
+      "impudent"
+    ],
+    "answer": "implausible",
+    "clues": [
+      "incredible",
+      "unconvincing",
+      "impossible",
+      "improbable"
+    ]
+  },
+  {
+    "q": "Legal advocates argued that mandatory minimum sentencing guidelines were profoundly __________ to the exercise of the judicial discretion essential to achieving just outcomes in cases where individual circumstances varied dramatically from the standardized scenarios that informed legislative drafting. The rigidity of these provisions consistently produced outcomes that violated widely shared intuitions about proportionate punishment.",
+    "options": [
+      "inimical",
+      "inert",
+      "indolent",
+      "ingenuous"
+    ],
+    "answer": "inimical",
+    "clues": [
+      "hostile",
+      "adverse",
+      "antagonistic",
+      "against"
+    ]
+  },
+  {
+    "q": "Security analysts documented how apparently __________ conversational queries directed at customer service representatives could be systematically aggregated to reconstruct sensitive organizational information that no individual response would have compromised. This pattern of incremental information gathering underscored the importance of training frontline staff to recognize queries that were individually benign but collectively revealing.",
+    "options": [
+      "infallible",
+      "ingenuous",
+      "inexorable",
+      "innocuous"
+    ],
+    "answer": "innocuous",
+    "clues": [
+      "harmless",
+      "benign",
+      "inoffensive",
+      "individually"
+    ]
+  },
+  {
+    "q": "The __________ crisis communication response—characterized by contradictory statements from multiple spokespersons, delayed acknowledgment of documented facts, and visible confusion about factual chronology—amplified rather than contained the reputational damage. Communications specialists subsequently used the episode as a case study in how organizational unpreparedness could transform a manageable incident into a prolonged institutional credibility crisis.",
+    "options": [
+      "indolent",
+      "incorrigible",
+      "inadvertent",
+      "inept"
+    ],
+    "answer": "inept",
+    "clues": [
+      "incompetent",
+      "bungling",
+      "confused",
+      "unpreparedness"
+    ]
+  },
+  {
+    "q": "The cross-examination strategy focused primarily on attempting to __________ the witness's reliability by systematically exposing inconsistencies between her current testimony and statements recorded in earlier police interviews, creating doubt about whether the discrepancies reflected honest memory limitations or deliberate misrepresentation of events she had directly observed.",
+    "options": [
+      "inadvertent",
+      "impugn",
+      "impiety",
+      "importune"
+    ],
+    "answer": "impugn",
+    "clues": [
+      "challenge",
+      "dispute",
+      "reliability",
+      "inconsistencies"
+    ]
+  },
+  {
+    "q": "Climate scientists described the __________ progression of permafrost degradation as creating feedback dynamics that would accelerate atmospheric warming regardless of near-term anthropogenic emission reductions, underscoring the critical importance of implementing comprehensive adaptation strategies alongside mitigation efforts rather than treating them as sequentially prioritized alternative responses.",
+    "options": [
+      "inexorable",
+      "infallible",
+      "ingenuous",
+      "innocuous"
+    ],
+    "answer": "inexorable",
+    "clues": [
+      "relentless",
+      "unstoppable",
+      "regardless",
+      "progression"
+    ]
+  },
+  {
+    "q": "The __________ employee's pattern of minimal output, strategic unavailability during peak demand periods, and habitual reliance on colleagues to absorb responsibilities he had tacitly abdicated had persisted without formal management intervention for nearly two years, creating measurable resentment among team members who found themselves consistently compensating for his chronic underperformance.",
+    "options": [
+      "incorrigible",
+      "indolent",
+      "inert",
+      "inept"
+    ],
+    "answer": "indolent",
+    "clues": [
+      "lazy",
+      "minimal",
+      "avoiding",
+      "chronic"
+    ]
+  },
+  {
+    "q": "The attorney's __________ questioning of the tribunal's procedural authority—delivered with a dismissive tone that implied the panel's legal reasoning was fundamentally incompetent—resulted in an immediate contempt finding and a brief recess during which judicial composure could be restored. Colleagues observed that effective advocacy required maintaining professional courtesy even in contexts of profound substantive disagreement.",
+    "options": [
+      "impertinent",
+      "impenitent",
+      "impudent",
+      "impiety"
+    ],
+    "answer": "impertinent",
+    "clues": [
+      "disrespectful",
+      "insolent",
+      "dismissive",
+      "irrelevant"
+    ]
+  },
+  {
+    "q": "Senior physicians cautioned that treating any single diagnostic test as __________ risked anchoring clinical judgment on potentially misleading data, particularly in presentations where symptom profiles were consistent with multiple competing etiologies. Sound medical practice required integrating test results with comprehensive clinical assessment rather than deferring uncritically to any individual technological output.",
+    "options": [
+      "inimical",
+      "ingenuous",
+      "indolent",
+      "infallible"
+    ],
+    "answer": "infallible",
+    "clues": [
+      "perfect",
+      "unerring",
+      "flawless",
+      "uncritically"
+    ]
+  },
+  {
+    "q": "The __________ volunteer's frank expression of surprise at the organization's reliance on outdated technology, while generating mild embarrassment among staff who had normalized the inefficiency, ultimately catalyzed a productive conversation about infrastructure investment that established insiders had been reluctant to initiate for fear of seeming critical of institutional decision-making.",
+    "options": [
+      "inert",
+      "inimical",
+      "ingenuous",
+      "insipid"
+    ],
+    "answer": "ingenuous",
+    "clues": [
+      "innocent",
+      "candid",
+      "naive",
+      "frank"
+    ]
+  },
+  {
+    "q": "The rehabilitation counselor concluded with reluctance that the client's pattern of immediately reverting to previous behaviors following every structured intervention suggested a degree of resistance to modification that available therapeutic modalities were not adequately equipped to address without significantly more intensive and sustained engagement than the current program could provide.",
+    "options": [
+      "impudent",
+      "incorrigible",
+      "inadvertent",
+      "inept"
+    ],
+    "answer": "incorrigible",
+    "clues": [
+      "irreformable",
+      "reverting",
+      "resistance",
+      "intractable"
+    ]
+  },
+  {
+    "q": "Anthropologists studying the community documented how acts of __________ toward its foundational ceremonial objects were treated not merely as religious violations but as fundamental attacks on the social cohesion and collective identity that the ritual practices were understood to embody and sustain across generations. The severity of communal responses to such transgressions reflected their perceived threat to social continuity.",
+    "options": [
+      "inert",
+      "impugn",
+      "impiety",
+      "ingenuous"
+    ],
+    "answer": "impiety",
+    "clues": [
+      "irreverence",
+      "sacrilege",
+      "violation",
+      "ceremonial"
+    ]
+  },
+  {
+    "q": "Legislators eventually adopted explicit protocols prohibiting advocacy groups from attempting to __________ committee members in hallways and informal settings outside formal testimony periods, recognizing that unrestricted access enabled well-resourced interests to exert influence through persistent personal contact that less organized constituencies were structurally unable to match.",
+    "options": [
+      "importune",
+      "impugn",
+      "inert",
+      "inadvertent"
+    ],
+    "answer": "importune",
+    "clues": [
+      "pester",
+      "persistent",
+      "requests",
+      "harass"
+    ]
+  },
+  {
+    "q": "The __________ reply that the intern submitted in response to a client's reasonable service complaint—dismissing the concern as reflecting a misunderstanding of standard industry practice without any acknowledgment of the client's legitimate frustration—required immediate managerial intervention and a personal apology to prevent permanent damage to a commercially significant professional relationship.",
+    "options": [
+      "impudent",
+      "impenitent",
+      "inert",
+      "inimical"
+    ],
+    "answer": "impudent",
+    "clues": [
+      "presumptuous",
+      "brazen",
+      "dismissing",
+      "insolent"
+    ]
+  },
+  {
+    "q": "The organizational culture had become so thoroughly __________ in its response to competitive pressures that capable employees motivated to drive change eventually transferred to more dynamic environments, leaving behind a workforce that had collectively adapted to minimal initiative and passive acceptance of institutional decline rather than actively seeking opportunities for renewal.",
+    "options": [
+      "implausible",
+      "incorrigible",
+      "ingenuous",
+      "inert"
+    ],
+    "answer": "inert",
+    "clues": [
+      "inactive",
+      "dormant",
+      "passive",
+      "motionless"
+    ]
+  }
+];
+const vocabDefs = {
+  "impenitent": {
+    "en": "not feeling shame or regret for wrongdoing",
+    "cn": "不悔過的；執迷不悟的",
+    "sentence": "The convicted official remained thoroughly impenitent throughout the sentencing proceedings, offering no expression of remorse and characterizing the prosecutio..."
+  },
+  "impertinent": {
+    "en": "not showing proper respect; irrelevant",
+    "cn": "無禮的；不相關的",
+    "sentence": "The junior staff member's impertinent interruption during the board presentation—challenging a senior executive's assertion with a dismissive tone that made no ..."
+  },
+  "impetuous": {
+    "en": "acting quickly without thought; impulsive",
+    "cn": "衝動的；魯莽的",
+    "sentence": "The impetuous acquisition decision, made without adequate due diligence or financial modeling, proved catastrophic when undisclosed liabilities totaling hundred..."
+  },
+  "impiety": {
+    "en": "lack of reverence for sacred things",
+    "cn": "不虔誠；褻瀆",
+    "sentence": "Medieval authorities treated philosophical questioning of theological doctrine as a form of impiety that threatened not only individual salvation but the entire..."
+  },
+  "implausible": {
+    "en": "not seeming reasonable or probable",
+    "cn": "難以置信的；不合理的",
+    "sentence": "The defendant's alibi struck most observers as inherently implausible, resting as it did on an unlikely sequence of coincidental encounters that would have requ..."
+  },
+  "importune": {
+    "en": "to harass with persistent requests",
+    "cn": "強求；死纏爛打",
+    "sentence": "Lobbyists who persistently attempted to importune the newly elected representatives during their first legislative session were met with a formal office policy ..."
+  },
+  "impudent": {
+    "en": "not showing due respect; presumptuous",
+    "cn": "無禮的；放肆的",
+    "sentence": "The impudent student challenged the professor's published interpretation in a class discussion without having read the primary sources on which the argument was..."
+  },
+  "impugn": {
+    "en": "to challenge as false; to call into question",
+    "cn": "質疑；駁斥",
+    "sentence": "Defense attorneys moved to impugn the credibility of the prosecution's primary witness by introducing documented evidence of previous inconsistent statements, f..."
+  },
+  "inadvertent": {
+    "en": "not resulting from deliberate intent; accidental",
+    "cn": "無意的；疏忽造成的",
+    "sentence": "The researcher's inadvertent omission of a critical control condition from the experimental design was identified during peer review, prompting a complete repli..."
+  },
+  "incisive": {
+    "en": "intelligently analytical and clear-thinking",
+    "cn": "深刻的；一針見血的",
+    "sentence": "Her incisive analysis of the merger proposal identified three structural vulnerabilities that the investment bank's modeling had entirely overlooked, potentiall..."
+  },
+  "incorrigible": {
+    "en": "not able to be corrected or reformed",
+    "cn": "屢教不改的；不可救藥的",
+    "sentence": "The juvenile court judge acknowledged that the young offender's pattern of escalating behavior, combined with active resistance to every rehabilitative interven..."
+  },
+  "indolent": {
+    "en": "wanting to avoid activity; lazy",
+    "cn": "懶惰的；懶散的",
+    "sentence": "The indolent student's consistent failure to submit assignments on time, complete required readings, or attend scheduled tutorial sessions eventually exhausted ..."
+  },
+  "inept": {
+    "en": "having or showing no skill; incompetent",
+    "cn": "不稱職的；笨拙的",
+    "sentence": "The inept project manager repeatedly scheduled incompatible resources simultaneously, overlooked critical dependency relationships between sequential tasks, and..."
+  },
+  "inert": {
+    "en": "lacking the ability to move or act; chemically inactive",
+    "cn": "惰性的；不活躍的",
+    "sentence": "The substance was described as chemically inert under standard atmospheric conditions, making it suitable for use as a stabilizing carrier medium in pharmaceuti..."
+  },
+  "inexorable": {
+    "en": "impossible to stop or prevent; relentless",
+    "cn": "不可阻擋的；無情的",
+    "sentence": "Geologists described the inexorable advance of the glacier as transforming the landscape at a pace imperceptible to individual human observers yet profoundly co..."
+  },
+  "infallible": {
+    "en": "incapable of making mistakes or being wrong",
+    "cn": "絕對可靠的；無誤的",
+    "sentence": "The technician warned against treating any diagnostic algorithm as entirely infallible, emphasizing that even the most sophisticated automated systems occasiona..."
+  },
+  "ingenuous": {
+    "en": "innocent and unsuspecting; candid",
+    "cn": "天真的；坦率的",
+    "sentence": "The ingenuous intern's unfiltered observations during her first team meeting—pointing out with cheerful directness several procedural inefficiencies that experi..."
+  },
+  "inimical": {
+    "en": "tending to obstruct; hostile; adverse",
+    "cn": "有敵意的；有害的",
+    "sentence": "Legal scholars argued that the proposed surveillance legislation was fundamentally inimical to the constitutional protections that democratic governance depende..."
+  },
+  "innocuous": {
+    "en": "not harmful or offensive",
+    "cn": "無害的；無惡意的",
+    "sentence": "What appeared to be a wholly innocuous administrative request—a routine query about document filing formats—was subsequently revealed as part of a sophisticated..."
+  },
+  "insipid": {
+    "en": "lacking vigor, interest, or strong flavor",
+    "cn": "乏味的；平淡無奇的",
+    "sentence": "The literary critic dismissed the bestselling novel as thoroughly insipid, arguing that its flattened characterization, predictable narrative resolution, and ca..."
+  }
+};
+const letters = ['A','B','C','D'];
+let currentQ = 0, score = 0, answered = false;
+function startQuiz() { document.getElementById('startScreen').style.display='none'; document.getElementById('quizCard').style.display='block'; renderQuestion(); }
+function renderQuestion() {
+  answered = false;
+  const q = questions[currentQ];
+  document.getElementById('qNum').textContent = 'Question ' + (currentQ+1);
+  document.getElementById('progressText').textContent = 'Question ' + (currentQ+1) + ' of 20';
+  document.getElementById('progressBar').style.width = (currentQ/20*100)+'%';
+  document.getElementById('wordHelper').classList.remove('visible');
+  document.getElementById('feedbackBox').classList.remove('visible');
+  document.getElementById('nextBtn').classList.remove('visible');
+  const passageEl = document.getElementById('passageText');
+  const tokens = q.q.split(/(\s+|[.,;:!?"""''—–-]+)/);
+  passageEl.innerHTML = tokens.map(tok => {
+    if (/\s+/.test(tok)) return tok;
+    if (tok === '__________') return '<span class="blank">__________</span>';
+    const clean = tok.replace(/[^a-zA-Z'-]/g,'');
+    if (!clean) return tok;
+    return '<span class="word" onclick="lookupWord(\'' + clean.toLowerCase().replace(/'/g,"\'") + '\')">' + tok + '</span>';
+  }).join('');
+  const grid = document.getElementById('optionsGrid');
+  grid.innerHTML = '';
+  q.options.forEach((opt,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = '<span class="option-label">'+letters[i]+'</span>'+opt;
+    btn.onclick = () => handleAnswer(i, btn);
+    grid.appendChild(btn);
+  });
+}
+function handleAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[currentQ];
+  const isCorrect = q.options[idx] === q.answer;
+  if (isCorrect) { score++; document.getElementById('scoreNum').textContent = score; }
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach((btn,i) => {
+    btn.disabled = true;
+    if (q.options[i] === q.answer) btn.classList.add('correct');
+    else if (i === idx && !isCorrect) btn.classList.add('incorrect');
+  });
+  const spans = document.getElementById('passageText').querySelectorAll('span.word');
+  spans.forEach(span => { const text = span.textContent.replace(/[^a-zA-Z'-]/g,'').toLowerCase(); if (q.clues.map(c=>c.toLowerCase()).includes(text)) span.classList.add('clue-highlight'); });
+  const fgrid = document.getElementById('feedbackGrid');
+  fgrid.innerHTML = '';
+  q.options.forEach(opt => {
+    const def = vocabDefs[opt] || {en:'',cn:'',sentence:''};
+    const card = document.createElement('div');
+    card.className = 'feedback-card'+(opt===q.answer?' is-answer':'');
+    card.innerHTML = `<div class="fc-word">${opt} <button class="fc-tts" onclick="speakWord('${opt}')"><i class="fa fa-volume-up"></i></button></div><div class="fc-en">${def.en}</div><div class="fc-cn">${def.cn}</div><div class="fc-sentence">${def.sentence} <button class="fc-tts" onclick="speakText('${def.sentence.replace(/'/g,"\\'")}')"><i class="fa fa-volume-up"></i></button></div>`;
+    fgrid.appendChild(card);
+  });
+  document.getElementById('feedbackBox').classList.add('visible');
+  document.getElementById('nextBtn').classList.add('visible');
+}
+function nextQuestion() { currentQ++; if (currentQ>=questions.length){showFinal();return;} renderQuestion(); }
+function showFinal() {
+  document.getElementById('quizCard').style.display='none';
+  document.getElementById('progressBar').style.width='100%';
+  document.getElementById('progressText').textContent='Quiz Complete!';
+  const pct = Math.round(score/questions.length*100);
+  document.getElementById('finalScore').textContent = score+'/'+questions.length;
+  document.getElementById('finalPercent').textContent = pct+'% Correct';
+  let msg,cn;
+  if(pct>=90){msg="Outstanding! You've mastered this unit.";cn="出色！你已經掌握了本單元的詞彙。";}
+  else if(pct>=75){msg="Great work! Keep reviewing the words you missed.";cn="做得好！繼續複習你錯過的單字。";}
+  else if(pct>=60){msg="Good effort! Try again to strengthen your knowledge.";cn="很努力！再試一次來加強你的記憶。";}
+  else{msg="Keep practicing! Regular review builds lasting vocabulary.";cn="繼續練習！定期複習能建立持久的詞彙量。";}
+  document.getElementById('finalMsg').textContent=msg;
+  document.getElementById('finalCn').textContent=cn;
+  document.getElementById('finalScreen').classList.add('visible');
+}
+function restartQuiz() { currentQ=0;score=0;document.getElementById('scoreNum').textContent='0';document.getElementById('finalScreen').classList.remove('visible');document.getElementById('quizCard').style.display='block';renderQuestion(); }
+function lookupWord(word) {
+  const helper=document.getElementById('wordHelper');
+  const whWord=document.getElementById('whWord');
+  const whDef=document.getElementById('whDef');
+  if(vocabDefs[word]){whWord.textContent=word;whDef.textContent=vocabDefs[word].en+' | '+vocabDefs[word].cn;helper.classList.add('visible');return;}
+  whWord.textContent=word;whDef.textContent='Looking up...';helper.classList.add('visible');
+  fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+word).then(r=>r.json()).then(data=>{
+    if(Array.isArray(data)&&data[0]&&data[0].meanings&&data[0].meanings[0]){whDef.textContent=data[0].meanings[0].definitions[0].definition;}
+    else{whDef.textContent='Definition not found. Try another word.';}
+  }).catch(()=>{whDef.textContent='Definition not found. Try another word.';});
+}
+function speakPassage() {
+  if(!window.speechSynthesis)return;
+  const raw=questions[currentQ].q.replace(/__________/g,'blank');
+  const utt=new SpeechSynthesisUtterance(raw);utt.lang='en-US';utt.rate=0.92;
+  const voices=window.speechSynthesis.getVoices();
+  const female=voices.find(v=>v.lang.startsWith('en')&&/female|woman|samantha|karen|victoria|zira/i.test(v.name));
+  if(female)utt.voice=female;
+  window.speechSynthesis.cancel();window.speechSynthesis.speak(utt);
+}
+function speakWord(word){if(!window.speechSynthesis)return;const utt=new SpeechSynthesisUtterance(word);utt.lang='en-US';utt.rate=0.85;window.speechSynthesis.cancel();window.speechSynthesis.speak(utt);}
+function speakText(text){if(!window.speechSynthesis)return;const utt=new SpeechSynthesisUtterance(text);utt.lang='en-US';utt.rate=0.9;window.speechSynthesis.cancel();window.speechSynthesis.speak(utt);}
+if(window.speechSynthesis)window.speechSynthesis.getVoices();
+</script>
+</body>
+</html>

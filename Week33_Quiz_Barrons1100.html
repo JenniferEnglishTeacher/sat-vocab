@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 33 Interactive Quiz — Barron's 1100 Words</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-body: 'DM Sans', 'Segoe UI', sans-serif;
+    --color-primary: #1a3a5c;
+    --color-accent: #c8962e;
+    --color-correct: #2d7a4f;
+    --color-incorrect: #b53a2f;
+    --color-clue: #fff3a3;
+    --color-surface: #faf8f5;
+    --color-card: #ffffff;
+    --color-border: #e0d8cc;
+    --color-text: #2c2c2c;
+    --color-muted: #7a7065;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); background: var(--color-surface); color: var(--color-text); min-height: 100vh; }
+  
+  /* Header */
+  .quiz-header {
+    background: linear-gradient(135deg, var(--color-primary) 0%, #2a5a8c 100%);
+    color: white; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .quiz-header h1 { font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; }
+  .quiz-header .subtitle { font-size: 0.82rem; opacity: 0.8; margin-top: 3px; }
+  .score-counter { background: rgba(255,255,255,0.15); border-radius: 12px; padding: 8px 16px; text-align: center; }
+  .score-counter .score-num { font-family: var(--font-heading); font-size: 1.6rem; font-weight: 700; }
+  .score-counter .score-label { font-size: 0.72rem; opacity: 0.8; }
+
+  /* Progress */
+  .progress-bar-wrap { background: #e0d8cc; height: 6px; }
+  .progress-bar { height: 6px; background: var(--color-accent); transition: width 0.4s ease; }
+  .progress-text { text-align: center; font-size: 0.82rem; color: var(--color-muted); padding: 8px; background: var(--color-surface); }
+
+  /* Card */
+  .quiz-card { max-width: 780px; margin: 24px auto; padding: 0 16px 40px; }
+  .card { background: var(--color-card); border-radius: 16px; box-shadow: 0 4px 20px rgba(26,58,92,0.1); overflow: hidden; }
+
+  /* Passage */
+  .passage-wrap { padding: 24px 28px 16px; border-bottom: 1px solid var(--color-border); }
+  .passage-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .q-number { font-size: 0.8rem; color: var(--color-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .tts-btn { background: none; border: 1px solid var(--color-border); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 0.82rem; color: var(--color-primary); transition: all 0.2s; }
+  .tts-btn:hover { background: var(--color-primary); color: white; }
+  .passage-text { font-size: 1.02rem; line-height: 1.75; color: var(--color-text); }
+  .passage-text span.word { cursor: pointer; border-bottom: 1px dotted var(--color-muted); transition: background 0.15s; border-radius: 2px; }
+  .passage-text span.word:hover { background: #e8f0f7; }
+  .passage-text span.clue-highlight { background: var(--color-clue); border-radius: 3px; padding: 0 2px; }
+  .blank { font-weight: 700; color: var(--color-primary); letter-spacing: 0.1em; }
+
+  /* Word helper */
+  .word-helper { margin: 0 28px 8px; padding: 10px 14px; background: #eef4f8; border-left: 3px solid var(--color-accent); border-radius: 4px; font-size: 0.88rem; color: var(--color-text); display: none; }
+  .word-helper.visible { display: block; }
+  .word-helper .wh-word { font-weight: 700; color: var(--color-primary); margin-bottom: 3px; }
+  .word-helper .wh-def { color: var(--color-muted); }
+
+  /* Options */
+  .options-wrap { padding: 16px 28px 20px; }
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media(max-width: 560px) { .options-grid { grid-template-columns: 1fr; } }
+  .option-btn {
+    padding: 12px 18px; background: #f4f0eb; border: 2px solid var(--color-border);
+    border-radius: 10px; cursor: pointer; font-family: var(--font-body); font-size: 0.95rem;
+    text-align: left; transition: all 0.2s; color: var(--color-text); font-weight: 500;
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--color-primary); background: #eef4f8; }
+  .option-btn.correct { background: #e8f5ee; border-color: var(--color-correct); color: var(--color-correct); }
+  .option-btn.incorrect { background: #fceaea; border-color: var(--color-incorrect); color: var(--color-incorrect); }
+  .option-btn:disabled { cursor: default; }
+  .option-label { display: inline-block; width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: white; font-size: 0.75rem; font-weight: 700; text-align: center; line-height: 22px; margin-right: 8px; flex-shrink: 0; }
+  .option-btn.correct .option-label { background: var(--color-correct); }
+  .option-btn.incorrect .option-label { background: var(--color-incorrect); }
+
+  /* Feedback */
+  .feedback-box { margin: 0 28px 20px; display: none; }
+  .feedback-box.visible { display: block; }
+  .feedback-title { font-weight: 700; font-size: 0.88rem; color: var(--color-primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .feedback-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media(max-width: 560px) { .feedback-grid { grid-template-columns: 1fr; } }
+  .feedback-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; padding: 10px 12px; }
+  .feedback-card.is-answer { border-color: var(--color-correct); background: #e8f5ee; }
+  .fc-word { font-weight: 700; font-size: 0.92rem; color: var(--color-primary); }
+  .fc-en { font-size: 0.82rem; color: var(--color-muted); margin: 2px 0; }
+  .fc-cn { font-size: 0.85rem; color: var(--color-text); }
+  .fc-sentence { font-size: 0.78rem; color: var(--color-muted); margin-top: 4px; font-style: italic; }
+  .fc-tts { background: none; border: none; color: var(--color-accent); cursor: pointer; font-size: 0.85rem; padding: 2px 4px; }
+
+  /* Navigation */
+  .nav-wrap { padding: 0 28px 24px; display: flex; justify-content: flex-end; }
+  .next-btn {
+    background: var(--color-primary); color: white; border: none; border-radius: 10px;
+    padding: 12px 28px; font-family: var(--font-body); font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; display: none; transition: background 0.2s;
+  }
+  .next-btn.visible { display: block; }
+  .next-btn:hover { background: #2a5a8c; }
+
+  /* Final screen */
+  .final-screen { display: none; max-width: 560px; margin: 40px auto; text-align: center; padding: 0 16px; }
+  .final-screen.visible { display: block; }
+  .final-score { font-family: var(--font-heading); font-size: 4rem; color: var(--color-primary); }
+  .final-percent { font-size: 1.2rem; color: var(--color-accent); font-weight: 600; margin-bottom: 12px; }
+  .final-msg { font-size: 1rem; color: var(--color-muted); margin-bottom: 8px; }
+  .final-cn { font-size: 0.92rem; color: var(--color-muted); }
+  .restart-btn { margin-top: 28px; background: var(--color-primary); color: white; border: none; border-radius: 10px; padding: 14px 36px; font-family: var(--font-body); font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .restart-btn:hover { background: #2a5a8c; }
+
+  /* Start screen */
+  .start-screen { max-width: 560px; margin: 60px auto; text-align: center; padding: 0 16px; }
+  .start-screen h2 { font-family: var(--font-heading); font-size: 2rem; color: var(--color-primary); margin-bottom: 12px; }
+  .start-screen p { color: var(--color-muted); margin-bottom: 28px; font-size: 0.97rem; }
+  .start-btn { background: var(--color-primary); color: white; border: none; border-radius: 10px; padding: 14px 42px; font-family: var(--font-body); font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .start-btn:hover { background: #2a5a8c; }
+</style>
+</head>
+<body>
+
+<div class="quiz-header">
+  <div>
+    <h1>Unit 33 — Barron's 1100 Words</h1>
+    <div class="subtitle">EFL SAT Vocabulary Interactive Quiz</div>
+  </div>
+  <div class="score-counter">
+    <div class="score-num" id="scoreNum">0</div>
+    <div class="score-label">Score</div>
+  </div>
+</div>
+<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+<div class="progress-text" id="progressText">Question 1 of 20</div>
+
+<!-- Start Screen -->
+<div class="start-screen" id="startScreen">
+  <h2>Unit 33 Quiz</h2>
+  <p>20 SAT-style reading questions using this unit's vocabulary words.<br>Click each word in the passage to look it up. Press 🔊 to listen.</p>
+  <button class="start-btn" onclick="startQuiz()">Start Quiz →</button>
+</div>
+
+<!-- Quiz Card -->
+<div class="quiz-card" id="quizCard" style="display:none">
+  <div class="card">
+    <div class="passage-wrap">
+      <div class="passage-meta">
+        <span class="q-number" id="qNum">Question 1</span>
+        <button class="tts-btn" id="ttsBtn" onclick="speakPassage()"><i class="fa fa-volume-up"></i> Listen</button>
+      </div>
+      <div class="passage-text" id="passageText"></div>
+    </div>
+    <div class="word-helper" id="wordHelper">
+      <div class="wh-word" id="whWord"></div>
+      <div class="wh-def" id="whDef"></div>
+    </div>
+    <div class="options-wrap">
+      <div class="options-grid" id="optionsGrid"></div>
+    </div>
+    <div class="feedback-box" id="feedbackBox">
+      <div class="feedback-title">All Options Explained</div>
+      <div class="feedback-grid" id="feedbackGrid"></div>
+    </div>
+    <div class="nav-wrap">
+      <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Final Screen -->
+<div class="final-screen" id="finalScreen">
+  <div class="final-score" id="finalScore">0/20</div>
+  <div class="final-percent" id="finalPercent"></div>
+  <div class="final-msg" id="finalMsg"></div>
+  <div class="final-cn" id="finalCn"></div>
+  <button class="restart-btn" onclick="restartQuiz()">Try Again ↺</button>
+</div>
+
+<script>
+const questions = [
+  {
+    "q": "The veteran diplomat remained deliberately __________ throughout the preliminary negotiations, carefully evaluating every proposal before committing to any substantive position. Her cautious approach frustrated impatient junior colleagues but proved prescient when several apparently attractive early offers were later revealed to contain provisions that would have substantially compromised her government's strategic interests.",
+    "options": [
+      "clandestine",
+      "circumspect",
+      "coerce",
+      "complacent"
+    ],
+    "answer": "circumspect",
+    "clues": [
+      "carefully",
+      "cautious",
+      "evaluating",
+      "prescient"
+    ]
+  },
+  {
+    "q": "The former campaign manager had grown profoundly __________ about electoral politics after witnessing repeated instances where public commitments were systematically abandoned once elections were won. Despite this disillusionment, she channeled her skepticism productively into designing more robust accountability mechanisms that made it structurally harder for elected officials to ignore stated policy commitments.",
+    "options": [
+      "contrite",
+      "cynical",
+      "circuitous",
+      "credulous"
+    ],
+    "answer": "cynical",
+    "clues": [
+      "skeptical",
+      "disillusionment",
+      "abandoned",
+      "accountability"
+    ]
+  },
+  {
+    "q": "The interdisciplinary research center deliberately cultivated a __________ atmosphere that encouraged productive informal exchange between scientists from radically different methodological traditions. Regular social events, shared workspace, and collaborative seminars created conditions where unexpected intellectual partnerships emerged organically, generating innovative approaches that neither discipline would have developed independently.",
+    "options": [
+      "congenial",
+      "clandestine",
+      "compunction",
+      "contrite"
+    ],
+    "answer": "congenial",
+    "clues": [
+      "pleasant",
+      "collaborative",
+      "exchange",
+      "partnerships"
+    ]
+  },
+  {
+    "q": "The independent commission found all three senior executives equally __________ for the systemic compliance failures, despite their attempts to attribute responsibility exclusively to subordinate operational staff. Investigators demonstrated that the executives had received multiple documented warnings about procedural violations and had consciously elected to defer corrective action, constituting deliberate institutional negligence.",
+    "options": [
+      "credulous",
+      "circumspect",
+      "cynical",
+      "culpable"
+    ],
+    "answer": "culpable",
+    "clues": [
+      "responsible",
+      "failures",
+      "negligence",
+      "violations"
+    ]
+  },
+  {
+    "q": "Labor inspectors documented employers attempting to __________ foreign workers into forfeiting legally protected overtime compensation by exploiting their unfamiliarity with domestic employment law and vulnerability to threats regarding immigration documentation. New enforcement protocols specifically trained inspectors to identify and document these coercive patterns as part of comprehensive anti-exploitation initiatives.",
+    "options": [
+      "compunction",
+      "coerce",
+      "congenial",
+      "cursory"
+    ],
+    "answer": "coerce",
+    "clues": [
+      "force",
+      "threats",
+      "vulnerable",
+      "exploiting"
+    ]
+  },
+  {
+    "q": "The committee found the organization's response to the data breach insufficiently __________, noting that the official statement contained more strategic messaging than genuine acknowledgment of harm caused to affected individuals. Consumer advocates argued that authentic accountability required specific recognition of failures, clear explanations of remedial measures taken, and tangible commitments to preventing recurrence.",
+    "options": [
+      "cynical",
+      "credulous",
+      "contrite",
+      "complacent"
+    ],
+    "answer": "contrite",
+    "clues": [
+      "remorseful",
+      "acknowledge",
+      "accountability",
+      "genuine"
+    ]
+  },
+  {
+    "q": "The formidable complexity of restructuring an organization employing thousands of people across thirty countries did not __________ the newly appointed chief executive, who had successfully managed comparable transformational challenges throughout her extensive international career. She immediately established clear strategic priorities, assembled a capable leadership team, and communicated a compelling vision that inspired organizational confidence.",
+    "options": [
+      "daunt",
+      "debilitate",
+      "decorum",
+      "deference"
+    ],
+    "answer": "daunt",
+    "clues": [
+      "complexity",
+      "intimidate",
+      "discourage",
+      "confidence"
+    ]
+  },
+  {
+    "q": "Consumer protection agencies identified a disturbingly large population of __________ investors who had committed substantial retirement savings to fraudulent cryptocurrency schemes based solely on social media testimonials lacking any verifiable supporting evidence. Educational campaigns targeting financial literacy were subsequently expanded to help vulnerable populations develop more critical and rigorous approaches to evaluating investment opportunities.",
+    "options": [
+      "cursory",
+      "cynical",
+      "circumspect",
+      "credulous"
+    ],
+    "answer": "credulous",
+    "clues": [
+      "gullible",
+      "verifiable",
+      "fraud",
+      "vulnerable"
+    ]
+  },
+  {
+    "q": "The university's formal graduation ceremony demanded strict __________ from all participants, with explicit guidelines distributed in advance specifying appropriate attire, behavioral expectations, and procedural conduct. Faculty marshals were positioned throughout the venue to address any breach of the established protocol and ensure that the occasion maintained the dignified character traditional to the institution's academic culture.",
+    "options": [
+      "deference",
+      "deft",
+      "daunt",
+      "decorum"
+    ],
+    "answer": "decorum",
+    "clues": [
+      "formal",
+      "appropriate",
+      "dignified",
+      "protocol"
+    ]
+  },
+  {
+    "q": "A __________ review of the application documents failed to detect significant discrepancies in the financial projections that a more thorough examination would have identified immediately. The subsequent discovery of these inconsistencies at a later stage of the approval process necessitated a time-consuming reassessment that could have been avoided through more rigorous initial screening procedures.",
+    "options": [
+      "convoluted",
+      "cursory",
+      "clandestine",
+      "complacent"
+    ],
+    "answer": "cursory",
+    "clues": [
+      "hasty",
+      "detect",
+      "thorough",
+      "superficial"
+    ]
+  },
+  {
+    "q": "Counter-intelligence specialists uncovered a __________ network of informants that had been systematically gathering sensitive technological intelligence for nearly six years without detection. The operation's remarkable longevity was attributed to meticulous operational security practices and the use of multiple layered communication channels specifically designed to evade standard monitoring systems.",
+    "options": [
+      "clandestine",
+      "cynical",
+      "contrite",
+      "credulous"
+    ],
+    "answer": "clandestine",
+    "clues": [
+      "secret",
+      "covert",
+      "detection",
+      "network"
+    ]
+  },
+  {
+    "q": "The experienced mentor taught her supervisees never to openly __________ alternative methodological approaches presented during professional conferences, emphasizing that intellectual generosity and genuine curiosity about diverse analytical frameworks were hallmarks of productive academic culture. She consistently modeled this inclusive disposition herself, even when discussing approaches with which she held substantive theoretical disagreements.",
+    "options": [
+      "daunt",
+      "deprecate",
+      "decorum",
+      "deference"
+    ],
+    "answer": "deprecate",
+    "clues": [
+      "belittle",
+      "approaches",
+      "dismissive",
+      "disagree"
+    ]
+  },
+  {
+    "q": "Younger members of the surgical team showed appropriate __________ toward the attending physician's clinical judgment during complex cases, while remaining alert to communicate any observations that might influence critical decisions. This careful balance between respectful professional hierarchy and genuine clinical vigilance reflected the team's sophisticated understanding of collaborative medical responsibility.",
+    "options": [
+      "deference",
+      "decorum",
+      "daunt",
+      "debilitate"
+    ],
+    "answer": "deference",
+    "clues": [
+      "respect",
+      "hierarchy",
+      "judgment",
+      "balance"
+    ]
+  },
+  {
+    "q": "The investigative journalist reported the sensitive findings without apparent __________, reasoning that the significant public interest in institutional accountability clearly outweighed any private discomfort experienced by the individuals whose professional conduct the evidence documented. Her editors fully supported this principled prioritization, citing the publication's long-standing commitment to transparency in matters of genuine civic importance.",
+    "options": [
+      "circumspect",
+      "cynical",
+      "convoluted",
+      "compunction"
+    ],
+    "answer": "compunction",
+    "clues": [
+      "guilt",
+      "principled",
+      "transparency",
+      "accountability"
+    ]
+  },
+  {
+    "q": "The economic crisis continued to __________ communities already struggling with infrastructure deficits and limited employment opportunities, making sustained recovery increasingly dependent on targeted external support rather than organic local economic growth. Policy experts argued that immediate intervention was necessary to prevent the deterioration from reaching a threshold beyond which recovery would become prohibitively costly.",
+    "options": [
+      "deprecate",
+      "denounce",
+      "debilitate",
+      "daunt"
+    ],
+    "answer": "debilitate",
+    "clues": [
+      "weaken",
+      "struggling",
+      "deterioration",
+      "recovery"
+    ]
+  },
+  {
+    "q": "International human rights bodies moved swiftly to __________ the policy of extended administrative detention without judicial review, presenting documented evidence that the practice systematically violated established international legal standards protecting individuals from arbitrary state action. The formal condemnation triggered immediate diplomatic pressure from multiple allied governments.",
+    "options": [
+      "deference",
+      "denounce",
+      "decorum",
+      "deft"
+    ],
+    "answer": "denounce",
+    "clues": [
+      "condemn",
+      "violated",
+      "pressure",
+      "arbitrary"
+    ]
+  },
+  {
+    "q": "The forensic accountant's __________ navigation through years of deliberately obscured financial records allowed investigators to reconstruct the full extent of the systematic misappropriation far more rapidly than traditional investigative methods would have permitted. Her exceptional technical proficiency and analytical precision proved decisive in establishing the evidentiary foundation required for successful prosecution.",
+    "options": [
+      "daunt",
+      "debilitate",
+      "deft",
+      "deference"
+    ],
+    "answer": "deft",
+    "clues": [
+      "proficiency",
+      "precision",
+      "skillful",
+      "analytical"
+    ]
+  },
+  {
+    "q": "The political historian traced the __________ 's rise to prominence through a careful analysis of rhetorical strategies that systematically amplified social grievances while deliberately avoiding specific policy commitments that might expose his positions to critical scrutiny. This combination of emotional intensity and substantive vagueness proved remarkably effective in mobilizing disaffected constituencies during a period of acute institutional distrust.",
+    "options": [
+      "demagogue",
+      "decorum",
+      "debilitate",
+      "daunt"
+    ],
+    "answer": "demagogue",
+    "clues": [
+      "rhetorical",
+      "grievances",
+      "mobilizing",
+      "distrust"
+    ]
+  },
+  {
+    "q": "Legal commentators criticized the proposed regulatory framework as unnecessarily __________, arguing that its labyrinthine cross-referencing structure would make compliance prohibitively difficult for small enterprises without dedicated legal teams capable of navigating its multiple intersecting requirements. Simplified alternative drafts were proposed that achieved equivalent regulatory objectives with far greater structural clarity.",
+    "options": [
+      "convoluted",
+      "cynical",
+      "cursory",
+      "clandestine"
+    ],
+    "answer": "convoluted",
+    "clues": [
+      "complex",
+      "labyrinthine",
+      "navigate",
+      "simplified"
+    ]
+  },
+  {
+    "q": "The auditor's __________ approach to evaluating the contested transactions proved invaluable when preliminary indicators suggested potential irregularities. Rather than forming premature conclusions that might bias subsequent analysis, she systematically examined every available document, interviewed all relevant personnel, and cross-referenced multiple independent data sources before formulating any preliminary assessment of the situation.",
+    "options": [
+      "credulous",
+      "coerce",
+      "complacent",
+      "circumspect"
+    ],
+    "answer": "circumspect",
+    "clues": [
+      "cautious",
+      "preliminary",
+      "systematically",
+      "assessment"
+    ]
+  }
+];
+const vocabDefs = {
+  "circumspect": {
+    "en": "wary and cautious; considering all circumstances",
+    "cn": "謹慎的；深思熟慮的",
+    "sentence": "The circumspect investigator refused to draw conclusions until every available piece of evidence had been thoroughly examined and independently verified by qual..."
+  },
+  "clandestine": {
+    "en": "done in secret; hidden",
+    "cn": "秘密的；暗中的",
+    "sentence": "Intelligence agencies uncovered a sophisticated clandestine communication network that had operated undetected for nearly four years, enabling sensitive informa..."
+  },
+  "coerce": {
+    "en": "to persuade by threats or force",
+    "cn": "強迫；逼迫",
+    "sentence": "Labor inspectors documented systematic attempts to coerce immigrant workers into accepting substandard wages by threatening to report their undocumented status ..."
+  },
+  "complacent": {
+    "en": "showing smug or uncritical satisfaction",
+    "cn": "自滿的；沾沾自喜的",
+    "sentence": "Coaches warned that becoming complacent after a successful season was the most dangerous trap that championship teams consistently failed to avoid. Historical d..."
+  },
+  "compunction": {
+    "en": "guilt or moral scruple",
+    "cn": "良心上的不安；悔恨",
+    "sentence": "The whistleblower reported her colleagues' misconduct without any apparent compunction, believing that protecting vulnerable patients unambiguously outweighed a..."
+  },
+  "congenial": {
+    "en": "pleasant because suited to one's tastes",
+    "cn": "令人愉快的；志趣相投的",
+    "sentence": "The research institute cultivated a remarkably congenial intellectual environment where scholars from diverse disciplines engaged in genuinely collaborative exc..."
+  },
+  "contrite": {
+    "en": "feeling deep regret; penitent",
+    "cn": "悔恨的；痛悔的",
+    "sentence": "The athlete delivered a genuinely contrite public apology that acknowledged specific harm caused by his actions and outlined concrete behavioral changes he had ..."
+  },
+  "convoluted": {
+    "en": "extremely complex and difficult to follow",
+    "cn": "複雜的；費解的",
+    "sentence": "The tax regulation's convoluted structure made compliance extraordinarily difficult even for specialized accountants who devoted considerable professional time ..."
+  },
+  "credulous": {
+    "en": "too ready to believe things; gullible",
+    "cn": "輕信的；易受騙的",
+    "sentence": "The financial scammer deliberately targeted credulous elderly investors who lacked the digital literacy and market experience necessary to identify the sophisti..."
+  },
+  "culpable": {
+    "en": "deserving blame for wrongdoing",
+    "cn": "應受責備的；有罪的",
+    "sentence": "The investigation concluded that senior management was equally culpable for the environmental violations, having knowingly approved cost-cutting measures that c..."
+  },
+  "cursory": {
+    "en": "hasty and therefore not thorough",
+    "cn": "草率的；粗略的",
+    "sentence": "The inspector's cursory examination of the facility failed to detect several critical safety deficiencies that a more thorough assessment would have readily ide..."
+  },
+  "cynical": {
+    "en": "believing that people are motivated by self-interest",
+    "cn": "憤世嫉俗的；玩世不恭的",
+    "sentence": "Years of observing institutional corruption had rendered the journalist deeply cynical about the possibility of meaningful systemic reform, though she continued..."
+  },
+  "daunt": {
+    "en": "to make someone feel intimidated",
+    "cn": "使膽怯；使氣餒",
+    "sentence": "The sheer complexity of the doctoral dissertation research did not daunt the determined graduate student, who approached each methodological challenge as an int..."
+  },
+  "debilitate": {
+    "en": "to make weak; to impair strength",
+    "cn": "使衰弱；削弱",
+    "sentence": "The prolonged economic recession continued to debilitate small and medium enterprises that lacked the financial reserves necessary to sustain operations through..."
+  },
+  "decorum": {
+    "en": "behavior in keeping with good taste and propriety",
+    "cn": "禮節；端莊得體",
+    "sentence": "The presiding judge strictly enforced courtroom decorum, immediately removing any observer whose conduct fell short of the professional standards essential to m..."
+  },
+  "deference": {
+    "en": "respectful submission to another's judgment",
+    "cn": "尊重；順從",
+    "sentence": "Junior physicians were expected to show appropriate deference toward senior consultants during ward rounds, listening attentively and refraining from contradict..."
+  },
+  "deft": {
+    "en": "skillful in physical movements; adroit",
+    "cn": "靈巧的；熟練的",
+    "sentence": "The surgeon's deft technique during the delicate procedure minimized tissue disruption and substantially reduced recovery time compared with conventional approa..."
+  },
+  "demagogue": {
+    "en": "a political leader who exploits prejudice",
+    "cn": "煽動者；蠱惑民心的政客",
+    "sentence": "Political scientists warned that the charismatic candidate displayed unmistakable characteristics of a classic demagogue, systematically exploiting economic anx..."
+  },
+  "denounce": {
+    "en": "to publicly declare wrong or evil",
+    "cn": "譴責；公開指責",
+    "sentence": "Human rights organizations moved swiftly to denounce the government's detention policy, presenting detailed documentary evidence demonstrating systematic violat..."
+  },
+  "deprecate": {
+    "en": "to express disapproval of; to belittle",
+    "cn": "反對；貶低",
+    "sentence": "The senior engineer was careful not to deprecate the intern's unconventional technical proposal outright, recognizing that dismissing creative approaches too ha..."
+  }
+};
+
+const letters = ['A','B','C','D'];
+let currentQ = 0;
+let score = 0;
+let answered = false;
+
+function startQuiz() {
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('quizCard').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = questions[currentQ];
+  document.getElementById('qNum').textContent = 'Question ' + (currentQ + 1);
+  document.getElementById('progressText').textContent = 'Question ' + (currentQ + 1) + ' of 20';
+  document.getElementById('progressBar').style.width = (currentQ / 20 * 100) + '%';
+  document.getElementById('wordHelper').classList.remove('visible');
+  document.getElementById('feedbackBox').classList.remove('visible');
+  document.getElementById('nextBtn').classList.remove('visible');
+
+  // Render passage with clickable words
+  const passageEl = document.getElementById('passageText');
+  const raw = q.q;
+  const tokens = raw.split(/(s+|[.,;:!?"""''—–-]+)/);
+  passageEl.innerHTML = tokens.map(tok => {
+    if (/s+/.test(tok)) return tok;
+    if (tok === '__________') return '<span class="blank">__________</span>';
+    const clean = tok.replace(/[^a-zA-Z'-]/g,'');
+    if (!clean) return tok;
+    return '<span class="word" onclick="lookupWord(\'' + clean.toLowerCase().replace(/'/g,"\'") + '\')">' + tok + '</span>';
+  }).join('');
+
+  // Options
+  const grid = document.getElementById('optionsGrid');
+  grid.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = '<span class="option-label">' + letters[i] + '</span>' + opt;
+    btn.onclick = () => handleAnswer(i, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function handleAnswer(idx, clickedBtn) {
+  if (answered) return;
+  answered = true;
+  const q = questions[currentQ];
+  const isCorrect = q.options[idx] === q.answer;
+  if (isCorrect) { score++; document.getElementById('scoreNum').textContent = score; }
+  
+  // Color buttons
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach((btn, i) => {
+    btn.disabled = true;
+    if (q.options[i] === q.answer) btn.classList.add('correct');
+    else if (i === idx && !isCorrect) btn.classList.add('incorrect');
+  });
+
+  // Highlight clues
+  const passageEl = document.getElementById('passageText');
+  const spans = passageEl.querySelectorAll('span.word');
+  spans.forEach(span => {
+    const text = span.textContent.replace(/[^a-zA-Z'-]/g,'').toLowerCase();
+    if (q.clues.map(c=>c.toLowerCase()).includes(text)) span.classList.add('clue-highlight');
+  });
+
+  // Show feedback cards
+  const grid = document.getElementById('feedbackGrid');
+  grid.innerHTML = '';
+  q.options.forEach(opt => {
+    const def = vocabDefs[opt] || { en: '', cn: '', sentence: '' };
+    const card = document.createElement('div');
+    card.className = 'feedback-card' + (opt === q.answer ? ' is-answer' : '');
+    card.innerHTML = `
+      <div class="fc-word">${opt} <button class="fc-tts" onclick="speakWord('${opt}')"><i class="fa fa-volume-up"></i></button></div>
+      <div class="fc-en">${def.en}</div>
+      <div class="fc-cn">${def.cn}</div>
+      <div class="fc-sentence">${def.sentence} <button class="fc-tts" onclick="speakText('${def.sentence.replace(/'/g,"\\'")}')"><i class="fa fa-volume-up"></i></button></div>
+    `;
+    grid.appendChild(card);
+  });
+  document.getElementById('feedbackBox').classList.add('visible');
+  document.getElementById('nextBtn').classList.add('visible');
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) { showFinal(); return; }
+  renderQuestion();
+}
+
+function showFinal() {
+  document.getElementById('quizCard').style.display = 'none';
+  document.getElementById('progressBar').style.width = '100%';
+  document.getElementById('progressText').textContent = 'Quiz Complete!';
+  const pct = Math.round(score / questions.length * 100);
+  document.getElementById('finalScore').textContent = score + '/' + questions.length;
+  document.getElementById('finalPercent').textContent = pct + '% Correct';
+  let msg, cn;
+  if (pct >= 90) { msg = "Outstanding! You've mastered this unit."; cn = "出色！你已經掌握了本單元的詞彙。"; }
+  else if (pct >= 75) { msg = "Great work! Keep reviewing the words you missed."; cn = "做得好！繼續複習你錯過的單字。"; }
+  else if (pct >= 60) { msg = "Good effort! Try again to strengthen your knowledge."; cn = "很努力！再試一次來加強你的記憶。"; }
+  else { msg = "Keep practicing! Regular review builds lasting vocabulary."; cn = "繼續練習！定期複習能建立持久的詞彙量。"; }
+  document.getElementById('finalMsg').textContent = msg;
+  document.getElementById('finalCn').textContent = cn;
+  document.getElementById('finalScreen').classList.add('visible');
+}
+
+function restartQuiz() {
+  currentQ = 0; score = 0;
+  document.getElementById('scoreNum').textContent = '0';
+  document.getElementById('finalScreen').classList.remove('visible');
+  document.getElementById('quizCard').style.display = 'block';
+  renderQuestion();
+}
+
+function lookupWord(word) {
+  const helper = document.getElementById('wordHelper');
+  const whWord = document.getElementById('whWord');
+  const whDef = document.getElementById('whDef');
+  // Check local vocab first
+  if (vocabDefs[word]) {
+    whWord.textContent = word;
+    whDef.textContent = vocabDefs[word].en + ' | ' + vocabDefs[word].cn;
+    helper.classList.add('visible');
+    return;
+  }
+  whWord.textContent = word;
+  whDef.textContent = 'Looking up...';
+  helper.classList.add('visible');
+  fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + word)
+    .then(r => r.json())
+    .then(data => {
+      if (Array.isArray(data) && data[0] && data[0].meanings && data[0].meanings[0]) {
+        const def = data[0].meanings[0].definitions[0].definition;
+        whDef.textContent = def;
+      } else { whDef.textContent = 'Definition not found. Try another word.'; }
+    }).catch(() => { whDef.textContent = 'Definition not found. Try another word.'; });
+}
+
+function speakPassage() {
+  if (!window.speechSynthesis) return;
+  const raw = questions[currentQ].q.replace(/__________/g, 'blank');
+  const utt = new SpeechSynthesisUtterance(raw);
+  utt.lang = 'en-US'; utt.rate = 0.92;
+  const voices = window.speechSynthesis.getVoices();
+  const female = voices.find(v => v.lang.startsWith('en') && /female|woman|samantha|karen|victoria|zira/i.test(v.name));
+  if (female) utt.voice = female;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+}
+
+function speakWord(word) {
+  if (!window.speechSynthesis) return;
+  const utt = new SpeechSynthesisUtterance(word);
+  utt.lang = 'en-US'; utt.rate = 0.85;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+}
+
+function speakText(text) {
+  if (!window.speechSynthesis) return;
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'en-US'; utt.rate = 0.9;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+}
+
+// Preload voices
+if (window.speechSynthesis) window.speechSynthesis.getVoices();
+</script>
+</body>
+</html>

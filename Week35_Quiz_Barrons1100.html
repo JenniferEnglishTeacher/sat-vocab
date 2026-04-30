@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 35 Interactive Quiz — Barron's 1100 Words</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-body: 'DM Sans', 'Segoe UI', sans-serif;
+    --color-primary: #1a3a5c;
+    --color-accent: #c8962e;
+    --color-correct: #2d7a4f;
+    --color-incorrect: #b53a2f;
+    --color-clue: #fff3a3;
+    --color-surface: #faf8f5;
+    --color-card: #ffffff;
+    --color-border: #e0d8cc;
+    --color-text: #2c2c2c;
+    --color-muted: #7a7065;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); background: var(--color-surface); color: var(--color-text); min-height: 100vh; }
+  
+  /* Header */
+  .quiz-header {
+    background: linear-gradient(135deg, var(--color-primary) 0%, #2a5a8c 100%);
+    color: white; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .quiz-header h1 { font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; }
+  .quiz-header .subtitle { font-size: 0.82rem; opacity: 0.8; margin-top: 3px; }
+  .score-counter { background: rgba(255,255,255,0.15); border-radius: 12px; padding: 8px 16px; text-align: center; }
+  .score-counter .score-num { font-family: var(--font-heading); font-size: 1.6rem; font-weight: 700; }
+  .score-counter .score-label { font-size: 0.72rem; opacity: 0.8; }
+
+  /* Progress */
+  .progress-bar-wrap { background: #e0d8cc; height: 6px; }
+  .progress-bar { height: 6px; background: var(--color-accent); transition: width 0.4s ease; }
+  .progress-text { text-align: center; font-size: 0.82rem; color: var(--color-muted); padding: 8px; background: var(--color-surface); }
+
+  /* Card */
+  .quiz-card { max-width: 780px; margin: 24px auto; padding: 0 16px 40px; }
+  .card { background: var(--color-card); border-radius: 16px; box-shadow: 0 4px 20px rgba(26,58,92,0.1); overflow: hidden; }
+
+  /* Passage */
+  .passage-wrap { padding: 24px 28px 16px; border-bottom: 1px solid var(--color-border); }
+  .passage-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .q-number { font-size: 0.8rem; color: var(--color-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .tts-btn { background: none; border: 1px solid var(--color-border); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 0.82rem; color: var(--color-primary); transition: all 0.2s; }
+  .tts-btn:hover { background: var(--color-primary); color: white; }
+  .passage-text { font-size: 1.02rem; line-height: 1.75; color: var(--color-text); }
+  .passage-text span.word { cursor: pointer; border-bottom: 1px dotted var(--color-muted); transition: background 0.15s; border-radius: 2px; }
+  .passage-text span.word:hover { background: #e8f0f7; }
+  .passage-text span.clue-highlight { background: var(--color-clue); border-radius: 3px; padding: 0 2px; }
+  .blank { font-weight: 700; color: var(--color-primary); letter-spacing: 0.1em; }
+
+  /* Word helper */
+  .word-helper { margin: 0 28px 8px; padding: 10px 14px; background: #eef4f8; border-left: 3px solid var(--color-accent); border-radius: 4px; font-size: 0.88rem; color: var(--color-text); display: none; }
+  .word-helper.visible { display: block; }
+  .word-helper .wh-word { font-weight: 700; color: var(--color-primary); margin-bottom: 3px; }
+  .word-helper .wh-def { color: var(--color-muted); }
+
+  /* Options */
+  .options-wrap { padding: 16px 28px 20px; }
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media(max-width: 560px) { .options-grid { grid-template-columns: 1fr; } }
+  .option-btn {
+    padding: 12px 18px; background: #f4f0eb; border: 2px solid var(--color-border);
+    border-radius: 10px; cursor: pointer; font-family: var(--font-body); font-size: 0.95rem;
+    text-align: left; transition: all 0.2s; color: var(--color-text); font-weight: 500;
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--color-primary); background: #eef4f8; }
+  .option-btn.correct { background: #e8f5ee; border-color: var(--color-correct); color: var(--color-correct); }
+  .option-btn.incorrect { background: #fceaea; border-color: var(--color-incorrect); color: var(--color-incorrect); }
+  .option-btn:disabled { cursor: default; }
+  .option-label { display: inline-block; width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: white; font-size: 0.75rem; font-weight: 700; text-align: center; line-height: 22px; margin-right: 8px; flex-shrink: 0; }
+  .option-btn.correct .option-label { background: var(--color-correct); }
+  .option-btn.incorrect .option-label { background: var(--color-incorrect); }
+
+  /* Feedback */
+  .feedback-box { margin: 0 28px 20px; display: none; }
+  .feedback-box.visible { display: block; }
+  .feedback-title { font-weight: 700; font-size: 0.88rem; color: var(--color-primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .feedback-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media(max-width: 560px) { .feedback-grid { grid-template-columns: 1fr; } }
+  .feedback-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; padding: 10px 12px; }
+  .feedback-card.is-answer { border-color: var(--color-correct); background: #e8f5ee; }
+  .fc-word { font-weight: 700; font-size: 0.92rem; color: var(--color-primary); }
+  .fc-en { font-size: 0.82rem; color: var(--color-muted); margin: 2px 0; }
+  .fc-cn { font-size: 0.85rem; color: var(--color-text); }
+  .fc-sentence { font-size: 0.78rem; color: var(--color-muted); margin-top: 4px; font-style: italic; }
+  .fc-tts { background: none; border: none; color: var(--color-accent); cursor: pointer; font-size: 0.85rem; padding: 2px 4px; }
+
+  /* Navigation */
+  .nav-wrap { padding: 0 28px 24px; display: flex; justify-content: flex-end; }
+  .next-btn {
+    background: var(--color-primary); color: white; border: none; border-radius: 10px;
+    padding: 12px 28px; font-family: var(--font-body); font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; display: none; transition: background 0.2s;
+  }
+  .next-btn.visible { display: block; }
+  .next-btn:hover { background: #2a5a8c; }
+
+  /* Final screen */
+  .final-screen { display: none; max-width: 560px; margin: 40px auto; text-align: center; padding: 0 16px; }
+  .final-screen.visible { display: block; }
+  .final-score { font-family: var(--font-heading); font-size: 4rem; color: var(--color-primary); }
+  .final-percent { font-size: 1.2rem; color: var(--color-accent); font-weight: 600; margin-bottom: 12px; }
+  .final-msg { font-size: 1rem; color: var(--color-muted); margin-bottom: 8px; }
+  .final-cn { font-size: 0.92rem; color: var(--color-muted); }
+  .restart-btn { margin-top: 28px; background: var(--color-primary); color: white; border: none; border-radius: 10px; padding: 14px 36px; font-family: var(--font-body); font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .restart-btn:hover { background: #2a5a8c; }
+
+  /* Start screen */
+  .start-screen { max-width: 560px; margin: 60px auto; text-align: center; padding: 0 16px; }
+  .start-screen h2 { font-family: var(--font-heading); font-size: 2rem; color: var(--color-primary); margin-bottom: 12px; }
+  .start-screen p { color: var(--color-muted); margin-bottom: 28px; font-size: 0.97rem; }
+  .start-btn { background: var(--color-primary); color: white; border: none; border-radius: 10px; padding: 14px 42px; font-family: var(--font-body); font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .start-btn:hover { background: #2a5a8c; }
+</style>
+</head>
+<body>
+
+<div class="quiz-header">
+  <div>
+    <h1>Unit 35 — Barron's 1100 Words</h1>
+    <div class="subtitle">EFL SAT Vocabulary Interactive Quiz</div>
+  </div>
+  <div class="score-counter">
+    <div class="score-num" id="scoreNum">0</div>
+    <div class="score-label">Score</div>
+  </div>
+</div>
+<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+<div class="progress-text" id="progressText">Question 1 of 20</div>
+
+<!-- Start Screen -->
+<div class="start-screen" id="startScreen">
+  <h2>Unit 35 Quiz</h2>
+  <p>20 SAT-style reading questions using this unit's vocabulary words.<br>Click each word in the passage to look it up. Press 🔊 to listen.</p>
+  <button class="start-btn" onclick="startQuiz()">Start Quiz →</button>
+</div>
+
+<!-- Quiz Card -->
+<div class="quiz-card" id="quizCard" style="display:none">
+  <div class="card">
+    <div class="passage-wrap">
+      <div class="passage-meta">
+        <span class="q-number" id="qNum">Question 1</span>
+        <button class="tts-btn" id="ttsBtn" onclick="speakPassage()"><i class="fa fa-volume-up"></i> Listen</button>
+      </div>
+      <div class="passage-text" id="passageText"></div>
+    </div>
+    <div class="word-helper" id="wordHelper">
+      <div class="wh-word" id="whWord"></div>
+      <div class="wh-def" id="whDef"></div>
+    </div>
+    <div class="options-wrap">
+      <div class="options-grid" id="optionsGrid"></div>
+    </div>
+    <div class="feedback-box" id="feedbackBox">
+      <div class="feedback-title">All Options Explained</div>
+      <div class="feedback-grid" id="feedbackGrid"></div>
+    </div>
+    <div class="nav-wrap">
+      <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Final Screen -->
+<div class="final-screen" id="finalScreen">
+  <div class="final-score" id="finalScore">0/20</div>
+  <div class="final-percent" id="finalPercent"></div>
+  <div class="final-msg" id="finalMsg"></div>
+  <div class="final-cn" id="finalCn"></div>
+  <button class="restart-btn" onclick="restartQuiz()">Try Again ↺</button>
+</div>
+
+<script>
+const questions = [
+  {
+    "q": "Young scientists eager to __________ the legendary researcher's extraordinary productivity often overlooked the disciplined intellectual habits and rigorous self-critical practices that underlay her visible achievements. Superficial imitation of her external working patterns without the foundational commitment to genuine methodological rigor consistently produced disappointing results and frustrated aspiring researchers seeking analogous recognition.",
+    "options": [
+      "enervate",
+      "emulate",
+      "enigmatic",
+      "ephemeral"
+    ],
+    "answer": "emulate",
+    "clues": [
+      "imitate",
+      "mimic",
+      "productivity",
+      "habits"
+    ]
+  },
+  {
+    "q": "Public health officials warned that delays in expanding the vaccination program would significantly __________ the burden on hospital systems already operating beyond sustainable capacity. Every week of deferred rollout translated directly into increased preventable hospitalizations that generated cascading resource pressures across interdependent healthcare infrastructure components already severely strained by preceding years of systematic underinvestment.",
+    "options": [
+      "elusive",
+      "exonerate",
+      "exacerbate",
+      "expedient"
+    ],
+    "answer": "exacerbate",
+    "clues": [
+      "worsen",
+      "delays",
+      "burden",
+      "aggravate"
+    ]
+  },
+  {
+    "q": "A genuinely unified theoretical framework reconciling quantum mechanics with general relativity has proven remarkably __________ despite decades of sustained effort by the most gifted theoretical physicists working across multiple national research traditions. Each promising synthesis has eventually revealed fundamental incompatibilities that resisted resolution within existing mathematical frameworks, leaving the central challenge unresolved.",
+    "options": [
+      "elusive",
+      "explicit",
+      "extraneous",
+      "exhaustive"
+    ],
+    "answer": "elusive",
+    "clues": [
+      "evasive",
+      "unresolved",
+      "framework",
+      "resisted"
+    ]
+  },
+  {
+    "q": "The legal team successfully demonstrated that the prosecution's central argument rested on a fundamentally __________ causal inference that conflated correlation with causation in a manner that basic statistical analysis could readily expose. The court's careful examination of the evidentiary record revealed multiple alternative explanations that the prosecution had systematically failed to adequately consider or eliminate.",
+    "options": [
+      "fastidious",
+      "fatuous",
+      "fabricate",
+      "fallacious"
+    ],
+    "answer": "fallacious",
+    "clues": [
+      "erroneous",
+      "incorrect",
+      "misleading",
+      "correlation"
+    ]
+  },
+  {
+    "q": "The experienced negotiator coached his client to __________ disinterest in the specific contract term that was actually her highest priority, recognizing that visibly signaling its importance would enable the opposing party to deploy it as strategic leverage throughout subsequent discussions. This deliberate misrepresentation of priorities formed part of a broader negotiating approach calibrated to achieve maximum overall contractual benefit.",
+    "options": [
+      "fabricate",
+      "feign",
+      "fallacious",
+      "fastidious"
+    ],
+    "answer": "feign",
+    "clues": [
+      "pretend",
+      "simulate",
+      "disinterest",
+      "misrepresentation"
+    ]
+  },
+  {
+    "q": "The award recognized an educator whose __________ commitment to creating genuinely inclusive learning environments had produced measurably superior outcomes for students with diverse learning profiles who had historically been underserved by conventional pedagogical approaches. Her systematic documentation of innovative practices enabled successful replication across multiple additional schools within the district.",
+    "options": [
+      "extraneous",
+      "evasive",
+      "exemplary",
+      "ephemeral"
+    ],
+    "answer": "exemplary",
+    "clues": [
+      "model",
+      "outstanding",
+      "commitment",
+      "recognized"
+    ]
+  },
+  {
+    "q": "The composer's deliberately __________ programmatic notes provided no reliable interpretive guidance, instead generating a proliferation of compelling but irreconcilable analytical readings that sustained academic interest in her work across multiple generations of musicological scholarship. She maintained in rare interviews that the absence of definitive authorial interpretation was itself a central compositional intention.",
+    "options": [
+      "enigmatic",
+      "ephemeral",
+      "enervate",
+      "erudite"
+    ],
+    "answer": "enigmatic",
+    "clues": [
+      "mysterious",
+      "irreconcilable",
+      "ambiguous",
+      "interpretive"
+    ]
+  },
+  {
+    "q": "The revised contractual language contained __________ provisions that eliminated the interpretive ambiguity that had generated costly litigation in previous agreements between the two organizations. Both legal teams agreed that investing significant drafting effort upfront to achieve precise definitional clarity represented sound commercial practice that would substantially reduce the risk of future contractual disputes.",
+    "options": [
+      "extraneous",
+      "evasive",
+      "exhaustive",
+      "explicit"
+    ],
+    "answer": "explicit",
+    "clues": [
+      "clear",
+      "unambiguous",
+      "precise",
+      "definitive"
+    ]
+  },
+  {
+    "q": "The policy review panel dismissed the submission as entirely __________, noting that its core recommendations contradicted well-established empirical evidence, relied on logically incoherent causal assumptions, and demonstrated no awareness of the substantial academic literature directly relevant to the proposed intervention. Members expressed frustration that such superficially presented material had been formally submitted for serious policy consideration.",
+    "options": [
+      "fallacious",
+      "fastidious",
+      "feign",
+      "fatuous"
+    ],
+    "answer": "fatuous",
+    "clues": [
+      "foolish",
+      "inane",
+      "incoherent",
+      "superficial"
+    ]
+  },
+  {
+    "q": "The spokesperson's conspicuously __________ responses during the broadcast interview—repeatedly redirecting substantive questions toward general organizational values rather than addressing specific allegations—reinforced rather than alleviated public suspicion about the institution's actual practices. Media analysts noted that transparent engagement, despite its short-term discomfort, consistently produced superior reputational outcomes than strategic avoidance.",
+    "options": [
+      "erudite",
+      "evasive",
+      "ephemeral",
+      "enervate"
+    ],
+    "answer": "evasive",
+    "clues": [
+      "avoidance",
+      "redirecting",
+      "suspicion",
+      "specific"
+    ]
+  },
+  {
+    "q": "The senior editor systematically eliminated __________ material from the manuscript, requiring the author to demonstrate explicit relevance for every paragraph before it would be retained in the final submission. This demanding editorial discipline initially frustrated the author, who had invested considerable effort in several elaborate contextual sections that ultimately could not justify their claim on the reader's limited attention.",
+    "options": [
+      "extraneous",
+      "evasive",
+      "exhaustive",
+      "explicit"
+    ],
+    "answer": "extraneous",
+    "clues": [
+      "irrelevant",
+      "eliminated",
+      "peripheral",
+      "unrelated"
+    ]
+  },
+  {
+    "q": "Critics characterized the administration's decision to suspend normal competitive procurement procedures as politically __________ rather than procedurally justified, arguing that the claimed emergency circumstances did not meet established legal thresholds for bypassing the oversight mechanisms specifically designed to ensure fair and transparent use of public resources.",
+    "options": [
+      "evasive",
+      "expedient",
+      "explicit",
+      "egregious"
+    ],
+    "answer": "expedient",
+    "clues": [
+      "convenient",
+      "bypass",
+      "procedural",
+      "pragmatic"
+    ]
+  },
+  {
+    "q": "The philosopher observed that the __________ nature of cultural celebrity stood in stark contrast to the enduring significance of genuine artistic achievement, noting that media-generated renown frequently evaporated within months while work of genuine intellectual substance continued accumulating recognition across successive generations of critical appreciation and scholarly reappraisal.",
+    "options": [
+      "ephemeral",
+      "elusive",
+      "equivocal",
+      "explicit"
+    ],
+    "answer": "ephemeral",
+    "clues": [
+      "transient",
+      "evaporated",
+      "fleeting",
+      "contrast"
+    ]
+  },
+  {
+    "q": "Advanced forensic DNA analysis enabled investigators to completely __________ the originally convicted individual and identify the actual perpetrator after the wrongfully imprisoned man had served seventeen years of his sentence. The case prompted legislative proposals for mandatory review procedures applicable to all convictions where physical forensic evidence had not been subjected to modern analytical techniques.",
+    "options": [
+      "evasive",
+      "egregious",
+      "explicit",
+      "exonerate"
+    ],
+    "answer": "exonerate",
+    "clues": [
+      "absolve",
+      "acquit",
+      "wrongfully",
+      "vindicate"
+    ]
+  },
+  {
+    "q": "The __________ commentator's analysis of the geopolitical situation drew insightfully on historical parallels spanning three centuries, weaving primary source documentation, contemporary theoretical frameworks, and comparative regional analysis into a remarkably coherent interpretive synthesis. Both specialist and general audiences found his presentation equally illuminating, a pedagogical achievement that few scholars operating at comparable levels of analytical complexity could consistently attain.",
+    "options": [
+      "elusive",
+      "enervate",
+      "erudite",
+      "ephemeral"
+    ],
+    "answer": "erudite",
+    "clues": [
+      "scholarly",
+      "learned",
+      "historical",
+      "analytical"
+    ]
+  },
+  {
+    "q": "The investigative report revealed that the witness had systematically __________ key elements of her testimony, selectively misrepresenting both her whereabouts and communications in ways that could not be reconciled with independent digital evidence subsequently recovered during the formal evidentiary discovery process. Prosecutors immediately sought formal perjury charges based on the documented contradictions.",
+    "options": [
+      "feign",
+      "fabricate",
+      "fallacious",
+      "fastidious"
+    ],
+    "answer": "fabricate",
+    "clues": [
+      "invent",
+      "false",
+      "testimony",
+      "misrepresenting"
+    ]
+  },
+  {
+    "q": "The regulatory submission required an __________ documentation package covering every aspect of the product's safety profile, manufacturing processes, quality control procedures, and proposed distribution protocols. Incomplete submissions were systematically returned without review, requiring applicants to achieve full compliance with documentation standards before any substantive evaluation of the underlying technical merits could commence.",
+    "options": [
+      "equivocal",
+      "extraneous",
+      "exhaustive",
+      "explicit"
+    ],
+    "answer": "exhaustive",
+    "clues": [
+      "comprehensive",
+      "thorough",
+      "covering",
+      "complete"
+    ]
+  },
+  {
+    "q": "The combination of chronic sleep deprivation, unmanageable workloads, and sustained high-stakes decision-making responsibilities began to visibly __________ even the most resilient members of the emergency response team. Leadership recognized that rotating deployment schedules and mandatory recovery periods were not merely welfare considerations but operational necessities for maintaining the performance standards that effective crisis response demanded.",
+    "options": [
+      "enervate",
+      "elusive",
+      "evasive",
+      "explicit"
+    ],
+    "answer": "enervate",
+    "clues": [
+      "weaken",
+      "deprivation",
+      "drain",
+      "debilitate"
+    ]
+  },
+  {
+    "q": "The __________ wording of the environmental assessment created significant interpretive uncertainty about whether the proposed development met applicable regulatory thresholds, ultimately requiring a formal legal ruling to determine which of two substantially different compliance interpretations represented the correct application of the relevant statutory requirements.",
+    "options": [
+      "equivocal",
+      "evasive",
+      "ephemeral",
+      "exhaustive"
+    ],
+    "answer": "equivocal",
+    "clues": [
+      "ambiguous",
+      "uncertainty",
+      "vague",
+      "interpretive"
+    ]
+  },
+  {
+    "q": "The __________ curator's meticulous attention to exhibition design extended to the precise angular positioning of each framed work, the careful calibration of ambient lighting levels, and the exact physical separation maintained between adjacent pieces. Colleagues admired her exacting standards while occasionally suggesting that her perfectionism sometimes impeded the practical necessities of installing complex exhibitions within realistic institutional timelines.",
+    "options": [
+      "fallacious",
+      "feign",
+      "fatuous",
+      "fastidious"
+    ],
+    "answer": "fastidious",
+    "clues": [
+      "meticulous",
+      "precise",
+      "exacting",
+      "perfectionism"
+    ]
+  }
+];
+const vocabDefs = {
+  "elusive": {
+    "en": "difficult to find, catch, or achieve",
+    "cn": "難以捉摸的；難以找到的",
+    "sentence": "Despite years of dedicated investigation, a definitive cure for the condition remained frustratingly elusive, with each promising research avenue eventually rev..."
+  },
+  "emulate": {
+    "en": "to match or surpass through imitation",
+    "cn": "仿效；努力趕超",
+    "sentence": "Young entrepreneurs eager to emulate the legendary founder's approach to innovation often missed the crucial distinction between copying observable surface beha..."
+  },
+  "enigmatic": {
+    "en": "difficult to interpret; mysterious",
+    "cn": "神秘的；費解的",
+    "sentence": "The artist's deliberately enigmatic public persona—carefully cultivated through strategic ambiguity and deliberate contradictions—generated continuous media fas..."
+  },
+  "enervate": {
+    "en": "to weaken; to drain of energy",
+    "cn": "使衰弱；使精力耗盡",
+    "sentence": "The relentless bureaucratic obstacles seemed specifically designed to enervate reform advocates by consuming their finite time and energy in procedural complian..."
+  },
+  "ephemeral": {
+    "en": "lasting for only a short time",
+    "cn": "短暫的；瞬間即逝的",
+    "sentence": "The philosopher argued that the pursuit of ephemeral pleasures at the expense of deeper contemplative practices represented a fundamental misunderstanding of hu..."
+  },
+  "equivocal": {
+    "en": "uncertain or questionable; deliberately vague",
+    "cn": "模稜兩可的；含糊的",
+    "sentence": "The minister's equivocal response to direct questions about the proposed legislation left parliamentary observers uncertain whether the government was genuinely..."
+  },
+  "erudite": {
+    "en": "having great knowledge learned from reading",
+    "cn": "博學的；學識淵博的",
+    "sentence": "The erudite historian's latest monograph demonstrated an extraordinary synthesis of classical sources, contemporary theoretical frameworks, and previously negle..."
+  },
+  "evasive": {
+    "en": "tending to avoid commitment or direct answers",
+    "cn": "回避的；含糊其辭的",
+    "sentence": "The corporate spokesperson's evasive responses during the televised press conference—characterized by rhetorical deflections, strategic subject changes, and car..."
+  },
+  "exacerbate": {
+    "en": "to make a problem worse",
+    "cn": "使惡化；加劇",
+    "sentence": "Economic analysts warned that imposing punitive trade tariffs would likely exacerbate existing inflationary pressures rather than achieving the intended protect..."
+  },
+  "exemplary": {
+    "en": "representing the best of its kind; serving as a model",
+    "cn": "典範的；模範的",
+    "sentence": "The organization presented its annual award to an employee whose exemplary commitment to inclusive workplace practices had measurably transformed the institutio..."
+  },
+  "exhaustive": {
+    "en": "thorough and comprehensive; covering all possibilities",
+    "cn": "詳盡的；全面徹底的",
+    "sentence": "The forensic team conducted an exhaustive examination of all available physical evidence before presenting preliminary findings to investigators, ensuring that ..."
+  },
+  "exonerate": {
+    "en": "to officially absolve from blame",
+    "cn": "使免罪；宣告無罪",
+    "sentence": "Newly discovered forensic evidence enabled attorneys to exonerate their client after she had served more than twelve years for a crime investigators now believe..."
+  },
+  "expedient": {
+    "en": "convenient and practical, though possibly improper",
+    "cn": "權宜的；方便實際的（有時不擇手段）",
+    "sentence": "The administration's decision to bypass formal legislative procedures was criticized as politically expedient rather than constitutionally sound, prioritizing i..."
+  },
+  "explicit": {
+    "en": "stated clearly and in detail; leaving nothing implied",
+    "cn": "明確的；清晰說明的",
+    "sentence": "The contract contained explicit provisions specifying exactly which circumstances would constitute a material breach, thereby eliminating the ambiguity that had..."
+  },
+  "extraneous": {
+    "en": "irrelevant to the subject being dealt with",
+    "cn": "無關的；多餘的",
+    "sentence": "The editor systematically removed extraneous material from the documentary script, tightening the narrative to focus exclusively on developments directly releva..."
+  },
+  "fabricate": {
+    "en": "to invent false information; to make up",
+    "cn": "捏造；偽造",
+    "sentence": "The researcher was formally dismissed after an independent review panel determined that she had deliberately fabricate experimental results in multiple publishe..."
+  },
+  "fallacious": {
+    "en": "based on a false belief; containing errors",
+    "cn": "謬誤的；錯誤的",
+    "sentence": "The senator's central argument relied on a fallacious premise that had been comprehensively refuted by multiple independent economic analyses conducted over the..."
+  },
+  "fastidious": {
+    "en": "very attentive to detail; difficult to please",
+    "cn": "挑剔的；一絲不苟的",
+    "sentence": "The fastidious editor reviewed every submitted manuscript with extraordinary thoroughness, consistently identifying minor inconsistencies in citation formatting..."
+  },
+  "fatuous": {
+    "en": "foolish and pointless; vacuously silly",
+    "cn": "愚昧的；蠢笨的",
+    "sentence": "The policy analyst publicly dismissed the proposal as entirely fatuous, noting that its central recommendations were demonstrably incompatible with existing leg..."
+  },
+  "feign": {
+    "en": "to pretend to feel or be affected by something",
+    "cn": "假裝；裝作",
+    "sentence": "The experienced negotiator learned to feign indifference during critical contractual discussions, recognizing that visibly enthusiastic interest in particular t..."
+  }
+};
+
+const letters = ['A','B','C','D'];
+let currentQ = 0;
+let score = 0;
+let answered = false;
+
+function startQuiz() {
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('quizCard').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = questions[currentQ];
+  document.getElementById('qNum').textContent = 'Question ' + (currentQ + 1);
+  document.getElementById('progressText').textContent = 'Question ' + (currentQ + 1) + ' of 20';
+  document.getElementById('progressBar').style.width = (currentQ / 20 * 100) + '%';
+  document.getElementById('wordHelper').classList.remove('visible');
+  document.getElementById('feedbackBox').classList.remove('visible');
+  document.getElementById('nextBtn').classList.remove('visible');
+
+  // Render passage with clickable words
+  const passageEl = document.getElementById('passageText');
+  const raw = q.q;
+  const tokens = raw.split(/(s+|[.,;:!?"""''—–-]+)/);
+  passageEl.innerHTML = tokens.map(tok => {
+    if (/s+/.test(tok)) return tok;
+    if (tok === '__________') return '<span class="blank">__________</span>';
+    const clean = tok.replace(/[^a-zA-Z'-]/g,'');
+    if (!clean) return tok;
+    return '<span class="word" onclick="lookupWord(\'' + clean.toLowerCase().replace(/'/g,"\'") + '\')">' + tok + '</span>';
+  }).join('');
+
+  // Options
+  const grid = document.getElementById('optionsGrid');
+  grid.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = '<span class="option-label">' + letters[i] + '</span>' + opt;
+    btn.onclick = () => handleAnswer(i, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function handleAnswer(idx, clickedBtn) {
+  if (answered) return;
+  answered = true;
+  const q = questions[currentQ];
+  const isCorrect = q.options[idx] === q.answer;
+  if (isCorrect) { score++; document.getElementById('scoreNum').textContent = score; }
+  
+  // Color buttons
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach((btn, i) => {
+    btn.disabled = true;
+    if (q.options[i] === q.answer) btn.classList.add('correct');
+    else if (i === idx && !isCorrect) btn.classList.add('incorrect');
+  });
+
+  // Highlight clues
+  const passageEl = document.getElementById('passageText');
+  const spans = passageEl.querySelectorAll('span.word');
+  spans.forEach(span => {
+    const text = span.textContent.replace(/[^a-zA-Z'-]/g,'').toLowerCase();
+    if (q.clues.map(c=>c.toLowerCase()).includes(text)) span.classList.add('clue-highlight');
+  });
+
+  // Show feedback cards
+  const grid = document.getElementById('feedbackGrid');
+  grid.innerHTML = '';
+  q.options.forEach(opt => {
+    const def = vocabDefs[opt] || { en: '', cn: '', sentence: '' };
+    const card = document.createElement('div');
+    card.className = 'feedback-card' + (opt === q.answer ? ' is-answer' : '');
+    card.innerHTML = `
+      <div class="fc-word">${opt} <button class="fc-tts" onclick="speakWord('${opt}')"><i class="fa fa-volume-up"></i></button></div>
+      <div class="fc-en">${def.en}</div>
+      <div class="fc-cn">${def.cn}</div>
+      <div class="fc-sentence">${def.sentence} <button class="fc-tts" onclick="speakText('${def.sentence.replace(/'/g,"\\'")}')"><i class="fa fa-volume-up"></i></button></div>
+    `;
+    grid.appendChild(card);
+  });
+  document.getElementById('feedbackBox').classList.add('visible');
+  document.getElementById('nextBtn').classList.add('visible');
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) { showFinal(); return; }
+  renderQuestion();
+}
+
+function showFinal() {
+  document.getElementById('quizCard').style.display = 'none';
+  document.getElementById('progressBar').style.width = '100%';
+  document.getElementById('progressText').textContent = 'Quiz Complete!';
+  const pct = Math.round(score / questions.length * 100);
+  document.getElementById('finalScore').textContent = score + '/' + questions.length;
+  document.getElementById('finalPercent').textContent = pct + '% Correct';
+  let msg, cn;
+  if (pct >= 90) { msg = "Outstanding! You've mastered this unit."; cn = "出色！你已經掌握了本單元的詞彙。"; }
+  else if (pct >= 75) { msg = "Great work! Keep reviewing the words you missed."; cn = "做得好！繼續複習你錯過的單字。"; }
+  else if (pct >= 60) { msg = "Good effort! Try again to strengthen your knowledge."; cn = "很努力！再試一次來加強你的記憶。"; }
+  else { msg = "Keep practicing! Regular review builds lasting vocabulary."; cn = "繼續練習！定期複習能建立持久的詞彙量。"; }
+  document.getElementById('finalMsg').textContent = msg;
+  document.getElementById('finalCn').textContent = cn;
+  document.getElementById('finalScreen').classList.add('visible');
+}
+
+function restartQuiz() {
+  currentQ = 0; score = 0;
+  document.getElementById('scoreNum').textContent = '0';
+  document.getElementById('finalScreen').classList.remove('visible');
+  document.getElementById('quizCard').style.display = 'block';
+  renderQuestion();
+}
+
+function lookupWord(word) {
+  const helper = document.getElementById('wordHelper');
+  const whWord = document.getElementById('whWord');
+  const whDef = document.getElementById('whDef');
+  // Check local vocab first
+  if (vocabDefs[word]) {
+    whWord.textContent = word;
+    whDef.textContent = vocabDefs[word].en + ' | ' + vocabDefs[word].cn;
+    helper.classList.add('visible');
+    return;
+  }
+  whWord.textContent = word;
+  whDef.textContent = 'Looking up...';
+  helper.classList.add('visible');
+  fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + word)
+    .then(r => r.json())
+    .then(data => {
+      if (Array.isArray(data) && data[0] && data[0].meanings && data[0].meanings[0]) {
+        const def = data[0].meanings[0].definitions[0].definition;
+        whDef.textContent = def;
+      } else { whDef.textContent = 'Definition not found. Try another word.'; }
+    }).catch(() => { whDef.textContent = 'Definition not found. Try another word.'; });
+}
+
+function speakPassage() {
+  if (!window.speechSynthesis) return;
+  const raw = questions[currentQ].q.replace(/__________/g, 'blank');
+  const utt = new SpeechSynthesisUtterance(raw);
+  utt.lang = 'en-US'; utt.rate = 0.92;
+  const voices = window.speechSynthesis.getVoices();
+  const female = voices.find(v => v.lang.startsWith('en') && /female|woman|samantha|karen|victoria|zira/i.test(v.name));
+  if (female) utt.voice = female;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+}
+
+function speakWord(word) {
+  if (!window.speechSynthesis) return;
+  const utt = new SpeechSynthesisUtterance(word);
+  utt.lang = 'en-US'; utt.rate = 0.85;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+}
+
+function speakText(text) {
+  if (!window.speechSynthesis) return;
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'en-US'; utt.rate = 0.9;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+}
+
+// Preload voices
+if (window.speechSynthesis) window.speechSynthesis.getVoices();
+</script>
+</body>
+</html>
