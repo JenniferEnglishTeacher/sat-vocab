@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 32 Interactive Quiz — Barron's 1100 Words</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-body: 'DM Sans', 'Segoe UI', sans-serif;
+    --color-primary: #1a3a5c;
+    --color-accent: #c8962e;
+    --color-correct: #2d7a4f;
+    --color-incorrect: #b53a2f;
+    --color-clue: #fff3a3;
+    --color-surface: #faf8f5;
+    --color-card: #ffffff;
+    --color-border: #e0d8cc;
+    --color-text: #2c2c2c;
+    --color-muted: #7a7065;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); background: var(--color-surface); color: var(--color-text); min-height: 100vh; }
+  
+  /* Header */
+  .quiz-header {
+    background: linear-gradient(135deg, var(--color-primary) 0%, #2a5a8c 100%);
+    color: white; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .quiz-header h1 { font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; }
+  .quiz-header .subtitle { font-size: 0.82rem; opacity: 0.8; margin-top: 3px; }
+  .score-counter { background: rgba(255,255,255,0.15); border-radius: 12px; padding: 8px 16px; text-align: center; }
+  .score-counter .score-num { font-family: var(--font-heading); font-size: 1.6rem; font-weight: 700; }
+  .score-counter .score-label { font-size: 0.72rem; opacity: 0.8; }
+
+  /* Progress */
+  .progress-bar-wrap { background: #e0d8cc; height: 6px; }
+  .progress-bar { height: 6px; background: var(--color-accent); transition: width 0.4s ease; }
+  .progress-text { text-align: center; font-size: 0.82rem; color: var(--color-muted); padding: 8px; background: var(--color-surface); }
+
+  /* Card */
+  .quiz-card { max-width: 780px; margin: 24px auto; padding: 0 16px 40px; }
+  .card { background: var(--color-card); border-radius: 16px; box-shadow: 0 4px 20px rgba(26,58,92,0.1); overflow: hidden; }
+
+  /* Passage */
+  .passage-wrap { padding: 24px 28px 16px; border-bottom: 1px solid var(--color-border); }
+  .passage-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .q-number { font-size: 0.8rem; color: var(--color-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .tts-btn { background: none; border: 1px solid var(--color-border); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 0.82rem; color: var(--color-primary); transition: all 0.2s; }
+  .tts-btn:hover { background: var(--color-primary); color: white; }
+  .passage-text { font-size: 1.02rem; line-height: 1.75; color: var(--color-text); }
+  .passage-text span.word { cursor: pointer; border-bottom: 1px dotted var(--color-muted); transition: background 0.15s; border-radius: 2px; }
+  .passage-text span.word:hover { background: #e8f0f7; }
+  .passage-text span.clue-highlight { background: var(--color-clue); border-radius: 3px; padding: 0 2px; }
+  .blank { font-weight: 700; color: var(--color-primary); letter-spacing: 0.1em; }
+
+  /* Word helper */
+  .word-helper { margin: 0 28px 8px; padding: 10px 14px; background: #eef4f8; border-left: 3px solid var(--color-accent); border-radius: 4px; font-size: 0.88rem; color: var(--color-text); display: none; }
+  .word-helper.visible { display: block; }
+  .word-helper .wh-word { font-weight: 700; color: var(--color-primary); margin-bottom: 3px; }
+  .word-helper .wh-def { color: var(--color-muted); }
+
+  /* Options */
+  .options-wrap { padding: 16px 28px 20px; }
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media(max-width: 560px) { .options-grid { grid-template-columns: 1fr; } }
+  .option-btn {
+    padding: 12px 18px; background: #f4f0eb; border: 2px solid var(--color-border);
+    border-radius: 10px; cursor: pointer; font-family: var(--font-body); font-size: 0.95rem;
+    text-align: left; transition: all 0.2s; color: var(--color-text); font-weight: 500;
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--color-primary); background: #eef4f8; }
+  .option-btn.correct { background: #e8f5ee; border-color: var(--color-correct); color: var(--color-correct); }
+  .option-btn.incorrect { background: #fceaea; border-color: var(--color-incorrect); color: var(--color-incorrect); }
+  .option-btn:disabled { cursor: default; }
+  .option-label { display: inline-block; width: 22px; height: 22px; border-radius: 50%; background: var(--color-primary); color: white; font-size: 0.75rem; font-weight: 700; text-align: center; line-height: 22px; margin-right: 8px; flex-shrink: 0; }
+  .option-btn.correct .option-label { background: var(--color-correct); }
+  .option-btn.incorrect .option-label { background: var(--color-incorrect); }
+
+  /* Feedback */
+  .feedback-box { margin: 0 28px 20px; display: none; }
+  .feedback-box.visible { display: block; }
+  .feedback-title { font-weight: 700; font-size: 0.88rem; color: var(--color-primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .feedback-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media(max-width: 560px) { .feedback-grid { grid-template-columns: 1fr; } }
+  .feedback-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; padding: 10px 12px; }
+  .feedback-card.is-answer { border-color: var(--color-correct); background: #e8f5ee; }
+  .fc-word { font-weight: 700; font-size: 0.92rem; color: var(--color-primary); }
+  .fc-en { font-size: 0.82rem; color: var(--color-muted); margin: 2px 0; }
+  .fc-cn { font-size: 0.85rem; color: var(--color-text); }
+  .fc-sentence { font-size: 0.78rem; color: var(--color-muted); margin-top: 4px; font-style: italic; }
+  .fc-tts { background: none; border: none; color: var(--color-accent); cursor: pointer; font-size: 0.85rem; padding: 2px 4px; }
+
+  /* Navigation */
+  .nav-wrap { padding: 0 28px 24px; display: flex; justify-content: flex-end; }
+  .next-btn {
+    background: var(--color-primary); color: white; border: none; border-radius: 10px;
+    padding: 12px 28px; font-family: var(--font-body); font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; display: none; transition: background 0.2s;
+  }
+  .next-btn.visible { display: block; }
+  .next-btn:hover { background: #2a5a8c; }
+
+  /* Final screen */
+  .final-screen { display: none; max-width: 560px; margin: 40px auto; text-align: center; padding: 0 16px; }
+  .final-screen.visible { display: block; }
+  .final-score { font-family: var(--font-heading); font-size: 4rem; color: var(--color-primary); }
+  .final-percent { font-size: 1.2rem; color: var(--color-accent); font-weight: 600; margin-bottom: 12px; }
+  .final-msg { font-size: 1rem; color: var(--color-muted); margin-bottom: 8px; }
+  .final-cn { font-size: 0.92rem; color: var(--color-muted); }
+  .restart-btn { margin-top: 28px; background: var(--color-primary); color: white; border: none; border-radius: 10px; padding: 14px 36px; font-family: var(--font-body); font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .restart-btn:hover { background: #2a5a8c; }
+
+  /* Start screen */
+  .start-screen { max-width: 560px; margin: 60px auto; text-align: center; padding: 0 16px; }
+  .start-screen h2 { font-family: var(--font-heading); font-size: 2rem; color: var(--color-primary); margin-bottom: 12px; }
+  .start-screen p { color: var(--color-muted); margin-bottom: 28px; font-size: 0.97rem; }
+  .start-btn { background: var(--color-primary); color: white; border: none; border-radius: 10px; padding: 14px 42px; font-family: var(--font-body); font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .start-btn:hover { background: #2a5a8c; }
+</style>
+</head>
+<body>
+
+<div class="quiz-header">
+  <div>
+    <h1>Unit 32 — Barron's 1100 Words</h1>
+    <div class="subtitle">EFL SAT Vocabulary Interactive Quiz</div>
+  </div>
+  <div class="score-counter">
+    <div class="score-num" id="scoreNum">0</div>
+    <div class="score-label">Score</div>
+  </div>
+</div>
+<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+<div class="progress-text" id="progressText">Question 1 of 20</div>
+
+<!-- Start Screen -->
+<div class="start-screen" id="startScreen">
+  <h2>Unit 32 Quiz</h2>
+  <p>20 SAT-style reading questions using this unit's vocabulary words.<br>Click each word in the passage to look it up. Press 🔊 to listen.</p>
+  <button class="start-btn" onclick="startQuiz()">Start Quiz →</button>
+</div>
+
+<!-- Quiz Card -->
+<div class="quiz-card" id="quizCard" style="display:none">
+  <div class="card">
+    <div class="passage-wrap">
+      <div class="passage-meta">
+        <span class="q-number" id="qNum">Question 1</span>
+        <button class="tts-btn" id="ttsBtn" onclick="speakPassage()"><i class="fa fa-volume-up"></i> Listen</button>
+      </div>
+      <div class="passage-text" id="passageText"></div>
+    </div>
+    <div class="word-helper" id="wordHelper">
+      <div class="wh-word" id="whWord"></div>
+      <div class="wh-def" id="whDef"></div>
+    </div>
+    <div class="options-wrap">
+      <div class="options-grid" id="optionsGrid"></div>
+    </div>
+    <div class="feedback-box" id="feedbackBox">
+      <div class="feedback-title">All Options Explained</div>
+      <div class="feedback-grid" id="feedbackGrid"></div>
+    </div>
+    <div class="nav-wrap">
+      <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Final Screen -->
+<div class="final-screen" id="finalScreen">
+  <div class="final-score" id="finalScore">0/20</div>
+  <div class="final-percent" id="finalPercent"></div>
+  <div class="final-msg" id="finalMsg"></div>
+  <div class="final-cn" id="finalCn"></div>
+  <button class="restart-btn" onclick="restartQuiz()">Try Again ↺</button>
+</div>
+
+<script>
+const questions = [
+  {
+    "q": "The renowned architect designed the memorial with a deliberately __________ aesthetic: smooth concrete surfaces, minimal ornamentation, and a spatial arrangement that directed visitor attention toward silent reflection rather than elaborate visual stimulation. Critics praised this restrained approach as profoundly appropriate for commemorating events whose gravity resisted any decorative embellishment.",
+    "options": [
+      "avarice",
+      "austere",
+      "aversion",
+      "banal"
+    ],
+    "answer": "austere",
+    "clues": [
+      "minimal",
+      "restrained",
+      "smooth",
+      "reflection"
+    ]
+  },
+  {
+    "q": "The investigative journalist valued __________ above all other qualities in sources, believing that even uncomfortable or professionally inconvenient truths were ultimately more valuable than carefully managed information designed to project favorable institutional appearances. This commitment to unvarnished honesty distinguished her reporting as exceptionally trustworthy in an environment increasingly characterized by strategic information management.",
+    "options": [
+      "cacophony",
+      "callous",
+      "candor",
+      "capitulate"
+    ],
+    "answer": "candor",
+    "clues": [
+      "honesty",
+      "truths",
+      "trustworthy",
+      "unvarnished"
+    ]
+  },
+  {
+    "q": "The government allocated substantial additional resources specifically to __________ the underfunded rural healthcare system, which had demonstrated measurable inadequacies in managing both routine medical needs and urgent emergency situations. Independent assessments projected that the targeted investment would produce meaningful improvements in patient outcomes within a three-year implementation horizon.",
+    "options": [
+      "bolster",
+      "boorish",
+      "brevity",
+      "burgeon"
+    ],
+    "answer": "bolster",
+    "clues": [
+      "resources",
+      "underfunded",
+      "improvements",
+      "investment"
+    ]
+  },
+  {
+    "q": "After months of sustained public pressure and extensive negative media coverage, the municipal authority finally agreed to __________ to community demands for an independent environmental assessment of the proposed industrial development. Environmental advocates characterized the reversal as a landmark victory demonstrating the effectiveness of organized civic advocacy in influencing institutional decision-making.",
+    "options": [
+      "banal",
+      "belittle",
+      "brevity",
+      "capitulate"
+    ],
+    "answer": "capitulate",
+    "clues": [
+      "pressure",
+      "demands",
+      "reversal",
+      "yielded"
+    ]
+  },
+  {
+    "q": "Market analysts described investor sentiment as unusually __________ during the first quarter, with enthusiasm rapidly cycling between optimism and pessimism in response to relatively minor economic announcements. This heightened volatility made reliable portfolio management exceptionally challenging, as established valuation models struggled to account for sentiment-driven fluctuations that bore little relationship to fundamental economic indicators.",
+    "options": [
+      "caustic",
+      "capricious",
+      "callous",
+      "circuitous"
+    ],
+    "answer": "capricious",
+    "clues": [
+      "cycling",
+      "volatility",
+      "unpredictable",
+      "fluctuations"
+    ]
+  },
+  {
+    "q": "Residents living near the newly expanded freight terminal complained bitterly about the relentless __________ generated by round-the-clock loading operations, which severely disrupted sleep patterns and created persistent stress among nearby households. Local environmental health officers were commissioned to conduct acoustic measurements and recommend feasible mitigation strategies for the affected residential zones.",
+    "options": [
+      "brevity",
+      "buffoon",
+      "cacophony",
+      "censure"
+    ],
+    "answer": "cacophony",
+    "clues": [
+      "noise",
+      "disrupted",
+      "acoustic",
+      "relentless"
+    ]
+  },
+  {
+    "q": "The foundation's __________ mission extended far beyond simple charitable giving, encompassing comprehensive educational programs, healthcare access initiatives, and workforce development projects targeted specifically at communities experiencing persistent structural disadvantage. Trustees emphasized that genuine philanthropic impact required long-term systemic engagement rather than isolated transactional donations.",
+    "options": [
+      "benevolent",
+      "banal",
+      "boorish",
+      "burgeon"
+    ],
+    "answer": "benevolent",
+    "clues": [
+      "charitable",
+      "philanthropic",
+      "mission",
+      "communities"
+    ]
+  },
+  {
+    "q": "Literary critics noted that Dickens consistently portrayed __________ not merely as a personal moral failing but as a systemic social pathology actively destroying familial bonds, civic trust, and the broader fabric of compassionate human community. His most memorable antagonists embodied an insatiable hunger for accumulation that rendered them increasingly isolated despite their growing material wealth.",
+    "options": [
+      "brevity",
+      "buffoon",
+      "boorish",
+      "avarice"
+    ],
+    "answer": "avarice",
+    "clues": [
+      "accumulation",
+      "insatiable",
+      "pathology",
+      "material"
+    ]
+  },
+  {
+    "q": "The regulatory authority voted to formally __________ the financial institution for systematically failing to implement mandatory risk management protocols that had been explicitly required under compliance agreements signed following earlier violations. The official reprimand was accompanied by substantial monetary penalties and specific remedial requirements to be completed within a stipulated timeframe.",
+    "options": [
+      "capricious",
+      "capitulate",
+      "callous",
+      "censure"
+    ],
+    "answer": "censure",
+    "clues": [
+      "formally",
+      "failing",
+      "reprimand",
+      "penalties"
+    ]
+  },
+  {
+    "q": "The distinguished editor mentored young writers by emphasizing that __________ was not the enemy of depth but rather its essential prerequisite. She argued that compression forced authors to identify and retain only what genuinely mattered, producing prose that carried significantly greater intellectual and emotional impact than discursive writing that valued verbosity over precision.",
+    "options": [
+      "avarice",
+      "brevity",
+      "buffoon",
+      "burgeon"
+    ],
+    "answer": "brevity",
+    "clues": [
+      "compression",
+      "concise",
+      "precision",
+      "shorter"
+    ]
+  },
+  {
+    "q": "Urban cycling infrastructure investments allowed the network of dedicated bike lanes to __________ substantially over just three years, transforming what had been a marginal commuting option into a mainstream transportation choice used daily by hundreds of thousands of residents. City planners credited the rapid expansion with measurably reducing vehicle congestion and improving public health outcomes across multiple districts.",
+    "options": [
+      "burgeon",
+      "belittle",
+      "banal",
+      "bolster"
+    ],
+    "answer": "burgeon",
+    "clues": [
+      "expand",
+      "rapid",
+      "growth",
+      "substantially"
+    ]
+  },
+  {
+    "q": "The veteran mediator employed a characteristically __________ approach to resolving the industrial dispute, spending several initial sessions discussing uncontroversial peripheral topics before gradually introducing more sensitive central issues once a foundation of mutual respect had been established. This patient strategy ultimately produced a settlement that more direct confrontational approaches had repeatedly failed to achieve.",
+    "options": [
+      "callous",
+      "circuitous",
+      "caustic",
+      "capricious"
+    ],
+    "answer": "circuitous",
+    "clues": [
+      "indirect",
+      "peripheral",
+      "gradually",
+      "patient"
+    ]
+  },
+  {
+    "q": "Humanitarian observers described the administration's response to the refugee crisis as deeply __________, characterized by bureaucratic inflexibility and a visible absence of urgency that stood in stark contrast to the acute suffering documented at reception centers. International advocacy organizations demanded immediate intervention to prevent further preventable deterioration in living conditions.",
+    "options": [
+      "callous",
+      "censure",
+      "candor",
+      "cacophony"
+    ],
+    "answer": "callous",
+    "clues": [
+      "inflexibility",
+      "absence",
+      "contrast",
+      "suffering"
+    ]
+  },
+  {
+    "q": "The satirist's __________ commentary on contemporary political culture drew both admiring readers who welcomed the sharp critique and offended subjects who objected to what they characterized as destructive contempt masquerading as principled social commentary. Debates about the legitimate ethical boundaries of satirical expression intensified following the publication of his most controversial collection.",
+    "options": [
+      "candor",
+      "capitulate",
+      "circuitous",
+      "caustic"
+    ],
+    "answer": "caustic",
+    "clues": [
+      "sharp",
+      "contempt",
+      "critique",
+      "satirical"
+    ]
+  },
+  {
+    "q": "The senior advisor would occasionally __________ her team when preparation for client presentations fell below her established professional standard, but she consistently balanced correction with recognition of genuine effort and constructive guidance on specific improvement strategies. Her measured feedback approach produced a highly motivated team that rarely repeated the same errors.",
+    "options": [
+      "capitulate",
+      "candor",
+      "chide",
+      "callous"
+    ],
+    "answer": "chide",
+    "clues": [
+      "scold",
+      "correction",
+      "feedback",
+      "mildly"
+    ]
+  },
+  {
+    "q": "Educational psychologists warn that teachers who habitually __________ students' contributions in classroom settings create lasting psychological barriers to intellectual risk-taking that can persist well beyond the immediate educational experience. Creating environments where learners feel genuinely safe to express tentative ideas represents a fundamental prerequisite for authentic intellectual development.",
+    "options": [
+      "brevity",
+      "belittle",
+      "burgeon",
+      "boorish"
+    ],
+    "answer": "belittle",
+    "clues": [
+      "habitually",
+      "barriers",
+      "risk-taking",
+      "safe"
+    ]
+  },
+  {
+    "q": "Guests at the charity gala were visibly uncomfortable with the prominent donor's __________ behavior, which included interrupting speakers, dismissing other attendees, and conspicuously ignoring established social courtesies that the event's organizers had explicitly emphasized in advance communications. Several board members privately expressed concern about the reputational implications of his continued association with the organization.",
+    "options": [
+      "banal",
+      "bolster",
+      "boorish",
+      "belittle"
+    ],
+    "answer": "boorish",
+    "clues": [
+      "interrupting",
+      "dismissing",
+      "courtesies",
+      "uncomfortable"
+    ]
+  },
+  {
+    "q": "His deep __________ to hierarchical organizational structures led him to seek employment exclusively in flat, collaborative environments where professional relationships were governed more by mutual respect than formal authority. Career counselors noted that while this preference narrowed his options substantially, it reflected an authentic understanding of the working conditions under which he performed most effectively.",
+    "options": [
+      "aversion",
+      "avarice",
+      "austere",
+      "banal"
+    ],
+    "answer": "aversion",
+    "clues": [
+      "dislike",
+      "hierarchical",
+      "preference",
+      "avoid"
+    ]
+  },
+  {
+    "q": "Political commentators noted that the opposition had made a strategic error in dismissing the challenger as a __________, underestimating the genuine popular resonance of his deliberately informal style and his talent for converting complex policy questions into accessible language that meaningfully connected with voters alienated by conventional political discourse.",
+    "options": [
+      "buffoon",
+      "brevity",
+      "burgeon",
+      "banal"
+    ],
+    "answer": "buffoon",
+    "clues": [
+      "clown",
+      "dismissing",
+      "underestimating",
+      "informal"
+    ]
+  },
+  {
+    "q": "The technology company's leadership became dangerously __________ following a decade of market dominance, failing to respond adequately to the disruptive innovations that competitors were rapidly developing. By the time executives acknowledged the severity of their competitive position, the market landscape had shifted so dramatically that recovery required years of painful restructuring and substantial strategic reinvestment.",
+    "options": [
+      "caustic",
+      "candor",
+      "circuitous",
+      "complacent"
+    ],
+    "answer": "complacent",
+    "clues": [
+      "dominance",
+      "failing",
+      "competitive",
+      "restructuring"
+    ]
+  }
+];
+const vocabDefs = {
+  "austere": {
+    "en": "severely simple; stern in appearance or manner",
+    "cn": "嚴峻的；樸素的",
+    "sentence": "The monastery's austere interior, stripped of decorative ornamentation and furnished with only the most essential items, reflected the community's profound comm..."
+  },
+  "avarice": {
+    "en": "extreme greed for wealth",
+    "cn": "貪婪；貪財",
+    "sentence": "The executive's naked avarice became apparent when investigators uncovered multiple fraudulent accounting schemes designed to divert company funds into private ..."
+  },
+  "aversion": {
+    "en": "strong dislike or disinclination",
+    "cn": "厭惡；反感",
+    "sentence": "Her deep aversion to confrontational situations made professional negotiation extraordinarily challenging, leading her to consistently avoid difficult conversat..."
+  },
+  "banal": {
+    "en": "lacking originality; commonplace",
+    "cn": "平庸的；老套的",
+    "sentence": "The film critic dismissed the screenplay as profoundly banal, noting that every character development arc, narrative twist, and thematic resolution had been dep..."
+  },
+  "belittle": {
+    "en": "to make seem less important; to disparage",
+    "cn": "貶低；小看",
+    "sentence": "The manager's habit of consistently belittle team members' suggestions during collaborative meetings created a profoundly toxic workplace dynamic that severely ..."
+  },
+  "benevolent": {
+    "en": "well-meaning and kindly",
+    "cn": "仁慈的；善意的",
+    "sentence": "The benevolent donor anonymously funded scholarships for hundreds of disadvantaged students over three decades, asking nothing in return and steadfastly refusin..."
+  },
+  "bolster": {
+    "en": "to support or strengthen",
+    "cn": "支撐；加強",
+    "sentence": "Economic analysts recommended several targeted investment strategies to bolster the struggling regional economy, including infrastructure development projects a..."
+  },
+  "boorish": {
+    "en": "rough and bad-mannered; crude",
+    "cn": "粗魯的；無禮的",
+    "sentence": "The diplomat's boorish conduct during the formal state reception shocked attendees accustomed to the refined protocols traditionally observed at such prestigiou..."
+  },
+  "brevity": {
+    "en": "concise and exact use of words; shortness",
+    "cn": "簡潔；簡短",
+    "sentence": "The celebrated journalist was admired throughout the industry for the remarkable brevity of his prose, managing to convey complex geopolitical situations with e..."
+  },
+  "buffoon": {
+    "en": "a person who amuses others by acting foolishly",
+    "cn": "小丑；愛出洋相的人",
+    "sentence": "The opposition leader characterized the minister's proposal as the work of a complete buffoon, arguing that its fundamental logical inconsistencies and practica..."
+  },
+  "burgeon": {
+    "en": "to grow or increase rapidly",
+    "cn": "迅速成長；萌芽",
+    "sentence": "The tech startup began to burgeon exponentially after securing its second round of venture capital funding, rapidly expanding its workforce from twelve to over ..."
+  },
+  "cacophony": {
+    "en": "a harsh, discordant mixture of sounds",
+    "cn": "刺耳的噪音；不和諧的聲音",
+    "sentence": "The construction project created an almost unbearable cacophony that disrupted the daily operations of nearby businesses and made concentration nearly impossibl..."
+  },
+  "callous": {
+    "en": "showing no concern for others' feelings",
+    "cn": "冷酷的；無情的",
+    "sentence": "The executive's callous decision to eliminate the entire division without any advance notice, severance assistance, or acknowledgment of employees' years of ded..."
+  },
+  "candor": {
+    "en": "the quality of being open and honest",
+    "cn": "坦率；直言不諱",
+    "sentence": "The CEO's surprising candor during the shareholder meeting, where she openly acknowledged strategic missteps and outlined concrete corrective measures, restored..."
+  },
+  "capitulate": {
+    "en": "to give up resistance; to surrender",
+    "cn": "投降；屈服",
+    "sentence": "After enduring months of sustained commercial pressure and declining market share, the independent retailer finally agreed to capitulate and accepted the multin..."
+  },
+  "capricious": {
+    "en": "given to sudden changes of mood; unpredictable",
+    "cn": "善變的；任性的",
+    "sentence": "The renowned director's capricious management style made collaborative filmmaking extraordinarily stressful, as creative decisions made decisively one morning w..."
+  },
+  "caustic": {
+    "en": "sarcastic in a bitter way; corrosive",
+    "cn": "刻薄的；腐蝕性的",
+    "sentence": "The critic's caustic review of the debut novel dismayed the publishing house's entire editorial team, who believed the harsh assessment was disproportionate and..."
+  },
+  "censure": {
+    "en": "to express strong disapproval officially",
+    "cn": "譴責；申斥",
+    "sentence": "The professional ethics committee voted unanimously to censure the practitioner for repeatedly violating established standards of conduct that protected vulnera..."
+  },
+  "chide": {
+    "en": "to scold mildly",
+    "cn": "輕責；責備",
+    "sentence": "The professor would gently chide students who arrived unprepared for seminars, not with harsh criticism but with a measured expression of disappointed expectati..."
+  },
+  "circuitous": {
+    "en": "taking a longer route; not direct",
+    "cn": "繞遠路的；迂迴的",
+    "sentence": "The diplomat pursued a deliberately circuitous negotiating strategy, approaching the core issues through extended preliminary discussions that allowed both part..."
+  }
+};
+
+const letters = ['A','B','C','D'];
+let currentQ = 0;
+let score = 0;
+let answered = false;
+
+function startQuiz() {
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('quizCard').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = questions[currentQ];
+  document.getElementById('qNum').textContent = 'Question ' + (currentQ + 1);
+  document.getElementById('progressText').textContent = 'Question ' + (currentQ + 1) + ' of 20';
+  document.getElementById('progressBar').style.width = (currentQ / 20 * 100) + '%';
+  document.getElementById('wordHelper').classList.remove('visible');
+  document.getElementById('feedbackBox').classList.remove('visible');
+  document.getElementById('nextBtn').classList.remove('visible');
+
+  // Render passage with clickable words
+  const passageEl = document.getElementById('passageText');
+  const raw = q.q;
+  const tokens = raw.split(/(s+|[.,;:!?"""''—–-]+)/);
+  passageEl.innerHTML = tokens.map(tok => {
+    if (/s+/.test(tok)) return tok;
+    if (tok === '__________') return '<span class="blank">__________</span>';
+    const clean = tok.replace(/[^a-zA-Z'-]/g,'');
+    if (!clean) return tok;
+    return '<span class="word" onclick="lookupWord(\'' + clean.toLowerCase().replace(/'/g,"\'") + '\')">' + tok + '</span>';
+  }).join('');
+
+  // Options
+  const grid = document.getElementById('optionsGrid');
+  grid.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = '<span class="option-label">' + letters[i] + '</span>' + opt;
+    btn.onclick = () => handleAnswer(i, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function handleAnswer(idx, clickedBtn) {
+  if (answered) return;
+  answered = true;
+  const q = questions[currentQ];
+  const isCorrect = q.options[idx] === q.answer;
+  if (isCorrect) { score++; document.getElementById('scoreNum').textContent = score; }
+  
+  // Color buttons
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach((btn, i) => {
+    btn.disabled = true;
+    if (q.options[i] === q.answer) btn.classList.add('correct');
+    else if (i === idx && !isCorrect) btn.classList.add('incorrect');
+  });
+
+  // Highlight clues
+  const passageEl = document.getElementById('passageText');
+  const spans = passageEl.querySelectorAll('span.word');
+  spans.forEach(span => {
+    const text = span.textContent.replace(/[^a-zA-Z'-]/g,'').toLowerCase();
+    if (q.clues.map(c=>c.toLowerCase()).includes(text)) span.classList.add('clue-highlight');
+  });
+
+  // Show feedback cards
+  const grid = document.getElementById('feedbackGrid');
+  grid.innerHTML = '';
+  q.options.forEach(opt => {
+    const def = vocabDefs[opt] || { en: '', cn: '', sentence: '' };
+    const card = document.createElement('div');
+    card.className = 'feedback-card' + (opt === q.answer ? ' is-answer' : '');
+    card.innerHTML = `
+      <div class="fc-word">${opt} <button class="fc-tts" onclick="speakWord('${opt}')"><i class="fa fa-volume-up"></i></button></div>
+      <div class="fc-en">${def.en}</div>
+      <div class="fc-cn">${def.cn}</div>
+      <div class="fc-sentence">${def.sentence} <button class="fc-tts" onclick="speakText('${def.sentence.replace(/'/g,"\\'")}')"><i class="fa fa-volume-up"></i></button></div>
+    `;
+    grid.appendChild(card);
+  });
+  document.getElementById('feedbackBox').classList.add('visible');
+  document.getElementById('nextBtn').classList.add('visible');
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) { showFinal(); return; }
+  renderQuestion();
+}
+
+function showFinal() {
+  document.getElementById('quizCard').style.display = 'none';
+  document.getElementById('progressBar').style.width = '100%';
+  document.getElementById('progressText').textContent = 'Quiz Complete!';
+  const pct = Math.round(score / questions.length * 100);
+  document.getElementById('finalScore').textContent = score + '/' + questions.length;
+  document.getElementById('finalPercent').textContent = pct + '% Correct';
+  let msg, cn;
+  if (pct >= 90) { msg = "Outstanding! You've mastered this unit."; cn = "出色！你已經掌握了本單元的詞彙。"; }
+  else if (pct >= 75) { msg = "Great work! Keep reviewing the words you missed."; cn = "做得好！繼續複習你錯過的單字。"; }
+  else if (pct >= 60) { msg = "Good effort! Try again to strengthen your knowledge."; cn = "很努力！再試一次來加強你的記憶。"; }
+  else { msg = "Keep practicing! Regular review builds lasting vocabulary."; cn = "繼續練習！定期複習能建立持久的詞彙量。"; }
+  document.getElementById('finalMsg').textContent = msg;
+  document.getElementById('finalCn').textContent = cn;
+  document.getElementById('finalScreen').classList.add('visible');
+}
+
+function restartQuiz() {
+  currentQ = 0; score = 0;
+  document.getElementById('scoreNum').textContent = '0';
+  document.getElementById('finalScreen').classList.remove('visible');
+  document.getElementById('quizCard').style.display = 'block';
+  renderQuestion();
+}
+
+function lookupWord(word) {
+  const helper = document.getElementById('wordHelper');
+  const whWord = document.getElementById('whWord');
+  const whDef = document.getElementById('whDef');
+  // Check local vocab first
+  if (vocabDefs[word]) {
+    whWord.textContent = word;
+    whDef.textContent = vocabDefs[word].en + ' | ' + vocabDefs[word].cn;
+    helper.classList.add('visible');
+    return;
+  }
+  whWord.textContent = word;
+  whDef.textContent = 'Looking up...';
+  helper.classList.add('visible');
+  fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + word)
+    .then(r => r.json())
+    .then(data => {
+      if (Array.isArray(data) && data[0] && data[0].meanings && data[0].meanings[0]) {
+        const def = data[0].meanings[0].definitions[0].definition;
+        whDef.textContent = def;
+      } else { whDef.textContent = 'Definition not found. Try another word.'; }
+    }).catch(() => { whDef.textContent = 'Definition not found. Try another word.'; });
+}
+
+function speakPassage() {
+  if (!window.speechSynthesis) return;
+  const raw = questions[currentQ].q.replace(/__________/g, 'blank');
+  const utt = new SpeechSynthesisUtterance(raw);
+  utt.lang = 'en-US'; utt.rate = 0.92;
+  const voices = window.speechSynthesis.getVoices();
+  const female = voices.find(v => v.lang.startsWith('en') && /female|woman|samantha|karen|victoria|zira/i.test(v.name));
+  if (female) utt.voice = female;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+}
+
+function speakWord(word) {
+  if (!window.speechSynthesis) return;
+  const utt = new SpeechSynthesisUtterance(word);
+  utt.lang = 'en-US'; utt.rate = 0.85;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+}
+
+function speakText(text) {
+  if (!window.speechSynthesis) return;
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'en-US'; utt.rate = 0.9;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+}
+
+// Preload voices
+if (window.speechSynthesis) window.speechSynthesis.getVoices();
+</script>
+</body>
+</html>
