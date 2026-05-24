@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barron's 1100 · Units 11–20 · Difficulty Vocab Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body: 'DM Sans', 'Segoe UI', sans-serif;
+  --primary: #1a3a5c;
+  --accent: #c8962e;
+  --correct: #2d7a4f;
+  --incorrect: #b53a2f;
+  --clue-bg: #fff3a3;
+  --surface: #faf8f5;
+  --card: #ffffff;
+  --border: #dde3ea;
+  --text: #1e2a35;
+  --muted: #6b7a8d;
+  --diff1: #2d7a4f;
+  --diff2: #c8962e;
+  --diff3: #d05c2f;
+  --diff4: #b53a2f;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-body); background: var(--surface); color: var(--text); min-height: 100vh; }
+
+/* ── TOP BAR ── */
+.topbar {
+  background: var(--primary); color: #fff; padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+.topbar-title { font-family: var(--font-heading); font-size: 1.15rem; letter-spacing: .3px; }
+.topbar-title span { color: var(--accent); }
+.score-pill {
+  background: rgba(255,255,255,.15); border-radius: 20px;
+  padding: 4px 14px; font-size: .85rem; font-weight: 600; white-space: nowrap;
+}
+
+/* ── TABS ── */
+.tabs { display: flex; background: #fff; border-bottom: 2px solid var(--border); position: sticky; top: 52px; z-index: 99; }
+.tab-btn {
+  flex: 1; padding: 11px 6px; border: none; background: none; cursor: pointer;
+  font-family: var(--font-body); font-size: .88rem; font-weight: 600; color: var(--muted);
+  border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .2s;
+}
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--accent); }
+.tab-btn:hover:not(.active) { color: var(--primary); background: #f5f7fa; }
+
+/* ── FILTERS ── */
+.filters {
+  padding: 12px 16px; background: #fff; border-bottom: 1px solid var(--border);
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+}
+.filter-label { font-size: .8rem; font-weight: 600; color: var(--muted); margin-right: 4px; }
+.filter-group { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  padding: 4px 12px; border-radius: 20px; border: 1.5px solid var(--border);
+  font-size: .78rem; font-weight: 600; cursor: pointer; background: #fff;
+  color: var(--muted); transition: all .15s;
+}
+.chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.chip.diff1.active { background: var(--diff1); border-color: var(--diff1); }
+.chip.diff2.active { background: var(--diff2); border-color: var(--diff2); }
+.chip.diff3.active { background: var(--diff3); border-color: var(--diff3); }
+.chip.diff4.active { background: var(--diff4); border-color: var(--diff4); }
+
+/* ── WORD HELPER ── */
+.word-helper {
+  margin: 0 16px 0; padding: 10px 14px; background: #eef3fb;
+  border-left: 4px solid var(--accent); border-radius: 0 8px 8px 0;
+  font-size: .83rem; line-height: 1.5; display: none; animation: fadeIn .2s;
+}
+.word-helper.show { display: block; }
+.word-helper strong { color: var(--primary); }
+
+/* ── MAIN CONTENT ── */
+.page { display: none; padding: 16px; max-width: 860px; margin: 0 auto; }
+.page.active { display: block; }
+
+/* ── FLASHCARD GRID ── */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.flash-card {
+  background: var(--card); border-radius: 12px; border: 1.5px solid var(--border);
+  overflow: hidden; cursor: pointer; transition: box-shadow .2s, transform .15s;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.flash-card:hover { box-shadow: 0 4px 16px rgba(26,58,92,.15); transform: translateY(-2px); }
+.flash-card .fc-header {
+  padding: 10px 14px 8px; background: linear-gradient(135deg, var(--primary), #2a5298);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.fc-word { font-family: var(--font-heading); font-size: 1.1rem; color: #fff; font-weight: 700; }
+.fc-pos { font-size: .75rem; color: rgba(255,255,255,.75); font-style: italic; }
+.diff-badge {
+  font-size: .8rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; color: #fff;
+  background: rgba(255,255,255,.2);
+}
+.flash-card .fc-body { padding: 10px 14px 12px; }
+.fc-def { font-size: .85rem; color: var(--text); margin-bottom: 5px; line-height: 1.4; }
+.fc-cn { font-size: .88rem; color: var(--accent); font-weight: 600; margin-bottom: 6px; }
+.fc-syn { font-size: .78rem; color: var(--muted); }
+.fc-unit { font-size: .72rem; color: #aaa; margin-top: 4px; }
+
+/* ── FLASHCARD MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5);
+  z-index: 200; align-items: center; justify-content: center; padding: 16px;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--card); border-radius: 16px; width: 100%; max-width: 580px;
+  max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.3);
+  animation: slideUp .25s ease;
+}
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+.modal-header {
+  padding: 18px 20px 14px; background: linear-gradient(135deg, var(--primary), #2a5298);
+  border-radius: 16px 16px 0 0; position: relative;
+}
+.modal-word { font-family: var(--font-heading); font-size: 1.6rem; color: #fff; }
+.modal-pos { font-size: .85rem; color: rgba(255,255,255,.75); font-style: italic; margin-top: 2px; }
+.modal-close {
+  position: absolute; right: 16px; top: 16px; background: rgba(255,255,255,.2);
+  border: none; color: #fff; border-radius: 50%; width: 30px; height: 30px;
+  cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;
+}
+.modal-body { padding: 18px 20px; }
+.modal-row { margin-bottom: 14px; }
+.modal-label { font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; }
+.modal-val { font-size: .92rem; line-height: 1.55; color: var(--text); }
+.modal-cn { font-size: 1rem; color: var(--accent); font-weight: 600; }
+.modal-passage { font-size: .9rem; line-height: 1.6; background: #f5f7fa; border-radius: 8px; padding: 12px 14px; }
+.modal-passage .blank { font-weight: 700; color: var(--primary); border-bottom: 2px solid var(--accent); }
+.modal-cn-passage { font-size: .88rem; line-height: 1.6; color: #555; margin-top: 8px; }
+.tts-btn {
+  background: none; border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 5px 12px; cursor: pointer; color: var(--muted); font-size: .8rem;
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; transition: all .15s;
+}
+.tts-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+/* ── QUIZ MODE ── */
+.quiz-header { margin-bottom: 16px; }
+.quiz-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.quiz-progress-text { font-size: .82rem; font-weight: 600; color: var(--muted); }
+.quiz-score-text { font-size: .88rem; font-weight: 700; color: var(--primary); }
+.progress-bar { height: 6px; background: #dde3ea; border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width .4s ease; }
+
+.q-card {
+  background: var(--card); border-radius: 14px; border: 1.5px solid var(--border);
+  padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.06); margin-bottom: 14px;
+}
+.q-passage {
+  font-size: .95rem; line-height: 1.7; color: var(--text); margin-bottom: 14px;
+}
+.q-passage .word { cursor: pointer; border-bottom: 1px dotted var(--accent); transition: background .15s; }
+.q-passage .word:hover { background: #fef9ec; }
+.q-passage .blank-target { font-weight: 700; color: var(--primary); border-bottom: 2px solid var(--accent); }
+.q-passage .clue-highlight { background: var(--clue-bg); border-radius: 3px; padding: 0 2px; }
+
+.tts-row { margin-bottom: 12px; }
+.options-grid { display: grid; gap: 9px; }
+.opt-btn {
+  width: 100%; text-align: left; padding: 11px 16px; border-radius: 10px;
+  border: 1.5px solid var(--border); background: #fff; cursor: pointer;
+  font-family: var(--font-body); font-size: .9rem; font-weight: 500; color: var(--text);
+  display: flex; align-items: center; gap: 10px; transition: all .15s;
+}
+.opt-btn:hover:not(:disabled) { border-color: var(--primary); background: #f0f4fa; }
+.opt-btn .opt-letter {
+  width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid currentColor;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .75rem; font-weight: 700; flex-shrink: 0;
+}
+.opt-btn.correct { background: #e8f5ee; border-color: var(--correct); color: var(--correct); }
+.opt-btn.incorrect { background: #faeaea; border-color: var(--incorrect); color: var(--incorrect); }
+.opt-btn:disabled { cursor: default; }
+
+.feedback-box {
+  display: none; background: #f5f7fa; border-radius: 10px; border: 1px solid var(--border);
+  padding: 14px; margin-top: 12px;
+}
+.feedback-box.show { display: block; animation: fadeIn .3s; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.fb-title { font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
+.fb-word-row { padding: 8px 10px; border-radius: 8px; margin-bottom: 6px; background: #fff; border: 1px solid var(--border); }
+.fb-word-row.is-answer { border-color: var(--correct); background: #e8f5ee; }
+.fb-word-name { font-weight: 700; color: var(--primary); font-size: .9rem; }
+.fb-word-en { font-size: .82rem; color: var(--text); margin-top: 2px; }
+.fb-word-cn { font-size: .82rem; color: var(--accent); font-weight: 600; }
+.fb-word-sent { font-size: .8rem; color: var(--muted); margin-top: 3px; font-style: italic; }
+
+.next-btn {
+  display: none; width: 100%; padding: 13px; border-radius: 10px;
+  background: var(--primary); color: #fff; border: none; cursor: pointer;
+  font-family: var(--font-body); font-size: .95rem; font-weight: 700;
+  letter-spacing: .3px; transition: background .2s; margin-top: 10px;
+}
+.next-btn.show { display: block; }
+.next-btn:hover { background: #2a5298; }
+
+/* ── RESULT SCREEN ── */
+.result-screen {
+  display: none; text-align: center; padding: 32px 20px;
+  background: var(--card); border-radius: 16px; border: 1.5px solid var(--border);
+  box-shadow: 0 4px 20px rgba(0,0,0,.08);
+}
+.result-screen.show { display: block; animation: fadeIn .4s; }
+.result-icon { font-size: 3.5rem; margin-bottom: 12px; }
+.result-score { font-family: var(--font-heading); font-size: 2.8rem; color: var(--primary); font-weight: 700; }
+.result-pct { font-size: 1.1rem; color: var(--muted); margin-bottom: 12px; }
+.result-msg-en { font-size: 1rem; color: var(--text); margin-bottom: 4px; line-height: 1.5; }
+.result-msg-cn { font-size: .9rem; color: var(--muted); margin-bottom: 20px; }
+.restart-btn {
+  padding: 12px 32px; border-radius: 10px; background: var(--accent); color: #fff;
+  border: none; cursor: pointer; font-size: .95rem; font-weight: 700;
+  font-family: var(--font-body); transition: background .2s;
+}
+.restart-btn:hover { background: #b5851f; }
+
+/* ── QUIZ SETUP ── */
+.quiz-setup {
+  background: var(--card); border-radius: 14px; border: 1.5px solid var(--border);
+  padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,.06); margin-bottom: 14px;
+}
+.setup-title { font-family: var(--font-heading); font-size: 1.15rem; color: var(--primary); margin-bottom: 14px; }
+.setup-row { margin-bottom: 14px; }
+.setup-row label { display: block; font-size: .82rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.setup-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.start-btn {
+  width: 100%; padding: 13px; border-radius: 10px; background: var(--primary);
+  color: #fff; border: none; cursor: pointer; font-family: var(--font-body);
+  font-size: .95rem; font-weight: 700; transition: background .2s; margin-top: 4px;
+}
+.start-btn:hover { background: #2a5298; }
+
+/* ── DIFF COLORS ── */
+.diff-1 { color: var(--diff1); } .diff-2 { color: var(--diff2); }
+.diff-3 { color: var(--diff3); } .diff-4 { color: var(--diff4); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 500px) {
+  .topbar-title { font-size: 1rem; }
+  .card-grid { grid-template-columns: 1fr; }
+  .q-card { padding: 14px; }
+}
+.empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
+.empty-state i { font-size: 2.5rem; margin-bottom: 10px; color: var(--border); }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-title">Barron's 1100 · <span>Units 11–20</span> · Difficulty Vocab</div>
+  <div class="score-pill" id="globalScore">Score: 0 / 0</div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('study')"><i class="fa fa-book-open"></i> Study</button>
+  <button class="tab-btn" onclick="switchTab('quiz')"><i class="fa fa-circle-question"></i> Quiz</button>
+</div>
+
+<!-- ══════════ STUDY PAGE ══════════ -->
+<div class="page active" id="page-study">
+  <div class="filters" id="study-filters">
+    <span class="filter-label">Unit:</span>
+    <div class="filter-group" id="unit-chips"></div>
+    <span class="filter-label" style="margin-left:10px">Difficulty:</span>
+    <div class="filter-group" id="diff-chips"></div>
+  </div>
+  <div style="padding:12px 16px 0; max-width:860px; margin:0 auto;">
+    <div class="word-helper" id="study-helper"></div>
+  </div>
+  <div class="page" id="page-study" style="display:block">
+    <div class="card-grid" id="card-grid"></div>
+  </div>
+</div>
+
+<!-- ══════════ QUIZ PAGE ══════════ -->
+<div class="page" id="page-quiz">
+  <!-- Setup -->
+  <div class="quiz-setup" id="quiz-setup">
+    <div class="setup-title"><i class="fa fa-sliders"></i> Quiz Settings</div>
+    <div class="setup-row">
+      <label>Select Units</label>
+      <div class="setup-chips" id="quiz-unit-chips"></div>
+    </div>
+    <div class="setup-row">
+      <label>Select Difficulty</label>
+      <div class="setup-chips" id="quiz-diff-chips"></div>
+    </div>
+    <div class="setup-row">
+      <label>Number of Questions</label>
+      <div class="setup-chips" id="quiz-count-chips"></div>
+    </div>
+    <button class="start-btn" onclick="startQuiz()"><i class="fa fa-play"></i> Start Quiz</button>
+  </div>
+
+  <!-- Quiz in progress -->
+  <div id="quiz-area" style="display:none">
+    <div class="quiz-header">
+      <div class="quiz-meta">
+        <span class="quiz-progress-text" id="q-progress">Question 1 of 10</span>
+        <span class="quiz-score-text" id="q-score">Score: 0</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="q-progress-bar" style="width:0%"></div></div>
+    </div>
+    <div class="word-helper" id="quiz-helper"></div>
+    <div class="q-card">
+      <div class="q-passage" id="q-passage"></div>
+      <div class="tts-row">
+        <button class="tts-btn" onclick="speakPassage()"><i class="fa fa-volume-high"></i> Listen</button>
+      </div>
+      <div class="options-grid" id="q-options"></div>
+      <div class="feedback-box" id="q-feedback"></div>
+      <button class="next-btn" id="q-next" onclick="nextQuestion()">Next Question <i class="fa fa-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="result-screen" id="quiz-result">
+    <div class="result-icon" id="result-icon">🎉</div>
+    <div class="result-score" id="result-score"></div>
+    <div class="result-pct" id="result-pct"></div>
+    <div class="result-msg-en" id="result-en"></div>
+    <div class="result-msg-cn" id="result-cn"></div>
+    <button class="restart-btn" onclick="resetQuiz()"><i class="fa fa-rotate-right"></i> Try Again</button>
+  </div>
+</div>
+
+<!-- ══════════ WORD MODAL ══════════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="modal-word" id="m-word"></div>
+          <div class="modal-pos" id="m-pos"></div>
+        </div>
+        <button class="modal-close" onclick="closeModalDirect()"><i class="fa fa-times"></i></button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <div class="modal-label">Definition</div>
+        <div class="modal-val" id="m-def"></div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-label">中文釋義</div>
+        <div class="modal-val modal-cn" id="m-cn"></div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-label">Synonyms</div>
+        <div class="modal-val" id="m-syn"></div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-label">SAT Sample Passage</div>
+        <div class="modal-passage" id="m-passage"></div>
+        <button class="tts-btn" onclick="speakModal()"><i class="fa fa-volume-high"></i> Listen to Passage</button>
+        <div class="modal-cn-passage" id="m-cn-passage"></div>
+      </div>
+      <div class="modal-row" id="m-dict-row" style="display:none">
+        <div class="modal-label">Dictionary</div>
+        <div class="modal-val" id="m-dict"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════ DATA ══════════
+const ALL_WORDS = [{"unit":11,"difficulty":2,"word":"poignant","pos":"adj.","def":"deeply moving; painfully touching the feelings","synonyms":"moving, touching, affecting.","cn":"辛酸的；令人動容的","passage":"The documentary ended with a __________ scene of a child reuniting with a parent after years of forced separation, leaving many viewers in tears. Critics agreed that this quiet moment carried more emotional weight than any dramatic speech in the film.","cnPassage":"這部紀錄片以一個孩子在多年強制分離後與父母重聚的辛酸場景作結，讓許多觀眾落淚。評論家一致認為，這個安靜的時刻比片中任何激情演說都更具情感份量。"},{"unit":11,"difficulty":2,"word":"inundate","pos":"v.","def":"to flood or overwhelm with a large amount","synonyms":"overwhelm, flood, swamp.","cn":"淹沒；使應接不暇","passage":"After the prize announcement, the author was __________ with interview requests, fan letters, and speaking invitations from around the world. Her assistant had to create a system to manage the volume of communication, which showed no sign of slowing down weeks later.","cnPassage":"獎項公布後，這位作者被來自世界各地的採訪邀請、讀者來信和演講邀請所淹沒。她的助理不得不建立一套管理大量通訊的系統，而這一切在數週後仍未見減緩的跡象。"},{"unit":11,"difficulty":2,"word":"sanguine","pos":"adj.","def":"optimistic, especially in a difficult situation","synonyms":"optimistic, hopeful, confident.","cn":"樂觀的；充滿希望的","passage":"Despite the disappointing first-quarter figures, the chief executive remained __________ about the company's long-term prospects, pointing to strong product demand and a growing client base as reasons for confidence. Analysts, however, cautioned that the recovery would depend heavily on market conditions.","cnPassage":"儘管第一季度數據令人失望，首席執行官對公司的長期前景仍然保持樂觀，以強勁的產品需求和不斷增長的客戶群作為信心的依據。然而，分析師警告說，復甦將在很大程度上取決於市場狀況。"},{"unit":11,"difficulty":2,"word":"phlegmatic","pos":"adj.","def":"calm and hard to excite or disturb","synonyms":"calm, composed, unruffled.","cn":"冷靜的；不易激動的","passage":"The surgeon's __________ manner during a complex procedure reassured both the patient and the assisting nurses, who drew strength from her steady focus. Even when an unexpected complication arose, she addressed it methodically without any sign of panic or hesitation.","cnPassage":"外科醫生在複雜手術中冷靜沉著的態度讓患者和協助的護士都感到放心，大家從她穩定的專注中汲取力量。即使出現意外的併發症，她也有條不紊地處理，沒有任何恐慌或猶豫的跡象。"},{"unit":11,"difficulty":2,"word":"corroborate","pos":"v.","def":"to confirm or support with evidence","synonyms":"confirm, substantiate, verify.","cn":"證實；確證","passage":"The second witness's account served to __________ the original testimony, providing independent confirmation of the key details surrounding the incident. Prosecutors argued that consistent evidence from multiple sources significantly strengthened the case for the jury to consider.","cnPassage":"第二位證人的陳述確證了最初的證詞，對事件關鍵細節提供了獨立的佐證。檢察官認為，來自多個來源的一致證據大大加強了提交陪審團考慮的案件。"},{"unit":11,"difficulty":1,"word":"zealous","pos":"adj.","def":"showing great energy and enthusiasm for a cause","synonyms":"enthusiastic, fervent, dedicated.","cn":"熱心的；狂熱的","passage":"The __________ volunteer arrived an hour early every morning, organized supplies, and stayed late to ensure every task was completed before the shelter closed. Her tireless dedication inspired other team members to contribute more time and effort to the organization's mission.","cnPassage":"這位熱心的義工每天早到一小時，整理物資，並在收容所關閉前留下確保每項任務都已完成。她不懈的奉獻精神激勵了其他團隊成員為機構的使命投入更多時間和精力。"},{"unit":11,"difficulty":1,"word":"coerce","pos":"v.","def":"to force someone to act using threats or pressure","synonyms":"compel, force, intimidate.","cn":"強制；脅迫","passage":"The investigation found that employees had been __________ into signing agreements that waived important legal rights, through a combination of pressure and misleading information. Labor authorities declared the contracts invalid and required the company to compensate all affected workers.","cnPassage":"調查發現，員工通過壓力和誤導性信息相結合的方式被脅迫簽署了放棄重要法律權利的協議。勞工部門宣布合同無效，並要求公司賠償所有受影響的工人。"},{"unit":11,"difficulty":2,"word":"meticulous","pos":"adj.","def":"showing great care and attention to detail","synonyms":"careful, thorough, precise.","cn":"一絲不苟的；細心的","passage":"The archivist was __________ in her cataloguing process, recording the condition, origin, and estimated date of each document before placing it in an acid-free folder. Her careful approach ensured that researchers could locate and study any item in the vast collection with ease.","cnPassage":"這位檔案管理員在目錄編製過程中一絲不苟，在將每份文件放入無酸文件夾之前，記錄其狀況、來源和估計日期。她謹慎的方式確保研究人員能夠輕鬆找到並研究龐大收藏中的任何物件。"},{"unit":11,"difficulty":1,"word":"domicile","pos":"n.","def":"a person's home or place of residence","synonyms":"residence, dwelling, abode.","cn":"住所；住宅","passage":"For tax purposes, the government requires individuals to declare their permanent __________ and update the record whenever they relocate to a different region. Failure to register an accurate address can result in delayed correspondence and potential penalties for non-compliance.","cnPassage":"出於稅務目的，政府要求個人申報其永久住所，並在遷移到不同地區時更新記錄。未能登記準確地址可能導致郵件延遲和不合規的潛在罰款。"},{"unit":11,"difficulty":2,"word":"sporadic","pos":"adj.","def":"occurring at irregular and infrequent intervals","synonyms":"occasional, irregular, intermittent.","cn":"偶爾的；零星的","passage":"Rain fell in __________ bursts throughout the afternoon, making it difficult for organizers to decide whether to proceed with the outdoor ceremony or move it inside. By evening, the showers had stopped entirely, and the event went ahead under a clear sky.","cnPassage":"整個下午雨水以零星的陣雨形式降落，使組織者難以決定是否繼續戶外典禮或將其移至室內。到了傍晚，陣雨完全停止，活動在晴朗的天空下如期舉行。"},{"unit":11,"difficulty":1,"word":"rash","pos":"adj.","def":"acting too quickly without enough thought; reckless","synonyms":"reckless, impulsive, hasty.","cn":"魯莽的；輕率的","passage":"The investor made a __________ decision to sell all his shares after a single negative news report, missing the strong recovery that occurred just three days later. Financial advisers often remind clients that reacting emotionally to short-term events can significantly undermine long-term investment strategies.","cnPassage":"這位投資者在一份負面新聞報導後魯莽地決定出售所有股票，錯過了僅僅三天後出現的強勁反彈。財務顧問經常提醒客戶，對短期事件作出情緒化反應可能會顯著損害長期投資策略。"},{"unit":11,"difficulty":2,"word":"conjecture","pos":"n.","def":"an opinion formed without definite proof; a guess","synonyms":"speculation, surmise, hypothesis.","cn":"推測；猜測","passage":"At this early stage of the investigation, any conclusions about the cause of the accident remain pure __________, as forensic teams have yet to complete their analysis of the scene. Officials cautioned the public against drawing firm conclusions from incomplete or unofficial reports.","cnPassage":"在調查的這個早期階段，關於事故原因的任何結論都仍然是純粹的推測，因為法證團隊尚未完成對現場的分析。官員警告公眾不要從不完整或非官方的報告中得出確定的結論。"},{"unit":11,"difficulty":2,"word":"obviate","pos":"v.","def":"to remove a difficulty or problem before it arises","synonyms":"prevent, eliminate, preclude.","cn":"消除；排除（問題）","passage":"Installing a reliable backup system would __________ the need for manual data recovery in the event of a server failure, saving the team hours of stressful work. The IT department recommended implementing the solution before the next major software update to ensure full compatibility.","cnPassage":"安裝可靠的備份系統將消除在伺服器故障時手動恢復數據的需要，為團隊節省數小時緊張的工作。IT部門建議在下一次主要軟件更新之前實施此解決方案，以確保完全相容性。"},{"unit":11,"difficulty":2,"word":"lurid","pos":"adj.","def":"unpleasantly vivid; shocking and sensational","synonyms":"sensational, shocking, graphic.","cn":"駭人聽聞的；煽情的","passage":"The tabloid's __________ front-page story drew widespread criticism from media ethics organizations, who argued that the graphic details served no public interest and only contributed to unnecessary alarm. Several advertisers withdrew their support in response to the publication's handling of the story.","cnPassage":"這份小報駭人聽聞的頭版故事招致媒體道德機構的廣泛批評，他們認為這些生動的細節毫無公共利益，只會引起不必要的恐慌。幾家廣告商因出版物對該故事的處理方式而撤回了支持。"},{"unit":12,"difficulty":2,"word":"diatribe","pos":"n.","def":"a long, bitter, and forceful verbal attack","synonyms":"tirade, denunciation, invective.","cn":"激烈的抨擊；長篇批評","passage":"The politician's unexpected __________ against the proposed budget dominated the evening news, as viewers were surprised by the unusual hostility of language coming from someone known for measured and diplomatic communication. Party leaders quickly moved to distance themselves from the remarks.","cnPassage":"這位政客對擬議預算出人意料的激烈抨擊主導了晚間新聞，因為觀眾對一位以克制和外交溝通著稱的人使用如此充滿敵意的語言感到驚訝。黨內領袖迅速與這些言論保持距離。"},{"unit":12,"difficulty":2,"word":"inhibition","pos":"n.","def":"a feeling that prevents natural behavior; a restraint","synonyms":"restraint, block, reservation.","cn":"抑制；心理障礙","passage":"Many performers experience significant __________ before stepping onto a large stage for the first time, making it hard to project confidence during early rehearsals. Acting coaches often use improvisation exercises specifically designed to help students overcome these mental barriers in a low-pressure setting.","cnPassage":"許多表演者在第一次登上大舞台之前會經歷顯著的心理抑制，使他們在早期排練中很難展現自信。表演教練常常使用即興練習，專門幫助學生在低壓環境中克服這些心理障礙。"},{"unit":12,"difficulty":1,"word":"ilk","pos":"n.","def":"a type, kind, or sort of person or thing","synonyms":"type, sort, kind.","cn":"同類；同種","passage":"The critic argued that the film and others of its __________ relied too heavily on familiar plot formulas rather than developing original stories that challenged viewers. She called on studios to take more creative risks and support writers who bring genuinely fresh perspectives to the screen.","cnPassage":"評論家認為，這部電影及其同類作品過於依賴熟悉的情節公式，而非發展挑戰觀眾的原創故事。她呼籲製片公司承擔更多的創意風險，並支持那些為銀幕帶來真正新鮮視角的編劇。"},{"unit":12,"difficulty":1,"word":"placard","pos":"n.","def":"a sign or notice carried or displayed in public","synonyms":"sign, banner, poster.","cn":"標語牌；告示牌","passage":"Demonstrators lined the street carrying __________ bearing slogans that called for immediate policy changes related to housing and public transportation. The peaceful protest attracted significant media coverage and prompted city officials to schedule a formal meeting with community representatives.","cnPassage":"示威者排列在街道上，手持標語牌，上面印著呼籲立即改變住房和公共交通政策的口號。這次和平抗議引起了大量媒體報導，並促使市府官員安排與社區代表舉行正式會議。"},{"unit":12,"difficulty":1,"word":"integral","pos":"adj.","def":"essential; necessary to make something complete","synonyms":"essential, fundamental, vital.","cn":"不可或缺的；整體的","passage":"Regular feedback sessions are an __________ part of the mentorship program, giving participants the chance to reflect on their progress and adjust their goals. Without these structured conversations, trainees would lose a key opportunity to identify gaps in their skills before the final evaluation.","cnPassage":"定期的反饋會議是師徒計劃不可或缺的部分，讓參與者有機會反思自己的進展並調整目標。如果沒有這些有結構的對話，受訓者將在最終評估之前失去識別技能缺口的重要機會。"},{"unit":12,"difficulty":2,"word":"remuneration","pos":"n.","def":"payment or reward for work or services","synonyms":"payment, compensation, reward.","cn":"報酬；酬勞","passage":"The contract clearly outlined the __________ structure, including a base salary, quarterly bonuses tied to performance targets, and a comprehensive benefits package. Candidates were encouraged to review all terms carefully before accepting the offer, as several components were non-negotiable after signing.","cnPassage":"合同清楚地列出了報酬結構，包括底薪、與績效目標掛鉤的季度獎金，以及全面的福利待遇。鼓勵候選人在接受聘書之前仔細審閱所有條款，因為簽署後有幾個部分是不可協商的。"},{"unit":12,"difficulty":1,"word":"nominal","pos":"adj.","def":"very small; existing in name only","synonyms":"token, minimal, slight.","cn":"名義上的；微不足道的","passage":"Members pay only a __________ annual fee to access the community library's full collection of digital resources, making it one of the most affordable cultural services available in the city. Officials are considering waiving even this small charge for residents who qualify for low-income support.","cnPassage":"會員每年只需支付微不足道的年費，就可以使用社區圖書館完整的數字資源，使其成為城市中最實惠的文化服務之一。官員們正在考慮為符合低收入支持資格的居民免除這筆小額費用。"},{"unit":12,"difficulty":2,"word":"expunge","pos":"v.","def":"to remove or erase completely; to wipe out","synonyms":"erase, delete, eliminate.","cn":"抹去；刪除","passage":"The court ruled that the offence would be __________ from the defendant's record following ten years of law-abiding conduct, giving her a genuine opportunity to rebuild her life without the burden of a permanent criminal history affecting future employment applications.","cnPassage":"法院裁定，在被告十年守法行為之後，該違規記錄將從其檔案中抹去，給予她一個真正的機會重建生活，而不必讓永久的犯罪記錄影響未來的就業申請。"},{"unit":12,"difficulty":1,"word":"flamboyant","pos":"adj.","def":"confidently showy; very bright and attention-grabbing","synonyms":"showy, ostentatious, vivid.","cn":"艷麗的；炫耀的","passage":"The designer's __________ use of bold colours and oversized accessories made her collection the most discussed at the entire fashion week, drawing both admiration from those who appreciated daring creativity and criticism from those who preferred more restrained elegance.","cnPassage":"這位設計師對大膽色彩和超大配飾的炫耀性運用，使她的系列成為整個時裝周討論最多的話題，既獲得了欣賞大膽創意者的讚賞，也招來了偏好更克制優雅風格者的批評。"},{"unit":12,"difficulty":2,"word":"anathema","pos":"n.","def":"something strongly detested or loathed","synonyms":"abomination, curse, aversion.","cn":"令人憎惡的事物；詛咒","passage":"Any suggestion of compromising on data privacy was __________ to the software team, who had built the platform's entire reputation on its strict commitment to protecting user information. They rejected every proposal that would allow third-party access to personal data, regardless of the financial incentive offered.","cnPassage":"任何在數據隱私方面妥協的建議對軟件團隊來說都是令人憎惡的事，他們整個平台的聲譽都建立在嚴格保護用戶信息的承諾上。他們拒絕了所有允許第三方訪問個人數據的提案，無論提供的財務激勵有多大。"},{"unit":12,"difficulty":1,"word":"schism","pos":"n.","def":"a split or division between strongly opposed groups","synonyms":"division, split, rift.","cn":"分裂；派系分歧","passage":"A deep __________ developed within the organization after the board announced plans to relocate its headquarters to a different city, with staff divided between those who supported the move for financial reasons and those who opposed it on grounds of community loyalty.","cnPassage":"董事會宣布將總部遷往另一座城市的計劃後，組織內部出現了深刻的分裂，員工分成支持此舉（出於財務原因）和反對此舉（基於社區忠誠）兩派。"},{"unit":12,"difficulty":2,"word":"timorous","pos":"adj.","def":"easily frightened; showing a lack of courage","synonyms":"fearful, timid, hesitant.","cn":"膽怯的；怯懦的","passage":"The __________ new recruit hesitated at each stage of the training exercise, clearly uncomfortable with taking initiative in an unfamiliar environment. The supervising officer worked patiently with her, recognizing that building confidence would require consistent encouragement over several weeks of structured practice.","cnPassage":"這位膽怯的新招募在培訓演習的每個階段都猶豫不決，顯然對在陌生環境中主動行事感到不舒服。督導官員耐心地與她合作，認識到建立信心需要數週有結構的練習中持續的鼓勵。"},{"unit":12,"difficulty":1,"word":"truncated","pos":"adj.","def":"cut short; shortened by removing the end","synonyms":"shortened, abridged, curtailed.","cn":"截短的；縮短的","passage":"Due to technical difficulties, the broadcast aired a __________ version of the speech, cutting off the final section in which the speaker addressed questions from the audience. Viewers who wanted to hear the complete address were directed to the organization's official website for the full recording.","cnPassage":"由於技術問題，廣播播出了演講的截短版本，剪掉了演講者回答觀眾提問的最後部分。希望聆聽完整演講的觀眾被引導至機構的官方網站收看完整錄音。"},{"unit":12,"difficulty":2,"word":"jaunty","pos":"adj.","def":"lively, cheerful, and self-confident in manner","synonyms":"lively, cheerful, sprightly.","cn":"輕鬆活潑的；神氣的","passage":"Despite the challenging circumstances, the expedition leader maintained a __________ attitude that helped lift the morale of the entire group. Her relaxed confidence and easy humor made it easier for team members to cope with difficult conditions without losing focus on their shared objective.","cnPassage":"儘管情況艱難，探險隊長保持了輕鬆活潑的態度，幫助提振了整個團隊的士氣。她輕鬆的自信和幽默，使團隊成員更容易在困難條件下應對，同時不失去對共同目標的專注。"},{"unit":12,"difficulty":1,"word":"fractious","pos":"adj.","def":"irritable and quarrelsome; hard to control","synonyms":"quarrelsome, irritable, unruly.","cn":"易怒的；好爭吵的","passage":"Managing a __________ group of delegates who held strongly opposing views required exceptional diplomatic skill from the chairperson. She allowed each party sufficient time to express their position while firmly preventing the discussion from descending into personal attacks or unproductive repetition.","cnPassage":"管理一群持有強烈對立觀點的易怒代表，需要主席具備卓越的外交技巧。她允許每一方有足夠的時間表達自己的立場，同時堅決防止討論淪為人身攻擊或無益的重複。"},{"unit":12,"difficulty":3,"word":"ostentatious","pos":"adj.","def":"designed to impress; showy in a way that lacks taste","synonyms":"showy, flamboyant, pretentious.","cn":"炫耀的；賣弄的","passage":"The new executive's __________ spending habits — including a company car far beyond what the role required — alienated colleagues who valued modesty and efficiency. Several board members quietly raised concerns that such visible extravagance sent the wrong message about the organization's financial priorities.","cnPassage":"這位新高管炫耀性的消費習慣——包括一輛遠超職位所需的公司用車——疏遠了重視謙遜和效率的同事。幾位董事會成員私下表達了擔憂，認為如此明顯的奢侈行為傳達了關於機構財務優先事項的錯誤信息。"},{"unit":13,"difficulty":2,"word":"importune","pos":"v.","def":"to ask repeatedly and insistently; to pester","synonyms":"pester, badger, press.","cn":"強求；胡纏","passage":"The charity volunteers continued to __________ local businesses for sponsorship, returning week after week with updated proposals despite receiving no initial response. Their persistence eventually paid off when three companies agreed to contribute, providing enough funding to launch the annual community event.","cnPassage":"慈善義工繼續向當地企業胡纏贊助，儘管最初未獲回應，仍週復一週地帶著更新的提案回來。他們的堅持最終獲得了回報，三家公司同意出資，提供了足夠的資金啟動年度社區活動。"},{"unit":13,"difficulty":2,"word":"surreptitious","pos":"adj.","def":"done secretly to avoid being noticed","synonyms":"secretive, covert, stealthy.","cn":"鬼鬼祟祟的；暗中的","passage":"The journalist conducted __________ observations of the facility over several weeks before publishing her findings, documenting patterns of activity that management had not disclosed to regulators. Her report triggered an official inspection and led to significant changes in the organization's operating practices.","cnPassage":"這位記者在發表調查結果之前，對該設施進行了數週的秘密觀察，記錄了管理層未向監管機構披露的活動模式。她的報告引發了官方檢查，並導致該機構運營方式的重大變化。"},{"unit":13,"difficulty":2,"word":"subjugate","pos":"v.","def":"to bring under control; to conquer completely","synonyms":"conquer, dominate, suppress.","cn":"征服；使臣服","passage":"Historical accounts describe how the colonizing power attempted to __________ local populations through a combination of military force and restrictions on language, culture, and religious practice. Resistance movements emerged in response, forming the foundation of what would later become formal independence campaigns.","cnPassage":"歷史記載描述了殖民力量如何試圖通過軍事力量與對語言、文化和宗教活動的限制相結合，來征服當地人口。反抗運動因此而生，構成了後來正式獨立運動的基礎。"},{"unit":13,"difficulty":1,"word":"viable","pos":"adj.","def":"capable of working or succeeding; practical","synonyms":"feasible, workable, practical.","cn":"切實可行的；有生命力的","passage":"Engineers assessed whether the proposed bridge design was financially and structurally __________ given the challenging terrain and tight budget constraints. After months of analysis, they concluded that a modified version of the original plan could meet safety standards without exceeding available funding.","cnPassage":"工程師評估了擬議的橋樑設計在充滿挑戰的地形和緊張預算限制下，在財務和結構上是否切實可行。經過數月的分析，他們得出結論，原始計劃的修改版本可以在不超出可用資金的情況下符合安全標準。"},{"unit":13,"difficulty":2,"word":"premise","pos":"n.","def":"an idea assumed to be true as a basis for argument","synonyms":"assumption, basis, foundation.","cn":"前提；假設","passage":"The entire argument rests on the __________ that consumers make purchasing decisions primarily based on price, which recent studies suggest may no longer hold true as brand values and ethical concerns play an increasing role in buying behaviour.","cnPassage":"整個論點建立在消費者主要根據價格做出購買決策的前提之上，而近期研究表明，隨著品牌價值和道德考量在購買行為中扮演越來越重要的角色，這一前提可能不再成立。"},{"unit":13,"difficulty":2,"word":"incredulous","pos":"adj.","def":"unwilling or unable to believe something; skeptical","synonyms":"skeptical, disbelieving, doubtful.","cn":"懷疑的；不相信的","passage":"The audience appeared __________ when the speaker claimed the project had been completed under half the original budget, with many exchanging skeptical glances before a detailed financial breakdown was presented to support the claim. Only after reviewing the figures did most accept the result as genuine.","cnPassage":"當演講者聲稱該項目以不到原始預算一半的費用完成時，觀眾顯得不相信，許多人互相交換懷疑的眼神，直到提出詳細的財務明細來支持這一說法。只有在審閱了數字之後，大多數人才接受這一結果是真實的。"},{"unit":13,"difficulty":1,"word":"permeate","pos":"v.","def":"to spread through every part of something","synonyms":"penetrate, spread through, saturate.","cn":"彌漫；滲透","passage":"A sense of quiet optimism began to __________ the organization after the new leadership team announced a clear and credible plan for addressing the challenges that had affected staff morale over the previous two years. Departments that had worked in isolation started collaborating more openly.","cnPassage":"新的領導團隊宣布了一個清晰而可信的計劃，以解決過去兩年影響員工士氣的挑戰後，一種平靜的樂觀情緒開始彌漫整個機構。曾經孤立工作的各部門開始更公開地合作。"},{"unit":13,"difficulty":2,"word":"propitious","pos":"adj.","def":"giving a good chance of success; favorable","synonyms":"favorable, auspicious, promising.","cn":"吉利的；有利的","passage":"The timing of the product launch could not have been more __________, coinciding with a surge in consumer demand and a temporary absence of direct competition in the market. The company's sales figures for the first quarter far exceeded projections, validating the decision to accelerate the release schedule.","cnPassage":"產品發布的時機再有利不過，恰逢消費者需求激增，且市場上暫時缺乏直接競爭。公司第一季度的銷售數字遠超預期，驗證了加速發布時間表這一決定的正確性。"},{"unit":13,"difficulty":2,"word":"surmise","pos":"v.","def":"to suppose something is true without firm evidence","synonyms":"guess, speculate, conjecture.","cn":"猜測；臆測","passage":"Based on the pattern of purchases and travel records, investigators began to __________ that the suspect had been planning the operation for at least six months before it was carried out. However, they acknowledged that further evidence would be needed before formal charges could be filed.","cnPassage":"根據購買記錄和旅行記錄的模式，調查人員開始猜測，嫌疑人在行動實施之前至少已計劃了六個月。然而，他們承認在提出正式指控之前需要進一步的證據。"},{"unit":13,"difficulty":1,"word":"curtail","pos":"v.","def":"to reduce or limit something; to cut short","synonyms":"reduce, limit, restrict.","cn":"縮減；削減","passage":"Budget pressures forced the municipality to __________ several popular community programs, including free weekend sports activities and subsidized arts workshops. Local residents protested the cuts, arguing that these services had a measurable impact on youth development and neighborhood wellbeing.","cnPassage":"預算壓力迫使市政府縮減幾個受歡迎的社區計劃，包括免費週末體育活動和補貼藝術工作坊。當地居民抗議削減，認為這些服務對青少年發展和社區福祉有可衡量的影響。"},{"unit":13,"difficulty":2,"word":"inchoate","pos":"adj.","def":"not yet fully developed; in an early stage","synonyms":"undeveloped, embryonic, nascent.","cn":"早期的；尚未成形的","passage":"The proposal was still __________ when it was first presented to the committee, lacking the detailed cost analysis and implementation timeline required for serious consideration. Members suggested the team return with a fully developed version before a formal vote could be scheduled.","cnPassage":"當該提案首次提交給委員會時，它仍然尚未成形，缺乏認真考慮所需的詳細成本分析和實施時間表。委員建議團隊在安排正式投票之前，帶著完整版本回來重新提交。"},{"unit":14,"difficulty":3,"word":"inveigh","pos":"v.","def":"to speak or write with strong hostility against something","synonyms":"denounce, castigate, condemn.","cn":"猛烈抨擊；痛罵","passage":"The editorial __________ against the proposed rezoning plan, arguing that it prioritized developer profits over the needs of long-term residents and would fundamentally alter the character of the historic neighborhood. The article generated hundreds of responses from readers who shared the writer's concerns.","cnPassage":"這篇社論猛烈抨擊擬議的重新分區計劃，認為它將開發商的利益置於長期居民的需求之上，並將從根本上改變歷史街區的特色。這篇文章引發了數百位對作者表示同感的讀者的回應。"},{"unit":14,"difficulty":1,"word":"nettle","pos":"v.","def":"to irritate or annoy someone","synonyms":"irritate, annoy, provoke.","cn":"惹怒；使煩惱","passage":"The manager's dismissive tone during the meeting clearly __________ several team members, who had worked hard to prepare the detailed report that he set aside without review. Morale dropped noticeably, and two staff members later requested a meeting to discuss the incident with HR.","cnPassage":"經理在會議上輕蔑的語氣明顯惹怒了幾位團隊成員，他們費心準備了詳細的報告，卻被他未經審閱便擱置一旁。士氣明顯下降，兩名員工後來要求與人力資源部門開會討論這一事件。"},{"unit":14,"difficulty":2,"word":"relegate","pos":"v.","def":"to move to a lower position or less important role","synonyms":"demote, downgrade, sideline.","cn":"降級；貶謫","passage":"After the restructuring, the experienced project manager was __________ to an administrative support role, a change she found deeply frustrating given her track record of delivering complex initiatives on time and within budget. She began exploring opportunities elsewhere within weeks of the announcement.","cnPassage":"重組後，這位經驗豐富的項目經理被降級到行政支持角色，考慮到她按時在預算內完成複雜項目的記錄，這一變化令她深感沮喪。公告發布後數週內，她便開始探索其他地方的機會。"},{"unit":14,"difficulty":2,"word":"supine","pos":"adj.","def":"lying face upward; failing to act through weakness","synonyms":"passive, inactive, indifferent.","cn":"仰臥的；被動軟弱的","passage":"Critics accused the regulatory body of being __________ in the face of repeated complaints about the company's practices, noting that years of documented violations had produced no meaningful enforcement action. Legislators called for an independent review of the agency's decision-making processes.","cnPassage":"批評者指責監管機構面對對公司做法的反復投訴時態度消極被動，指出多年有記錄在案的違規行為未產生任何有意義的執法行動。立法者呼籲對機構的決策流程進行獨立審查。"},{"unit":14,"difficulty":2,"word":"repulse","pos":"v.","def":"to drive back an attack; to cause disgust","synonyms":"repel, rebuff, drive back.","cn":"擊退；令人反感","passage":"The defensive team managed to __________ three consecutive attacks during the final period, preventing the opposition from closing the score gap with only minutes remaining. Their organized resistance under pressure was later highlighted as the decisive factor in securing the narrow victory.","cnPassage":"防守隊在最後階段成功擊退了三次連續進攻，阻止了對手在僅剩幾分鐘時縮小比分差距。他們在壓力下的有組織抵抗後來被認為是確保以微弱優勢獲勝的決定性因素。"},{"unit":14,"difficulty":1,"word":"havoc","pos":"n.","def":"widespread destruction or disorder","synonyms":"destruction, chaos, devastation.","cn":"大破壞；混亂","passage":"The unexpected power outage wreaked __________ on the hospital's scheduling system, forcing staff to reschedule dozens of non-emergency appointments and manually coordinate patient care without access to electronic records for several hours.","cnPassage":"意外的停電對醫院的排班系統造成了大破壞，迫使工作人員重新安排數十個非緊急預約，並在數小時內沒有電子記錄訪問的情況下手動協調患者護理。"},{"unit":14,"difficulty":2,"word":"incisive","pos":"adj.","def":"clear and sharp in analysis; penetrating","synonyms":"sharp, penetrating, perceptive.","cn":"敏銳的；深刻的","passage":"Her __________ questioning during the cross-examination exposed several inconsistencies in the witness's account that had previously gone unnoticed. Legal observers praised her ability to identify the weakest points in a complex testimony and pursue them with calm precision.","cnPassage":"她在盤問中敏銳的追問暴露了證人陳述中幾個之前未被注意到的矛盾之處。法律觀察員讚揚她識別複雜證詞中最薄弱點並以冷靜精確的態度加以追究的能力。"},{"unit":14,"difficulty":2,"word":"precipitate","pos":"v.","def":"to cause something to happen suddenly or too soon","synonyms":"trigger, provoke, hasten.","cn":"促成；突然引起","passage":"The unexpected resignation of three board members simultaneously __________ a leadership crisis that forced the organization to postpone its annual general meeting while an emergency succession plan was developed. The situation drew significant attention from investors and industry observers.","cnPassage":"三位董事會成員同時出人意料地辭職，突然引起了一場領導層危機，迫使機構在制定緊急繼任計劃的同時推遲年度股東大會。這一情況引起了投資者和行業觀察人士的高度關注。"},{"unit":14,"difficulty":2,"word":"stentorian","pos":"adj.","def":"very loud and powerful in sound","synonyms":"booming, resonant, thunderous.","cn":"聲音洪亮的；響亮的","passage":"The auctioneer's __________ voice filled the large hall without the need for amplification, reaching every corner of the room and commanding the attention of even the most distracted bidders. His ability to maintain energy and clarity throughout a long session was a mark of considerable professional skill.","cnPassage":"拍賣師聲音洪亮的嗓音無需擴音便充滿了整個大廳，傳達到房間的每個角落，甚至吸引了最分心競標者的注意。他在漫長拍賣過程中保持活力和清晰度的能力，是相當高水準專業技能的標誌。"},{"unit":14,"difficulty":3,"word":"valor","pos":"n.","def":"great courage in the face of danger; bravery","synonyms":"bravery, courage, heroism.","cn":"英勇；勇氣","passage":"The medal was awarded in recognition of the officer's remarkable __________ during the rescue operation, during which she repeatedly entered a burning structure to guide trapped individuals to safety despite the considerable personal risk involved in each entry.","cnPassage":"這枚獎章是為了表彰這位警員在救援行動中展現的非凡英勇，她在行動中不顧每次進入都涉及的巨大個人風險，多次進入一棟燃燒的建築物引導被困人員脫險。"},{"unit":14,"difficulty":1,"word":"sinecure","pos":"n.","def":"a paid job that requires little or no work","synonyms":"cushy job, soft job, non-job.","cn":"掛名差事；閒職","passage":"Critics accused the appointment of being a political __________, noting that the newly created advisory role came with a generous salary but no clearly defined responsibilities or measurable outcomes. Calls for transparency led to a formal review of how the position's scope of work would be evaluated.","cnPassage":"批評者指責這次任命是政治上的掛名差事，指出新設立的顧問職位附有豐厚薪酬，但沒有明確規定的職責或可衡量的成果。對透明度的呼籲導致對職位工作範圍評估方式的正式審查。"},{"unit":15,"difficulty":2,"word":"abrogate","pos":"v.","def":"to formally cancel or abolish a law or agreement","synonyms":"abolish, repeal, annul.","cn":"廢除；取消（法律或協議）","passage":"The new government moved swiftly to __________ several trade agreements that had been negotiated under the previous administration, arguing that the terms were unfavorable to domestic industries. Trading partners expressed concern and requested immediate consultations to discuss the implications of the changes.","cnPassage":"新政府迅速廢除了前任政府談判達成的幾項貿易協定，認為這些條款對國內工業不利。貿易夥伴表示關切，並要求立即進行磋商，討論這些變化的影響。"},{"unit":15,"difficulty":1,"word":"accomplice","pos":"n.","def":"a person who helps another commit a crime","synonyms":"partner, collaborator, associate.","cn":"共犯；幫兇","passage":"Prosecutors argued that the defendant had acted as an __________ by providing the necessary access codes and technical assistance, even though he was not physically present during the actual robbery. The court determined that his active participation in planning made him equally responsible under the law.","cnPassage":"檢察官認為，被告通過提供必要的訪問碼和技術協助充當了共犯，儘管在實際搶劫期間他並未親身在場。法院裁定，他積極參與策劃使他在法律上同樣負有責任。"},{"unit":15,"difficulty":4,"word":"asperity","pos":"n.","def":"harshness of tone or manner; roughness","synonyms":"harshness, sharpness, severity.","cn":"粗暴；嚴厲","passage":"She responded to the criticism with unexpected __________, her sharp words catching the committee off guard after weeks of measured and cooperative discussion. Colleagues later attributed the outburst to accumulated frustration over decisions that had repeatedly been made without adequate consultation.","cnPassage":"她以出乎意料的粗暴語氣回應批評，在數週克制合作的討論之後，她尖銳的言辭讓委員會措手不及。同事後來將這次情緒爆發歸因於長期積累的挫折感，因為決定被反覆做出而未得到充分諮詢。"},{"unit":15,"difficulty":2,"word":"culpable","pos":"adj.","def":"deserving blame for a fault or wrongdoing","synonyms":"blameworthy, responsible, accountable.","cn":"有罪的；該受譴責的","passage":"The inquiry found that senior management was __________ for failing to act on repeated warnings about the safety deficiencies, even when independent inspectors had flagged the same concerns on two previous occasions. The findings led to both regulatory sanctions and civil litigation.","cnPassage":"調查發現，高級管理層因未能對反覆出現的安全缺陷警告採取行動而該受譴責，即使獨立督察在前兩次已指出同樣的問題。調查結果導致了監管制裁和民事訴訟。"},{"unit":15,"difficulty":3,"word":"declaim","pos":"v.","def":"to speak or recite in a forceful, formal way","synonyms":"proclaim, orate, pronounce.","cn":"慷慨陳詞；高聲宣告","passage":"Standing at the podium, the reformer began to __________ her vision for a fairer economic system, her voice rising with conviction as she listed the specific policies she believed would reduce inequality. The crowd responded with growing enthusiasm as each point was made.","cnPassage":"這位改革者站在講台上，開始慷慨地陳述她對更公平經濟體制的願景，隨著她列舉她認為能夠減少不平等的具體政策，她的聲音帶著信念愈加高昂。隨著每個要點的提出，人群的熱情日益高漲。"},{"unit":15,"difficulty":3,"word":"epithet","pos":"n.","def":"a word or phrase used to describe someone, often critically","synonyms":"label, nickname, title.","cn":"綽號；貶稱","passage":"The political commentator earned the __________ 'the Skeptic' from his colleagues for his consistent habit of questioning assumptions that others in the field accepted without scrutiny. He wore the label without resentment, viewing rigorous doubt as a professional virtue rather than a liability.","cnPassage":"這位政治評論員因其一貫質疑同行不加審視便接受的假設的習慣，從同事那裡獲得了「懷疑論者」的綽號。他毫無怨恨地接受了這個標籤，視嚴格的質疑為職業美德而非負擔。"},{"unit":15,"difficulty":2,"word":"fetter","pos":"v.","def":"to restrict or hamper the freedom of someone","synonyms":"restrain, constrain, restrict.","cn":"束縛；羈絆","passage":"Excessive bureaucratic requirements were seen to __________ innovation within the agency, making it difficult for teams to test new approaches without first navigating lengthy approval processes. Leadership acknowledged the problem and launched a review aimed at removing unnecessary procedural barriers.","cnPassage":"過度的官僚要求被認為束縛了機構內的創新，使團隊難以在不先通過冗長審批流程的情況下測試新方法。領導層承認了這一問題，並發起了一項旨在消除不必要程序障礙的審查。"},{"unit":15,"difficulty":2,"word":"invalidate","pos":"v.","def":"to make something legally or officially void","synonyms":"nullify, cancel, void.","cn":"使無效；使作廢","passage":"The discovery of a procedural error in how the ballots had been handled threatened to __________ the election results, prompting calls from multiple parties for an independent audit before any winner could be formally declared. The electoral commission suspended its announcement pending the review.","cnPassage":"在選票處理方式中發現的程序錯誤威脅要使選舉結果無效，促使多個政黨呼籲在正式宣布任何勝選者之前進行獨立審計。選舉委員會暫停公告，等待審查結果。"},{"unit":15,"difficulty":3,"word":"paragon","pos":"n.","def":"a perfect example of a quality; a model of excellence","synonyms":"model, epitome, ideal.","cn":"模範；典範","passage":"The retiring headteacher was described by staff and students alike as a __________ of professional dedication, having devoted over thirty years to improving educational outcomes for children from every background in the district. Her leadership approach became a case study in several teacher training programs.","cnPassage":"退休的校長被員工和學生一致描述為職業奉獻精神的模範，她致力於三十多年，改善整個學區每個背景學生的教育成果。她的領導方式成為幾個教師培訓計劃的案例研究。"},{"unit":15,"difficulty":2,"word":"preclude","pos":"v.","def":"to prevent something from happening","synonyms":"prevent, rule out, eliminate.","cn":"排除；防止","passage":"A prior commitment to a client meeting in another city __________ the manager from attending the internal strategy session, so she submitted detailed written input to ensure her perspective was represented in the discussion. Her document became one of the most referenced contributions of the day.","cnPassage":"對另一城市客戶會議的事先承諾使這位經理無法出席內部策略會議，因此她提交了詳細的書面意見，以確保她的觀點在討論中得到呈現。她的文件成為當天被引用最多的貢獻之一。"},{"unit":15,"difficulty":2,"word":"recant","pos":"v.","def":"to withdraw or take back a previous statement or belief","synonyms":"retract, withdraw, renounce.","cn":"撤回（聲明）；放棄（信仰）","passage":"Under mounting pressure from colleagues and contradictory evidence, the researcher was forced to __________ her earlier conclusions and acknowledge that the study's methodology had contained a significant flaw. She published a formal correction and committed to conducting a more rigorous follow-up investigation.","cnPassage":"在同事的巨大壓力和相矛盾的證據下，這位研究員被迫撤回她早先的結論，並承認研究的方法論存在重大缺陷。她發表了正式更正，並承諾進行更為嚴謹的後續調查。"},{"unit":16,"difficulty":2,"word":"altruistic","pos":"adj.","def":"caring about others' wellbeing before one's own","synonyms":"selfless, generous, benevolent.","cn":"利他的；無私的","passage":"Her decision to donate a significant portion of her inheritance to fund scholarships for students from low-income families was widely praised as genuinely __________, as she had no personal connection to the beneficiaries and sought no public recognition for the contribution.","cnPassage":"她將一大部分遺產捐出，資助來自低收入家庭的學生獎學金，這一決定被廣泛讚譽為真正無私的行為，因為她與受益者沒有個人關係，也不尋求對這份貢獻的公眾認可。"},{"unit":16,"difficulty":1,"word":"bulwark","pos":"n.","def":"a strong defense or protection against something","synonyms":"defense, safeguard, barrier.","cn":"堡壘；保障","passage":"Independent journalism has long been considered a __________ against the abuse of power, providing citizens with accurate information needed to hold leaders accountable. When press freedom is restricted, accountability suffers and the public loses a critical check on those who govern.","cnPassage":"獨立新聞業長期被視為抵禦權力濫用的堡壘，為公民提供監督領導人問責所需的準確信息。當新聞自由受到限制時，問責制便會受損，公眾也失去了對執政者的重要制衡。"},{"unit":16,"difficulty":2,"word":"cache","pos":"n.","def":"a hidden store of something valuable","synonyms":"stockpile, hoard, reserve.","cn":"隱藏處；秘密儲藏物","passage":"During the renovation, workers discovered a __________ of historical documents hidden beneath the floorboards of the old archive room, including letters and official records dating back over a century. Historians were called in immediately to assess and preserve the unexpected find.","cnPassage":"在翻新過程中，工人們在舊檔案室的地板下發現了一批秘密儲藏的歷史文件，包括可追溯到一個多世紀前的信件和官方記錄。歷史學家立即被召來評估和保護這一意外發現。"},{"unit":16,"difficulty":2,"word":"coterie","pos":"n.","def":"a small exclusive group of people with shared interests","synonyms":"clique, circle, group.","cn":"小圈子；同夥","passage":"The artist found early support within a tight __________ of collectors and curators who championed her work long before the wider public became aware of her talent. This small but influential network helped secure exhibition space and critical attention during the formative years of her career.","cnPassage":"這位藝術家在廣大公眾意識到她的才華之前，很早便在一個緊密的收藏家和策展人小圈子中找到了支持，他們為她的作品積極倡導。這個雖小但有影響力的網絡幫助她在職業生涯的形成期獲得了展覽空間和評論界的關注。"},{"unit":16,"difficulty":2,"word":"cupidity","pos":"n.","def":"greed, especially for money or possessions","synonyms":"greed, avarice, covetousness.","cn":"貪婪；貪財","passage":"The fraud investigation revealed that __________ had motivated the scheme from the beginning, as the architects of the plan had used charitable funds intended for disaster relief to finance personal investments and luxury purchases. All parties involved faced both criminal charges and civil penalties.","cnPassage":"詐騙調查揭示，貪婪從一開始便是這個計劃的動機，因為計劃的策劃者將本用於賑災的慈善資金，挪作個人投資和奢侈品購買。所有涉案人員均面臨刑事指控和民事罰款。"},{"unit":16,"difficulty":2,"word":"cursory","pos":"adj.","def":"done quickly with little attention to detail","synonyms":"hasty, superficial, perfunctory.","cn":"粗略的；草率的","passage":"A __________ review of the application documents failed to catch the inconsistencies that a more thorough examination would have identified immediately. The oversight led to significant delays when the errors were discovered at a later stage in the approval process.","cnPassage":"對申請文件的草率審查未能發現那些在更徹底審查時本可立即識別的矛盾之處。當這些錯誤在批准流程的後期被發現時，這一疏忽導致了嚴重的延誤。"},{"unit":16,"difficulty":3,"word":"embellish","pos":"v.","def":"to make more attractive by adding details; to exaggerate","synonyms":"decorate, elaborate, exaggerate.","cn":"裝飾；潤飾；誇大","passage":"The travel writer admitted she sometimes chose to __________ her descriptions of remote destinations to make the experience sound more dramatic and appealing to readers. While readers expected vivid language, she was careful never to misrepresent actual conditions in ways that could mislead travelers.","cnPassage":"這位旅遊作家承認，她有時會選擇誇大對偏遠目的地的描述，使體驗聽起來對讀者更具戲劇性和吸引力。雖然讀者期待生動的語言，但她小心翼翼地不以可能誤導旅行者的方式歪曲實際情況。"},{"unit":16,"difficulty":2,"word":"frugal","pos":"adj.","def":"careful and economical with money; avoiding waste","synonyms":"thrifty, economical, careful.","cn":"節儉的；樸素的","passage":"Despite earning a substantial income, the engineer remained remarkably __________ throughout her career, choosing to live in a modest apartment and limiting discretionary spending in order to build a secure financial foundation well ahead of her planned retirement date.","cnPassage":"儘管收入可觀，這位工程師在整個職業生涯中依然保持著非常節儉的生活方式，選擇住在樸素的公寓並限制自由支出，以便在計劃的退休日期之前很早便建立穩固的財務基礎。"},{"unit":16,"difficulty":3,"word":"gregarious","pos":"adj.","def":"enjoying being in groups; very sociable","synonyms":"sociable, outgoing, convivial.","cn":"群居的；善於社交的","passage":"The new sales director was naturally __________, thriving in networking events and client meetings where her ease with conversation and genuine interest in people created the kind of trust that converted initial introductions into long-term business relationships.","cnPassage":"新的銷售主任天性善於社交，在社交活動和客戶會議中如魚得水，她在交談中的自如表現和對人的真誠興趣建立了一種信任，將初次介紹轉化為長期的業務關係。"},{"unit":16,"difficulty":2,"word":"interloper","pos":"n.","def":"a person who intrudes or interferes in a situation","synonyms":"intruder, outsider, trespasser.","cn":"闖入者；干涉者","passage":"The established vendors at the market viewed the new chain store as an __________ threatening to undermine the local character of the area and draw customers away from the independent businesses that had built the neighborhood's reputation over many decades.","cnPassage":"市場上的老牌攤販將這家新連鎖店視為一個闖入者，威脅著要破壞該地區的本地特色，並將顧客從幾十年來建立了街區聲譽的獨立商業中奪走。"},{"unit":16,"difficulty":2,"word":"progeny","pos":"n.","def":"a person's children or descendants","synonyms":"descendants, offspring, heirs.","cn":"後代；子孫","passage":"The founder believed that the values he had built the company on should be passed to future generations, and he established a trust to ensure his __________ would have both the resources and the guidance needed to continue the family enterprise with integrity.","cnPassage":"創始人相信他建立公司的價值觀應當傳承給後代，他設立了一個信託，以確保他的子孫後代擁有以誠信繼續家族企業所需的資源和指導。"},{"unit":16,"difficulty":2,"word":"prolific","pos":"adj.","def":"producing large amounts of something; highly fertile","synonyms":"productive, fruitful, abundant.","cn":"多產的；大量的","passage":"The composer was extraordinarily __________, completing over four hundred works across a career spanning more than fifty years, ranging from intimate chamber pieces to full-scale orchestral symphonies. Despite this remarkable output, critics noted that his commitment to quality remained consistently high.","cnPassage":"這位作曲家非常多產，在跨越五十多年的職業生涯中完成了四百多部作品，涵蓋從親密的室內樂到大型管弦交響曲的各種形式。儘管產量驚人，評論家指出他對質量的承諾始終保持如一。"},{"unit":16,"difficulty":1,"word":"sedentary","pos":"adj.","def":"spending a lot of time seated; not physically active","synonyms":"inactive, stationary, desk-bound.","cn":"久坐的；定棲的","passage":"Health researchers warned that a __________ lifestyle, combined with poor dietary habits, significantly increases the risk of developing chronic conditions such as heart disease and type 2 diabetes over time. They encouraged workers to incorporate brief periods of movement into every hour of the working day.","cnPassage":"健康研究人員警告，久坐的生活方式加上不良的飲食習慣，會隨著時間的推移顯著增加患心臟病和2型糖尿病等慢性疾病的風險。他們鼓勵工作者在每個工作小時內加入短暫的活動時間。"},{"unit":16,"difficulty":4,"word":"temerity","pos":"n.","def":"excessive confidence or boldness; reckless daring","synonyms":"audacity, recklessness, impudence.","cn":"魯莽；冒失","passage":"Few junior associates had the __________ to challenge the senior partner's strategy in an open meeting, given how rarely such disagreements were welcomed. When one analyst did speak up with carefully researched counterarguments, the unexpected candor ultimately led to a productive revision of the proposal.","cnPassage":"考慮到此類分歧很少受到歡迎，很少有初級同事有魯莽冒失地在公開會議上挑戰高級合夥人策略。當一位分析師帶著精心研究的反駁論點發言時，這份意外的坦誠最終促成了對提案的有益修訂。"},{"unit":16,"difficulty":3,"word":"virtuosity","pos":"n.","def":"great technical skill in an artistic pursuit","synonyms":"mastery, skill, brilliance.","cn":"精湛技藝；大師風範","passage":"The cellist's performance was praised for its extraordinary __________, with critics noting that her command of technical demands that would challenge even the most experienced players appeared entirely effortless. Several in the audience described the experience as among the finest they had witnessed in decades of attending concerts.","cnPassage":"這位大提琴手的演出因其非凡的精湛技藝而備受讚譽，評論家指出她對即使是最有經驗的演奏者都難以應付的技術要求的掌控，看起來完全毫不費力。幾位觀眾將這次體驗描述為他們幾十年音樂會觀賞生涯中最精彩的演出之一。"},{"unit":17,"difficulty":3,"word":"assiduous","pos":"adj.","def":"showing great care and persistent effort","synonyms":"diligent, industrious, meticulous.","cn":"勤勉的；刻苦的","passage":"The graduate student was __________ in her research habits, spending long hours in the library cross-referencing sources and carefully documenting every citation. Her supervisor noted that the exceptional quality of her dissertation reflected not just intellectual ability but genuine commitment to thorough scholarship.","cnPassage":"這位研究生在研究習慣上非常勤勉，在圖書館花費大量時間交叉核對來源，並仔細記錄每一個引文。她的導師指出，她論文的卓越質量不僅體現了智識能力，更體現了對嚴謹學術的真誠承諾。"},{"unit":17,"difficulty":2,"word":"attest","pos":"v.","def":"to provide evidence or proof of something","synonyms":"confirm, certify, testify.","cn":"證明；證實","passage":"Multiple colleagues were called to __________ to the manager's professional conduct, all of whom provided consistent accounts of her fair and transparent approach to decision-making. The hearing concluded that the original complaint had been based on misunderstanding rather than any genuine misconduct.","cnPassage":"多位同事被召來證明這位經理的職業行為，他們都對她公平透明的決策方式提供了一致的描述。聽證會得出結論，最初的投訴是基於誤解，而非任何真正的不當行為。"},{"unit":17,"difficulty":3,"word":"concoct","pos":"v.","def":"to devise or create something, especially a plan or story","synonyms":"fabricate, devise, invent.","cn":"捏造；精心策劃","passage":"The defense argued that the witness had __________ an elaborate account of events designed to shift blame away from the actual perpetrator. The lawyer presented communication records and timeline inconsistencies as evidence that the story had been constructed rather than genuinely recalled.","cnPassage":"辯護方認為，證人捏造了一個精心設計的事件陳述，旨在將責任轉移給真正的肇事者。律師提出了通訊記錄和時間線矛盾作為故事是被編造而非真實回憶的證據。"},{"unit":17,"difficulty":3,"word":"consummate","pos":"adj.","def":"highly skilled and accomplished; perfect","synonyms":"accomplished, complete, masterful.","cn":"圓滿的；技藝高超的","passage":"The veteran diplomat was a __________ negotiator, known for her ability to identify the precise concessions that would satisfy both sides without either party feeling it had conceded too much. Her technique had resolved disputes that others had considered permanently deadlocked.","cnPassage":"這位資深外交官是一位技藝高超的談判者，以她能夠確定讓雙方都滿意而又不讓任何一方感到讓步過多的精確妥協方案而聞名。她的技巧解決了其他人認為永久陷入僵局的爭端。"},{"unit":17,"difficulty":3,"word":"exult","pos":"v.","def":"to feel or show great happiness and triumph","synonyms":"rejoice, celebrate, revel.","cn":"歡欣鼓舞；狂喜","passage":"The team began to __________ as the final score confirmed their victory, players embracing and supporters surging onto the field in a wave of shared emotion. After three consecutive seasons without a title, the win carried a depth of meaning that made the celebration particularly memorable.","cnPassage":"隨著最終比分確認了他們的勝利，球隊開始歡欣鼓舞，球員互相擁抱，支持者如潮水般涌入球場，共同感受這份激動的情緒。在連續三個賽季未能奪冠之後，這場勝利帶有深刻的意義，使這次慶祝特別令人難忘。"},{"unit":17,"difficulty":3,"word":"fallacious","pos":"adj.","def":"based on a wrong or misleading idea; logically false","synonyms":"misleading, erroneous, deceptive.","cn":"謬誤的；欺騙性的","passage":"The report's central conclusion was built on a __________ assumption — that rising test scores directly indicate improved learning — which critics argued ignored the many factors that can inflate results without reflecting genuine academic development.","cnPassage":"報告的核心結論建立在一個謬誤的假設之上——考試分數上升直接表示學習有所改善——批評者認為這忽略了許多可以使成績虛高而不反映真正學術發展的因素。"},{"unit":17,"difficulty":1,"word":"gullible","pos":"adj.","def":"easily tricked because too willing to believe things","synonyms":"naive, credulous, trusting.","cn":"易受騙的；輕信的","passage":"Consumer protection agencies warn that __________ shoppers are frequently targeted by online schemes that promise unrealistic returns on minimal investments. Advisers recommend applying healthy skepticism to any offer that sounds too good to be true, particularly when it creates pressure to decide quickly.","cnPassage":"消費者保護機構警告，易受騙的購物者經常成為網絡計劃的目標，這些計劃承諾以最少的投資獲得不切實際的回報。顧問建議對任何聽起來好得不像真的邀約保持健康的懷疑態度，尤其是當它製造快速決策壓力時。"},{"unit":17,"difficulty":2,"word":"hoax","pos":"n.","def":"a deceptive trick intended to make people believe something false","synonyms":"deception, fraud, trick.","cn":"騙局；惡作劇","passage":"What initially appeared to be a scientific discovery quickly unraveled as a __________ when researchers attempting to replicate the results found no supporting evidence and identified fundamental errors in the original data. The journal retracted the paper and launched an investigation into how the submission had passed peer review.","cnPassage":"當試圖重複實驗結果的研究人員發現沒有支持性證據，並發現原始數據中存在根本性錯誤時，最初看似科學發現的事情很快被揭穿為一個騙局。該期刊撤回了論文，並對提交如何通過同行評審展開調查。"},{"unit":17,"difficulty":2,"word":"impeccable","pos":"adj.","def":"faultless; in accordance with the highest standards","synonyms":"flawless, perfect, faultless.","cn":"無懈可擊的；完美的","passage":"The candidate's __________ professional record — ten years without a single complaint or disciplinary note — made her the clear frontrunner for the position. The selection panel noted that her combination of experience, integrity, and consistent performance set her significantly apart from the other applicants.","cnPassage":"這位候選人無懈可擊的職業記錄——十年間沒有任何投訴或紀律記錄——使她成為這個職位的明確領先者。遴選小組指出，她的經驗、誠信和持續表現的結合，使她明顯優於其他申請者。"},{"unit":17,"difficulty":1,"word":"labyrinth","pos":"n.","def":"a complicated network; a confusing maze","synonyms":"maze, tangle, complex.","cn":"迷宮；錯綜複雜的事物","passage":"Navigating the __________ of regulations governing international trade requires specialized legal expertise, as even minor procedural errors can result in costly penalties or significant shipment delays. Companies entering new markets for the first time are strongly advised to engage consultants familiar with local compliance requirements.","cnPassage":"在複雜的國際貿易法規迷宮中穿行需要專業的法律知識，因為即使是微小的程序錯誤也可能導致高額罰款或重大貨物延誤。首次進入新市場的企業被強烈建議聘請熟悉當地合規要求的顧問。"},{"unit":17,"difficulty":2,"word":"murky","pos":"adj.","def":"dark and dirty; not clear or easy to understand","synonyms":"obscure, unclear, turbid.","cn":"昏暗的；不清晰的","passage":"The legal status of the arrangement remained __________, with lawyers on both sides unable to agree on whether the original contract had been formally terminated or merely suspended. Until the question was resolved, neither party could take further steps to enforce or exit the agreement.","cnPassage":"這項安排的法律狀態仍然不明朗，雙方律師無法就原始合同是否已被正式終止還是僅僅被暫停達成一致。在這個問題得到解決之前，任何一方都無法採取進一步措施來執行或退出協議。"},{"unit":17,"difficulty":3,"word":"perpetrate","pos":"v.","def":"to carry out or commit a harmful or illegal act","synonyms":"commit, carry out, execute.","cn":"犯（罪）；做（壞事）","passage":"Investigators determined that the fraud had been __________ over a period of nearly four years, with the offenders systematically manipulating records to conceal the scale of the losses from both shareholders and regulatory bodies. The coordinated nature of the scheme suggested prior planning by multiple individuals.","cnPassage":"調查人員確定，該詐騙行為歷時近四年，犯罪者系統性地篡改記錄，向股東和監管機構隱瞞損失規模。這個計劃的協調性表明是由多人事先策劃的。"},{"unit":17,"difficulty":2,"word":"subterfuge","pos":"n.","def":"a trick or deception used to achieve a goal","synonyms":"deception, trick, stratagem.","cn":"詭計；遁詞","passage":"The investigator suspected that the company had used __________ to conceal the true ownership of the asset, routing transactions through a complex series of shell companies specifically designed to obscure the connection between the funds and their actual source.","cnPassage":"調查員懷疑該公司使用了詭計來隱瞞資產的真實所有權，通過一系列專門設計來掩蓋資金與其實際來源之間聯繫的空殼公司來轉移交易。"},{"unit":18,"difficulty":3,"word":"abortive","pos":"adj.","def":"failing to produce the intended result; unsuccessful","synonyms":"unsuccessful, failed, futile.","cn":"失敗的；夭折的","passage":"After three __________ attempts to negotiate a settlement, the parties agreed to submit their dispute to binding arbitration. The mediator noted that each previous effort had collapsed at the same stage over the same unresolved issue, making a new approach clearly necessary.","cnPassage":"在三次失敗的談判和解嘗試之後，雙方同意將爭議提交具有約束力的仲裁。調解員指出，以前的每次嘗試都在同一個未解決的問題上的同一階段崩潰，顯然需要一種新的方法。"},{"unit":18,"difficulty":1,"word":"buff","pos":"n.","def":"an enthusiastic admirer or follower of something","synonyms":"enthusiast, fan, devotee.","cn":"愛好者；迷","passage":"A self-described history __________, she spent most of her weekends visiting museums and archaeological sites across the region, carefully documenting each trip in detailed journals that she later shared with an online community of people who shared her passion.","cnPassage":"作為一個自稱的歷史愛好者，她將大部分週末花在參觀該地區各地的博物館和考古遺址上，仔細地將每次旅行記錄在詳細的日記中，後來與分享她熱情的網絡社群分享。"},{"unit":18,"difficulty":1,"word":"conjugal","pos":"adj.","def":"relating to marriage or the relationship between spouses","synonyms":"marital, matrimonial, wedded.","cn":"婚姻的；夫妻的","passage":"The legal team argued that the property, purchased before the wedding, fell outside the scope of __________ assets and therefore should not be subject to division during the separation proceedings. The court reviewed the relevant statutes before issuing its ruling on the matter.","cnPassage":"法律團隊認為，在婚前購買的房產不屬於婚姻資產的範疇，因此在分居訴訟期間不應受到分割。法院在就此事作出裁決之前審查了相關法規。"},{"unit":18,"difficulty":1,"word":"deem","pos":"v.","def":"to regard or consider in a specified way","synonyms":"consider, judge, regard.","cn":"認為；視為","passage":"The committee will __________ applications incomplete if any required supporting documents are missing from the submission at the time of the deadline. Applicants are advised to check the full list of requirements carefully before submitting to avoid automatic disqualification.","cnPassage":"如果在截止日期提交時缺少任何所需的支持文件，委員會將認為申請不完整。建議申請人在提交前仔細檢查全部要求清單，以避免自動失格。"},{"unit":18,"difficulty":1,"word":"inherent","pos":"adj.","def":"naturally existing in something as a permanent quality","synonyms":"intrinsic, innate, built-in.","cn":"固有的；與生俱來的","passage":"There is an __________ tension in any organization between the need for consistency and the desire for innovation, as processes that ensure reliability can also slow the pace of change. Effective leaders find ways to manage this balance rather than treating the two goals as mutually exclusive.","cnPassage":"在任何組織中，對一致性的需求與對創新的渴望之間存在固有的張力，因為確保可靠性的流程也可能減慢變革的步伐。有效的領導者找到了管理這種平衡的方法，而不是將這兩個目標視為相互排斥的。"},{"unit":18,"difficulty":2,"word":"itinerant","pos":"adj.","def":"traveling from place to place; not settled","synonyms":"traveling, nomadic, wandering.","cn":"巡迴的；流動的","passage":"The __________ nature of the role appealed to candidates who enjoyed variety and were comfortable working in constantly changing environments. Applicants were informed that the position would require spending at least fifteen nights per month away from their home base during peak operational periods.","cnPassage":"這個職位的巡迴性質對喜歡多樣性且習慣在不斷變化環境中工作的候選人很有吸引力。申請人被告知，在業務高峰期間，該職位每月需要在離家基地至少待十五個晚上。"},{"unit":18,"difficulty":2,"word":"latent","pos":"adj.","def":"present but not yet fully developed or visible","synonyms":"dormant, hidden, undeveloped.","cn":"潛在的；隱伏的","passage":"The psychologist believed that __________ creative ability existed in nearly every individual, but that most people never developed it fully because their early experiences had not provided the encouragement or freedom needed to explore artistic expression without fear of judgment.","cnPassage":"心理學家相信，幾乎每個人都存在潛在的創造力，但大多數人從未充分發展它，因為他們的早年經歷沒有提供在不恐懼被評判的情況下探索藝術表達所需的鼓勵或自由。"},{"unit":18,"difficulty":1,"word":"myriad","pos":"adj.","def":"a very large number; countless","synonyms":"countless, innumerable, numerous.","cn":"無數的；極大量的","passage":"The report identified a __________ of factors contributing to the housing shortage, ranging from restrictive planning laws and limited construction capacity to demographic shifts and insufficient long-term investment in public infrastructure. Addressing any single cause in isolation, it concluded, would produce only limited results.","cnPassage":"這份報告確認了造成住房短缺的無數因素，從限制性規劃法律和有限的建設能力，到人口結構變化和公共基礎設施長期投資不足。它得出結論，孤立地解決任何單一原因只會產生有限的效果。"},{"unit":18,"difficulty":3,"word":"peregrination","pos":"n.","def":"a journey, especially one made on foot over a long distance","synonyms":"journey, wandering, travels.","cn":"長途旅行；遊歷","passage":"After retiring from a thirty-year career, she embarked on an extended __________ across four continents, keeping detailed journals that would eventually form the basis of a memoir about the people, landscapes, and unexpected encounters that had marked each stage of the journey.","cnPassage":"在結束三十年的職業生涯後，她開始了橫跨四大洲的漫長旅行，詳細記錄的日記最終成為一部回憶錄的基礎，記述了旅程每個階段留下深刻印象的人物、風景和意外遭遇。"},{"unit":18,"difficulty":2,"word":"romp","pos":"v.","def":"to move or proceed in a lively and energetic way","synonyms":"frolic, play, dash.","cn":"嬉鬧；輕鬆取勝","passage":"The home team __________ to a comfortable victory, scoring five goals in the second half to turn a narrow halftime lead into an emphatic result. Supporters celebrated enthusiastically as each goal went in, and the crowd left the stadium in high spirits after a thoroughly entertaining performance.","cnPassage":"主隊輕鬆取得了舒適的勝利，在下半場攻入五球，將中場時微弱的領先優勢轉化為決定性的結果。每個進球時支持者都熱情慶祝，球迷在充分享受精彩表演後興高采烈地離開了球場。"},{"unit":18,"difficulty":1,"word":"spontaneous","pos":"adj.","def":"done naturally without planning or external influence","synonyms":"unplanned, impulsive, natural.","cn":"自發的；自然的","passage":"The most memorable moment of the graduation ceremony came from a __________ speech given by a student who had not originally been scheduled to speak. Her unrehearsed words, clearly drawn from genuine experience, moved the audience more deeply than any of the carefully prepared official addresses.","cnPassage":"畢業典禮最令人難忘的時刻，來自一位最初未在計劃演講名單上的學生所作的自發演講。她未經排練的話語，顯然源自真實的經歷，比任何精心準備的正式演說都更深深地打動了觀眾。"},{"unit":18,"difficulty":2,"word":"tortuous","pos":"adj.","def":"full of twists and turns; excessively complex","synonyms":"winding, convoluted, complex.","cn":"蜿蜒的；曲折的","passage":"The approval process proved __________, requiring the applicant to navigate eleven separate departments across three agencies before receiving a final decision. Reform advocates used the case as an example of why the entire licensing procedure needed to be simplified and consolidated into a single streamlined system.","cnPassage":"批准流程被證明是曲折複雜的，需要申請人在收到最終決定之前，穿越三個機構的十一個獨立部門。改革倡導者以此案為例，說明為何整個許可程序需要簡化並整合為一個單一的精簡系統。"},{"unit":18,"difficulty":1,"word":"urbane","pos":"adj.","def":"refined, polished, and confident in manner","synonyms":"sophisticated, polished, suave.","cn":"溫文爾雅的；舉止優雅的","passage":"The ambassador was universally described as __________, navigating even the most difficult diplomatic moments with calm authority and a natural ease that put both colleagues and rivals at their comfortable. His manner never came across as arrogance, but rather as a genuine confidence born of experience.","cnPassage":"大使被普遍描述為溫文爾雅，以冷靜的權威和自然的從容應對最困難的外交時刻，讓同事和對手都感到舒適。他的舉止從不給人傲慢的感覺，而是源於經驗的真正自信。"},{"unit":18,"difficulty":2,"word":"veneer","pos":"n.","def":"a thin surface layer; a deceptive outward appearance","synonyms":"facade, surface, pretense.","cn":"薄表面；虛飾","passage":"Beneath the __________ of cooperation, significant disagreements remained unresolved, and observers predicted that the apparent unity would not survive the first major challenge to the coalition's shared interests. The carefully maintained public image concealed tensions that had been building for months.","cnPassage":"在合作的虛飾之下，重大分歧仍未解決，觀察人士預測，明顯的團結不會在聯盟共同利益面臨第一個重大挑戰時持續。精心維護的公眾形象掩蓋了數月來一直在積聚的緊張關係。"},{"unit":19,"difficulty":1,"word":"amnesty","pos":"n.","def":"an official pardon for people who have committed offenses","synonyms":"pardon, reprieve, forgiveness.","cn":"大赦；特赦","passage":"The government announced a limited __________ for citizens who had failed to declare overseas income, allowing them to come forward voluntarily and settle outstanding obligations without facing criminal prosecution. Tax authorities reported a significant increase in voluntary disclosures in the weeks following the announcement.","cnPassage":"政府宣布對未申報海外收入的公民實施有限度的大赦，允許他們自願申報並在不面臨刑事起訴的情況下解決未了義務。稅務機關報告，公告發布後數週內，自願申報的數量顯著增加。"},{"unit":19,"difficulty":3,"word":"balk","pos":"v.","def":"to hesitate or refuse to proceed with something","synonyms":"hesitate, resist, refuse.","cn":"畏縮；猶豫不肯","passage":"Several committee members began to __________ when the full financial implications of the expansion plan became clear, concerned that the projected costs were too high relative to the expected benefits. The chairperson requested a revised proposal with more conservative growth assumptions before scheduling a second vote.","cnPassage":"當擴張計劃的全部財務影響變得明朗時，幾位委員會成員開始猶豫不肯，擔心預計成本相對於預期收益過高。主席在安排第二次投票之前，要求提交一份採用更保守增長假設的修訂提案。"},{"unit":19,"difficulty":1,"word":"coup","pos":"n.","def":"a sudden and decisive achievement; an overthrow of government","synonyms":"triumph, overthrow, feat.","cn":"政變；出乎意料的成功","passage":"Securing the rights to publish the memoir of the retiring head of state was considered a major __________ for the small publishing house, giving it a significant commercial and reputational boost at a time when many similar firms were struggling to remain financially viable.","cnPassage":"獲得出版退休國家元首回憶錄的版權，被認為是這家小型出版社出乎意料的重大成功，在許多類似公司都在努力維持財務可行性的時候，給予它顯著的商業和聲譽提升。"},{"unit":19,"difficulty":3,"word":"exonerate","pos":"v.","def":"to officially free from blame or criminal charges","synonyms":"acquit, clear, vindicate.","cn":"免除責任；宣佈無罪","passage":"New forensic evidence emerged that served to __________ the defendant, demonstrating that he could not have been present at the location when the crime took place. The court ordered his immediate release and formally acknowledged that a serious miscarriage of justice had occurred.","cnPassage":"新的法醫證據出現，足以宣佈被告無罪，證明他在犯罪發生時不可能在現場。法院命令立即釋放他，並正式承認發生了嚴重的司法不公。"},{"unit":19,"difficulty":2,"word":"expatriate","pos":"n.","def":"a person who lives outside their native country","synonyms":"emigrant, exile, expat.","cn":"移居國外者；外籍人士","passage":"The community center offered language and cultural programs specifically tailored to the needs of __________ workers who had recently arrived in the city and were navigating unfamiliar systems while trying to establish themselves professionally and socially in a new environment.","cnPassage":"社區中心提供語言和文化計劃，專門為最近抵達城市的移居國外工作者的需求量身定制，他們一邊在陌生的系統中摸索，一邊努力在新環境中在職業和社交上建立自己的地位。"},{"unit":19,"difficulty":3,"word":"fiat","pos":"n.","def":"an official order or decree; authoritative sanction","synonyms":"decree, order, mandate.","cn":"命令；法令","passage":"The regulation was introduced by executive __________ rather than through the standard legislative process, a decision that drew criticism from lawmakers who argued it bypassed the public scrutiny and deliberation that significant policy changes typically require.","cnPassage":"這項法規是通過行政命令而非標準立法程序引入的，這一決定招致立法者的批評，他們認為這繞過了重大政策變化通常需要的公眾審查和審議。"},{"unit":19,"difficulty":1,"word":"legion","pos":"adj.","def":"very great in number; numerous","synonyms":"numerous, countless, multitudinous.","cn":"眾多的；大批的","passage":"The challenges facing the restoration project were __________, including funding gaps, deteriorating structural materials, and a shortage of craftspeople with the specialized skills needed for accurate historical reconstruction. Organizers appealed to government agencies and private donors to help address the most urgent needs.","cnPassage":"修復項目面臨的挑戰是眾多的，包括資金缺口、結構材料惡化，以及缺乏具備精確歷史重建所需專業技能的工匠。組織者呼籲政府機構和私人捐助者幫助解決最緊迫的需求。"},{"unit":19,"difficulty":1,"word":"megalomania","pos":"n.","def":"an obsession with having great power and importance","synonyms":"grandiosity, delusions of grandeur, narcissism.","cn":"狂妄自大；自大狂","passage":"Historians have noted that the leader's later decisions showed signs of __________, as he surrounded himself with advisers who never challenged his judgments and dismissed all dissent as disloyalty. His belief in his own infallibility ultimately led to a series of strategic errors that accelerated the regime's collapse.","cnPassage":"歷史學家指出，這位領袖後期的決策顯示出狂妄自大的跡象，他周圍的顧問從不質疑他的判斷，並將所有異見斥為不忠。他對自己無誤性的信念最終導致了一系列戰略錯誤，加速了政權的崩潰。"},{"unit":19,"difficulty":3,"word":"mendacious","pos":"adj.","def":"not telling the truth; habitually lying","synonyms":"dishonest, deceitful, lying.","cn":"虛假的；撒謊的","passage":"The audit revealed that several key sections of the report had been __________, containing figures that had been deliberately adjusted to present a more favorable financial picture than the underlying data could actually support. The findings triggered an immediate regulatory investigation.","cnPassage":"審計揭示，報告的幾個關鍵部分包含虛假的內容，其中數字被故意調整，以呈現比基礎數據實際上能支持的更有利的財務狀況。調查結果立即引發了監管調查。"},{"unit":19,"difficulty":1,"word":"nostalgia","pos":"n.","def":"a sentimental longing for the past","synonyms":"longing, yearning, wistfulness.","cn":"懷舊；思鄉病","passage":"The exhibition triggered a powerful sense of __________ among older visitors, many of whom paused in front of photographs and objects from their childhood decades, sharing memories with companions and with strangers who had experienced the same era in different parts of the country.","cnPassage":"這個展覽在年長的訪客中引起了強烈的懷舊情緒，許多人在幾十年前童年時期的照片和物品前停下來，與同伴以及在國家不同地方經歷過同一時代的陌生人分享記憶。"},{"unit":19,"difficulty":3,"word":"parsimonious","pos":"adj.","def":"excessively unwilling to spend money; miserly","synonyms":"miserly, stingy, penny-pinching.","cn":"吝嗇的；極度節儉的","passage":"The organization's __________ approach to staff development left many employees feeling undervalued, as training budgets were cut year after year while investment in marketing and executive compensation continued to grow. The pattern contributed significantly to rising turnover rates among skilled professionals.","cnPassage":"這個機構在員工發展上吝嗇的做法讓許多員工感到不被重視，因為培訓預算年復一年地削減，而在市場營銷和高管薪酬方面的投資卻持續增長。這種模式在很大程度上促成了技術人員的流失率上升。"},{"unit":19,"difficulty":2,"word":"pecuniary","pos":"adj.","def":"relating to or involving money","synonyms":"financial, monetary, economic.","cn":"金錢的；金錢上的","passage":"The court ordered __________ compensation to be paid to all parties who had suffered verifiable financial losses as a direct result of the breach of contract. Legal representatives were asked to submit detailed documentation of each client's damages within thirty days of the ruling.","cnPassage":"法院命令向所有因違約直接遭受可核實財務損失的各方支付金錢賠償。法律代表被要求在裁決後三十天內提交每位客戶損失的詳細文件。"},{"unit":19,"difficulty":3,"word":"profligate","pos":"adj.","def":"recklessly wasteful; spending without restraint","synonyms":"wasteful, extravagant, reckless.","cn":"揮霍的；放蕩的","passage":"The founder's __________ spending in the company's early years had left it deeply in debt, requiring a complete financial restructuring before any investor would consider providing fresh capital. The board brought in experienced management specifically to impose fiscal discipline across all departments.","cnPassage":"創始人在公司早年揮霍無度的花費使其背負深重債務，在任何投資者考慮提供新資本之前，需要進行全面的財務重組。董事會引進了有經驗的管理層，專門在所有部門推行財政紀律。"},{"unit":19,"difficulty":3,"word":"rife","pos":"adj.","def":"widespread; full of something undesirable","synonyms":"widespread, prevalent, full of.","cn":"普遍的；充斥著…的","passage":"The market was __________ with counterfeit goods, making it extremely difficult for buyers to distinguish genuine products from inferior imitations without specialist knowledge or access to authentication tools. Regulators pledged to increase inspections and impose heavier penalties on distributors caught selling fake merchandise.","cnPassage":"市場上充斥著假冒商品，使買家在沒有專業知識或認證工具的情況下，極難將真品與劣質仿冒品區分開來。監管機構承諾增加檢查，並對被抓到出售假冒商品的分銷商實施更重的罰款。"},{"unit":19,"difficulty":3,"word":"strife","pos":"n.","def":"bitter conflict or disagreement; discord","synonyms":"conflict, discord, contention.","cn":"衝突；爭吵","passage":"Years of internal __________ had weakened the organization's ability to pursue its core mission, as resources and attention were diverted to managing disputes between competing factions rather than delivering services to the communities it was meant to support.","cnPassage":"多年的內部衝突削弱了機構追求其核心使命的能力，因為資源和注意力被轉移到管理競爭派系之間的爭端，而非向其應支持的社區提供服務。"},{"unit":19,"difficulty":3,"word":"sumptuous","pos":"adj.","def":"splendid and expensive-looking; luxurious","synonyms":"lavish, luxurious, opulent.","cn":"奢華的；豪華的","passage":"The state banquet featured a __________ spread of dishes from across the country, each course presented with elaborate attention to presentation and tradition. Guests from visiting delegations commented that the meal represented not only excellent cuisine but also a thoughtful expression of cultural identity.","cnPassage":"國宴提供了來自全國各地的奢華菜餚，每道菜在擺盤和傳統方面都精心呈現。來訪代表團的賓客評論說，這頓餐食不僅代表了出色的美食，也是對文化身份的周到表達。"},{"unit":19,"difficulty":1,"word":"underwrite","pos":"v.","def":"to provide financial backing for; to guarantee","synonyms":"finance, fund, sponsor.","cn":"承保；提供資金","passage":"A consortium of regional banks agreed to __________ the infrastructure project, providing the long-term financing that allowed construction to proceed without dependence on fluctuating government allocations. The stable funding arrangement was credited with enabling the project to stay on schedule.","cnPassage":"一個地區銀行聯盟同意為這個基礎設施項目提供資金，提供長期融資，使建設得以在不依賴波動的政府撥款的情況下推進。這種穩定的融資安排被認為是使項目保持在計劃軌道上的原因。"},{"unit":20,"difficulty":1,"word":"derogatory","pos":"adj.","def":"showing a disrespectful or low opinion of someone","synonyms":"disrespectful, belittling, insulting.","cn":"貶低的；誹謗的","passage":"The company's code of conduct explicitly prohibits __________ language in any workplace communication, including informal messages and internal documents. Violations are treated as serious disciplinary matters, reflecting the organization's commitment to maintaining a professional and respectful working environment for all staff.","cnPassage":"公司的行為守則明確禁止在任何工作場所通訊中使用貶低性語言，包括非正式訊息和內部文件。違規行為被視為嚴重的紀律問題，反映了機構致力於為所有員工維護一個專業和相互尊重的工作環境。"},{"unit":20,"difficulty":2,"word":"disparate","pos":"adj.","def":"essentially different; unable to be compared","synonyms":"different, distinct, contrasting.","cn":"迥然不同的；無法比較的","passage":"Bringing together __________ teams from engineering, marketing, and customer support required a facilitation approach that acknowledged the different priorities, vocabularies, and working cultures of each group. The facilitator focused on identifying shared goals as a basis for productive cross-functional dialogue.","cnPassage":"將工程、市場和客戶支持等迥然不同的團隊聚集在一起，需要一種承認每個群體不同優先事項、詞彙和工作文化的引導方式。引導者專注於識別共同目標，作為富有成效的跨職能對話的基礎。"},{"unit":20,"difficulty":1,"word":"edifice","pos":"n.","def":"a large, impressive building; a complex system","synonyms":"building, structure, monument.","cn":"宏偉的建築；大廈","passage":"The grand __________ at the center of the old town had served successively as a palace, a courthouse, and a cultural center over more than four centuries. Its layered history was visible in the architectural details, which reflected the different periods and purposes that had shaped its appearance.","cnPassage":"舊城中心的宏偉建築在四個多世紀中先後作為宮殿、法院和文化中心。其分層的歷史在建築細節中可見一斑，這些細節反映了塑造其外觀的不同時期和用途。"},{"unit":20,"difficulty":2,"word":"extant","pos":"adj.","def":"still in existence; not destroyed or lost","synonyms":"surviving, existing, remaining.","cn":"現存的；尚存的","passage":"Only three __________ copies of the original manuscript are known to exist, each held in a different national archive. Scholars have called for digital preservation of all three documents to ensure permanent public access, given the fragility of the aging paper and ink.","cnPassage":"據悉，原始手稿只有三份現存的副本，分別保存在不同的國家檔案館中。學者呼籲對所有三份文件進行數字化保存，以確保永久的公眾訪問，因為年久的紙張和墨水非常脆弱。"},{"unit":20,"difficulty":2,"word":"indict","pos":"v.","def":"to formally charge someone with a serious crime","synonyms":"charge, prosecute, accuse.","cn":"控告；起訴","passage":"The grand jury voted to __________ the former official on multiple counts of financial misconduct, paving the way for a trial that legal observers predicted would attract significant public attention given the prominence of the accused and the scale of the alleged offences.","cnPassage":"大陪審團投票決定以多項財務不當行為指控起訴這位前官員，為審判鋪平了道路。法律觀察員預測，鑑於被告的知名度和涉嫌罪行的規模，審判將引起公眾的廣泛關注。"},{"unit":20,"difficulty":2,"word":"levity","pos":"n.","def":"the treatment of serious matters with humor; lightness","synonyms":"humor, lightness, frivolity.","cn":"輕浮；輕率","passage":"A moment of unexpected __________ broke the tension in the room when the presenter's notes slid off the podium and scattered across the floor, prompting laughter from the audience that seemed to relax everyone before the difficult discussion resumed.","cnPassage":"當演講者的稿子從講台上滑落並散落在地板上時，一個意外輕鬆的時刻打破了室內的緊張氣氛，引發了觀眾的笑聲，在艱難的討論恢復之前似乎讓所有人都放鬆了下來。"},{"unit":20,"difficulty":2,"word":"lugubrious","pos":"adj.","def":"looking or sounding sad and gloomy; mournful","synonyms":"mournful, sorrowful, melancholy.","cn":"悲哀的；令人傷心的","passage":"The actor's __________ expression throughout the second act convinced the audience that his character was genuinely grief-stricken, making the eventual revelation of his deception all the more striking by contrast. Critics praised the performance for its careful emotional calibration.","cnPassage":"這位演員在第二幕中悲哀的表情讓觀眾相信他的角色真的在痛苦中，相比之下，最終揭露他欺騙的時刻更加引人注目。評論家讚揚了這次表演謹慎的情感把握。"},{"unit":20,"difficulty":2,"word":"maudlin","pos":"adj.","def":"excessively sentimental, especially when drunk or upset","synonyms":"sentimental, teary, mushy.","cn":"傷感流淚的；感情過於脆弱的","passage":"What had been intended as a professional farewell dinner gradually became __________ as colleagues began sharing increasingly emotional stories about the years they had spent working together. Several guests admitted later that the evening had been unexpectedly affecting for everyone present.","cnPassage":"原本打算作為專業告別晚宴的活動，隨著同事們開始分享越來越情緒化的共同工作多年的故事，逐漸變得傷感起來。幾位賓客後來承認，那個晚上對所有在場者來說都出乎意料地令人動容。"},{"unit":20,"difficulty":1,"word":"nebulous","pos":"adj.","def":"unclear; not clearly defined or stated","synonyms":"vague, unclear, hazy.","cn":"朦朧的；模糊不清的","passage":"The committee grew frustrated with the consultant's __________ recommendations, which identified broad areas for improvement without specifying what concrete actions should be taken, by whom, or within what timeframe. Members requested a revised report with clearly defined, measurable targets.","cnPassage":"委員會對顧問模糊不清的建議感到沮喪，這些建議確認了廣泛的改善領域，但沒有具體說明應採取什麼具體行動、由誰在什麼時間框架內採取。委員們要求提交一份帶有明確可衡量目標的修訂報告。"},{"unit":20,"difficulty":1,"word":"pesky","pos":"adj.","def":"causing irritation or annoyance; troublesome","synonyms":"annoying, bothersome, troublesome.","cn":"討厭的；煩人的","passage":"The __________ software glitch kept reappearing despite three separate attempts to fix it, frustrating the development team who had been confident that each patch would resolve the issue permanently. They eventually traced the problem to a deeper architectural conflict that required a more fundamental redesign.","cnPassage":"這個討厭的軟件故障在三次單獨的修復嘗試之後仍然反覆出現，令開發團隊感到沮喪，他們原本確信每次補丁都能永久解決問題。他們最終將問題追溯到需要更根本重新設計的更深層架構衝突。"},{"unit":20,"difficulty":2,"word":"puissant","pos":"adj.","def":"having great power or authority; mighty","synonyms":"powerful, mighty, influential.","cn":"強大的；有權力的","passage":"The treaty required the consent of the three most __________ nations in the region, as any agreement that excluded their formal endorsement would lack the authority and credibility needed for widespread adoption and effective enforcement among smaller member states.","cnPassage":"該條約需要獲得該地區三個最強大國家的同意，因為任何排除其正式認可的協議都將缺乏在較小成員國之間廣泛採用和有效執行所需的權威性和可信度。"},{"unit":20,"difficulty":3,"word":"redolent","pos":"adj.","def":"strongly suggestive of something; fragrant","synonyms":"evocative, suggestive, fragrant.","cn":"使人想起…的；芬芳的","passage":"The old library was __________ of countless afternoons spent in the company of books, its familiar combination of wood polish, aged paper, and quiet atmosphere triggering vivid memories for anyone who had studied there during their student years.","cnPassage":"這個舊圖書館令人想起無數個與書籍為伴的下午，其熟悉的木材光澤、陳舊紙張和安靜氛圍的組合，為任何在學生時代在那裡學習過的人觸發了鮮明的回憶。"},{"unit":20,"difficulty":2,"word":"repose","pos":"n.","def":"a state of rest, sleep, or tranquility","synonyms":"rest, relaxation, peace.","cn":"休息；安靜","passage":"After a demanding week of back-to-back meetings and travel, she craved genuine __________, spending the entire weekend in quiet activities that required no decisions, no communication, and no performance. By Monday, she felt restored enough to return to the pressures of her professional life.","cnPassage":"在充滿連續會議和出差的繁忙一週之後，她渴望真正的休息，整個週末都在不需要做決策、無需溝通、也不需要表現的安靜活動中度過。到了週一，她感到足夠恢復，可以重新面對職業生活的壓力。"},{"unit":20,"difficulty":2,"word":"revile","pos":"v.","def":"to criticize in an abusive way; to denounce","synonyms":"denounce, berate, condemn.","cn":"辱罵；斥責","passage":"The unpopular policy was widely __________ by both opposition leaders and members of the public, who argued that it unfairly penalized lower-income households while offering significant advantages to those who were already financially comfortable. Demonstrations against the measure attracted growing crowds.","cnPassage":"這項不受歡迎的政策受到反對黨領袖和公眾的廣泛辱罵和斥責，他們認為它不公平地懲罰了低收入家庭，同時為那些已經財務充裕的人提供了顯著的優勢。反對這一措施的示威活動吸引了越來越多的人群。"},{"unit":20,"difficulty":1,"word":"sultry","pos":"adj.","def":"hot, humid, and uncomfortable; alluring","synonyms":"hot, humid, sweltering.","cn":"悶熱的；熱辣的","passage":"The __________ summer weather made working conditions in the outdoor market extremely uncomfortable, prompting vendors to start trading earlier in the morning before temperatures peaked. Health officials reminded the public to stay hydrated and seek shade during the hottest hours of the afternoon.","cnPassage":"悶熱的夏季天氣使戶外市場的工作條件極為不舒適，促使攤販在氣溫達到高峰之前，在早晨更早開始交易。衛生官員提醒公眾在下午最熱的時段保持水分補充並尋找陰涼處。"},{"unit":20,"difficulty":2,"word":"trenchant","pos":"adj.","def":"vigorous and sharp in expression; penetrating","synonyms":"sharp, incisive, keen.","cn":"銳利的；一針見血的","passage":"The auditor's __________ assessment of the organization's financial management exposed weaknesses that previous reviews had glossed over. Her direct and well-documented report was credited with prompting the board to commission a comprehensive restructuring of both the budgeting process and the oversight framework.","cnPassage":"審計員對機構財務管理的銳利評估，揭露了以前審查所掩蓋的弱點。她直接且有充分文件記錄的報告，被認為是促使董事會委託對預算流程和監督框架進行全面重組的原因。"},{"unit":20,"difficulty":1,"word":"unabated","pos":"adj.","def":"continuing without becoming weaker or less intense","synonyms":"unrelenting, continuous, persistent.","cn":"不減退的；未減弱的","passage":"Public interest in the trial continued __________ throughout the third week, with daily attendance at the courthouse reaching levels that required security staff to manage queues forming several hours before hearings began. Media coverage remained intense as key witnesses were called to testify.","cnPassage":"公眾對審判的興趣在第三週持續不減，法院每天的出席人數達到了需要安保人員管理在開庭前數小時便形成的排隊人龍的水平。隨著關鍵證人被傳喚作證，媒體報導依然熱烈。"},{"unit":20,"difficulty":1,"word":"vicissitudes","pos":"n.","def":"the changes and difficulties of life; ups and downs","synonyms":"changes, hardships, ups and downs.","cn":"變遷；興衰起伏","passage":"The biography traced the __________ of the entrepreneur's career — from a promising start, through financial collapse, to an unexpected revival that eventually established her as a major figure in the industry. Her story resonated widely because it reflected experiences many readers recognized from their own lives.","cnPassage":"這部傳記追蹤了這位企業家職業生涯的興衰起伏——從充滿希望的開始，經歷財務崩潰，到最終讓她成為行業重要人物的意外復甦。她的故事引起廣泛共鳴，因為它反映了許多讀者從自己生活中認識到的經歷。"}];
+
+// ══════════ STATE ══════════
+let studyFilters = { units: new Set(), diffs: new Set() };
+let quizSettings = { units: new Set(), diffs: new Set(), count: 20 };
+let quizQuestions = [];
+let quizIndex = 0;
+let quizScore = 0;
+let totalScore = 0;
+let totalAnswered = 0;
+let currentWord = null;
+let modalWord = null;
+
+// ══════════ INIT ══════════
+function init() {
+  const units = [...new Set(ALL_WORDS.map(w => w.unit))].sort((a,b)=>a-b);
+  const diffs = [...new Set(ALL_WORDS.map(w => w.difficulty))].sort((a,b)=>a-b);
+  const diffLabels = {1:'★ Easy',2:'★★ Medium',3:'★★★ Hard',4:'★★★★ Expert'};
+
+  // Study filters
+  const uc = document.getElementById('unit-chips');
+  units.forEach(u => {
+    const c = makeChip('U'+u, 'unit-study', u, () => toggleFilter(studyFilters.units, u, renderCards));
+    uc.appendChild(c);
+  });
+  const dc = document.getElementById('diff-chips');
+  diffs.forEach(d => {
+    const c = makeChip(diffLabels[d]||('★'.repeat(d)), 'diff'+d+'-study', d,
+      () => toggleFilter(studyFilters.diffs, d, renderCards));
+    c.classList.add('diff'+d);
+    dc.appendChild(c);
+  });
+
+  // Quiz unit chips
+  const quc = document.getElementById('quiz-unit-chips');
+  units.forEach(u => {
+    const c = makeChip('Unit '+u, 'qu'+u, u, () => toggleFilter(quizSettings.units, u, ()=>{}));
+    quc.appendChild(c);
+  });
+  // Quiz diff chips
+  const qdc = document.getElementById('quiz-diff-chips');
+  diffs.forEach(d => {
+    const c = makeChip(diffLabels[d]||('★'.repeat(d)), 'qd'+d, d,
+      () => toggleFilter(quizSettings.diffs, d, ()=>{}));
+    c.classList.add('diff'+d);
+    qdc.appendChild(c);
+  });
+  // Quiz count chips
+  const qcc = document.getElementById('quiz-count-chips');
+  [10,20,30,50].forEach(n => {
+    const c = document.createElement('button');
+    c.className = 'chip' + (n===20?' active':'');
+    c.textContent = n + ' Qs';
+    c.onclick = () => {
+      document.querySelectorAll('#quiz-count-chips .chip').forEach(x=>x.classList.remove('active'));
+      c.classList.add('active');
+      quizSettings.count = n;
+    };
+    qcc.appendChild(c);
+  });
+
+  renderCards();
+}
+
+function makeChip(label, id, val, cb) {
+  const c = document.createElement('button');
+  c.className = 'chip';
+  c.id = id;
+  c.textContent = label;
+  c.onclick = () => { c.classList.toggle('active'); cb(); };
+  return c;
+}
+
+function toggleFilter(set, val, cb) {
+  if (set.has(val)) set.delete(val); else set.add(val);
+  cb();
+}
+
+// ══════════ STUDY ══════════
+function getFilteredWords(filters) {
+  return ALL_WORDS.filter(w =>
+    (filters.units.size === 0 || filters.units.has(w.unit)) &&
+    (filters.diffs.size === 0 || filters.diffs.has(w.difficulty))
+  );
+}
+
+function renderCards() {
+  const words = getFilteredWords(studyFilters);
+  const grid = document.getElementById('card-grid');
+  if (words.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><i class="fa fa-magnifying-glass"></i><p>No words match the selected filters.</p></div>';
+    return;
+  }
+  grid.innerHTML = '';
+  words.forEach(w => {
+    const card = document.createElement('div');
+    card.className = 'flash-card';
+    const stars = '★'.repeat(w.difficulty);
+    const diffColors = {1:'#2d7a4f',2:'#c8962e',3:'#d05c2f',4:'#b53a2f'};
+    card.innerHTML = `
+      <div class="fc-header">
+        <div><div class="fc-word">${w.word}</div><div class="fc-pos">${w.pos}</div></div>
+        <div class="diff-badge" style="background:${diffColors[w.difficulty]+'44'}">${stars}</div>
+      </div>
+      <div class="fc-body">
+        <div class="fc-def">${w.def}</div>
+        <div class="fc-cn">${w.cn}</div>
+        <div class="fc-syn"><i class="fa fa-link" style="font-size:.7rem;margin-right:4px"></i>${w.synonyms}</div>
+        <div class="fc-unit">Unit ${w.unit}</div>
+      </div>`;
+    card.onclick = () => openModal(w);
+    grid.appendChild(card);
+  });
+}
+
+// ══════════ MODAL ══════════
+function openModal(w) {
+  modalWord = w;
+  document.getElementById('m-word').textContent = w.word;
+  document.getElementById('m-pos').textContent = w.pos;
+  document.getElementById('m-def').textContent = w.def;
+  document.getElementById('m-cn').textContent = w.cn;
+  document.getElementById('m-syn').textContent = w.synonyms;
+  // Render passage with blank highlighted
+  const passageHtml = w.passage.replace(/_{6,}/g,
+    '<span class="blank">' + w.word + '</span>');
+  document.getElementById('m-passage').innerHTML = passageHtml;
+  document.getElementById('m-cn-passage').textContent = w.cnPassage;
+  document.getElementById('m-dict-row').style.display = 'none';
+  document.getElementById('modal-overlay').classList.add('show');
+}
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modal-overlay').classList.remove('show');
+}
+function speakModal() {
+  if (!modalWord) return;
+  const txt = modalWord.passage.replace(/_{6,}/g, modalWord.word);
+  speak(txt);
+}
+
+// ══════════ TTS ══════════
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.92;
+  const voices = speechSynthesis.getVoices();
+  const pref = voices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('female'))
+    || voices.find(v => v.lang === 'en-US')
+    || voices.find(v => v.lang.startsWith('en'));
+  if (pref) u.voice = pref;
+  speechSynthesis.speak(u);
+}
+window.speechSynthesis && speechSynthesis.addEventListener('voiceschanged', () => {});
+
+// ══════════ QUIZ ══════════
+function startQuiz() {
+  let pool = getFilteredWords(quizSettings);
+  if (pool.length < 4) {
+    alert('Please select more words (need at least 4). Choose more units or difficulty levels.');
+    return;
+  }
+  // Shuffle pool and pick questions
+  pool = shuffle([...pool]);
+  const count = Math.min(quizSettings.count, pool.length);
+  quizQuestions = pool.slice(0, count).map(word => {
+    // Pick 3 wrong answers from same pool (different word)
+    const others = shuffle(pool.filter(w => w.word !== word.word)).slice(0, 3);
+    // Build options array with correct word inserted at random position
+    const pos = Math.floor(Math.random() * 4);
+    const wrongOpts = others.map(o => o.word);
+    const opts = [...wrongOpts.slice(0,pos), word.word, ...wrongOpts.slice(pos)];
+    return { word, opts, answer: word.word, clues: extractClues(word) };
+  });
+  quizIndex = 0; quizScore = 0;
+  document.getElementById('quiz-setup').style.display = 'none';
+  document.getElementById('quiz-result').classList.remove('show');
+  document.getElementById('quiz-area').style.display = 'block';
+  renderQuestion();
+}
+
+function extractClues(word) {
+  // Pick 3-4 content words from passage that hint the meaning (not stopwords, not the blank)
+  const stop = new Set(['the','a','an','and','or','but','of','to','in','is','was','has','have',
+    'had','been','be','by','for','with','on','at','that','this','his','her','its','their',
+    'it','he','she','they','we','not','no','as','from','than','more','most','very','also',
+    'all','any','each','both','which','who','what','when','where','how','if','so','yet',
+    'while','after','before','during','over','into','about','against','between','through']);
+  const words = word.passage.replace(/_{6,}/g,'').replace(/[^a-zA-Zs]/g,'').split(/s+/)
+    .filter(w => w.length > 3 && !stop.has(w.toLowerCase()));
+  return shuffle(words).slice(0, 4);
+}
+
+function renderQuestion() {
+  if (quizIndex >= quizQuestions.length) { showResult(); return; }
+  const q = quizQuestions[quizIndex];
+  currentWord = q;
+
+  // Progress
+  const pct = (quizIndex / quizQuestions.length) * 100;
+  document.getElementById('q-progress').textContent = `Question ${quizIndex+1} of ${quizQuestions.length}`;
+  document.getElementById('q-score').textContent = `Score: ${quizScore}`;
+  document.getElementById('q-progress-bar').style.width = pct + '%';
+
+  // Passage with clickable words
+  const passageHtml = buildPassageHtml(q.word.passage, 'quiz');
+  document.getElementById('q-passage').innerHTML = passageHtml;
+
+  // Options
+  const letters = ['A','B','C','D'];
+  const optDiv = document.getElementById('q-options');
+  optDiv.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = `<span class="opt-letter">${letters[i]}</span> ${opt}`;
+    btn.onclick = () => selectAnswer(opt, btn, q);
+    optDiv.appendChild(btn);
+  });
+
+  document.getElementById('q-feedback').classList.remove('show');
+  document.getElementById('q-feedback').innerHTML = '';
+  document.getElementById('q-next').classList.remove('show');
+  document.getElementById('quiz-helper').classList.remove('show');
+}
+
+function buildPassageHtml(passage, ctx) {
+  const tokens = [];
+  const re = /([A-Za-z][A-Za-z'-]*[A-Za-z]|[A-Za-z]|_{6,}|[^A-Za-z_{]+)/g;
+  let tk;
+  while ((tk = re.exec(passage)) !== null) tokens.push(tk[0]);
+  return tokens.map(tok => {
+    if (/_{6,}/.test(tok)) return '<span class="blank-target">__________</span>';
+    if (/^[A-Za-z][A-Za-z'-]*$/.test(tok)) {
+      const escaped = tok.replace(/'/g, "&#39;");
+      return `<span class="word" onclick="lookupWord('${escaped}','${ctx}')">${tok}</span>`;
+    }
+    return tok;
+  }).join('');
+}
+
+function lookupWord(word, ctx) {
+  const clean = word.toLowerCase().replace(/[^a-z]/g,'');
+  const helperId = ctx === 'quiz' ? 'quiz-helper' : 'study-helper';
+  const helper = document.getElementById(helperId);
+  helper.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Looking up <strong>' + word + '</strong>…';
+  helper.classList.add('show');
+  fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + clean)
+    .then(r => r.json())
+    .then(data => {
+      if (!Array.isArray(data) || !data[0]) throw new Error();
+      const entry = data[0];
+      const meaning = entry.meanings[0];
+      const def = meaning?.definitions[0]?.definition || 'No definition found.';
+      const pos = meaning?.partOfSpeech || '';
+      helper.innerHTML = `<strong>${entry.word}</strong> <em>(${pos})</em> — ${def}`;
+    })
+    .catch(() => {
+      helper.innerHTML = `<strong>${word}</strong>: Definition not found. Try another word.`;
+    });
+}
+
+function selectAnswer(chosen, btn, q) {
+  // Disable all buttons
+  document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+  const correct = chosen === q.answer;
+  if (correct) { btn.classList.add('correct'); quizScore++; totalScore++; }
+  else {
+    btn.classList.add('incorrect');
+    // Highlight correct
+    document.querySelectorAll('.opt-btn').forEach(b => {
+      if (b.textContent.trim().slice(2).trim() === q.answer) b.classList.add('correct');
+    });
+    totalScore++;
+  }
+  totalAnswered++;
+  updateGlobalScore();
+
+  // Highlight clues
+  const passageEl = document.getElementById('q-passage');
+  q.clues.forEach(clue => {
+    passageEl.querySelectorAll('.word').forEach(span => {
+      if (span.textContent.toLowerCase() === clue.toLowerCase())
+        span.classList.add('clue-highlight');
+    });
+  });
+
+  // Feedback box
+  buildFeedback(q);
+  document.getElementById('q-next').classList.add('show');
+}
+
+function buildFeedback(q) {
+  const fb = document.getElementById('q-feedback');
+  fb.innerHTML = '<div class="fb-title"><i class="fa fa-circle-info"></i> All Options Explained</div>';
+  q.opts.forEach(opt => {
+    const wData = ALL_WORDS.find(w => w.word === opt);
+    if (!wData) return;
+    const row = document.createElement('div');
+    row.className = 'fb-word-row' + (opt === q.answer ? ' is-answer' : '');
+    const sentence = wData.passage.replace(/_{6,}/g, opt);
+    row.innerHTML = `
+      <div class="fb-word-name">${opt} ${opt===q.answer?'<i class="fa fa-check" style="color:var(--correct)"></i>':''}</div>
+      <div class="fb-word-en">${wData.def}</div>
+      <div class="fb-word-cn">${wData.cn}</div>
+      <div class="fb-word-sent">${sentence.length > 120 ? sentence.slice(0,120)+'…' : sentence}</div>
+      <button class="tts-btn" style="margin-top:4px" onclick="speak('${sentence.replace(/'/g,"\'").replace(/"/g,'&quot;').slice(0,200)}')">
+        <i class="fa fa-volume-low"></i> ${opt}
+      </button>`;
+    fb.appendChild(row);
+  });
+  fb.classList.add('show');
+}
+
+function speakPassage() {
+  if (!currentWord) return;
+  const txt = currentWord.word.passage.replace(/_{6,}/g, 'blank');
+  speak(txt);
+}
+
+function nextQuestion() {
+  quizIndex++;
+  renderQuestion();
+}
+
+function showResult() {
+  document.getElementById('quiz-area').style.display = 'none';
+  const pct = Math.round((quizScore / quizQuestions.length) * 100);
+  document.getElementById('result-score').textContent = quizScore + ' / ' + quizQuestions.length;
+  document.getElementById('result-pct').textContent = pct + '% Correct';
+  let icon='🎉', en='', cn='';
+  if (pct>=90){icon='🏆';en='Outstanding! You have mastered these words.';cn='太棒了！你已精通這些詞彙。'}
+  else if (pct>=75){icon='🌟';en='Great work! Keep reviewing the harder ones.';cn='表現很好！繼續複習困難的詞彙。'}
+  else if (pct>=60){icon='👍';en='Good effort! Review the words you missed.';cn='努力得很好！複習一下答錯的詞彙。'}
+  else if (pct>=40){icon='📚';en='Keep studying. Consistent review will help.';cn='繼續學習，定期複習會有幫助。'}
+  else{icon='💪';en="Don't give up! Every review makes you stronger.";cn='不要放棄！每次複習都讓你進步。'}
+  document.getElementById('result-icon').textContent = icon;
+  document.getElementById('result-en').textContent = en;
+  document.getElementById('result-cn').textContent = cn;
+  document.getElementById('quiz-result').classList.add('show');
+}
+
+function resetQuiz() {
+  document.getElementById('quiz-result').classList.remove('show');
+  document.getElementById('quiz-setup').style.display = 'block';
+}
+
+function updateGlobalScore() {
+  document.getElementById('globalScore').textContent = `Score: ${totalScore} / ${totalAnswered}`;
+}
+
+// ══════════ TAB SWITCHING ══════════
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',
+    (i===0&&tab==='study')||(i===1&&tab==='quiz')));
+  document.getElementById('page-study').classList.toggle('active', tab==='study');
+  document.getElementById('page-quiz').classList.toggle('active', tab==='quiz');
+}
+
+// ══════════ UTILS ══════════
+function shuffle(arr) {
+  for (let i = arr.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+// ══════════ BOOT ══════════
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
