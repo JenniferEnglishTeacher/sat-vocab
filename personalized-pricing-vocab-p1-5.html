@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Personalized Pricing Vocabulary Quiz – Pages 1–5</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --color-bg:#f4f6fb;
+  --color-card:#ffffff;
+  --color-primary:#1a3a5c;
+  --color-accent:#2e86ab;
+  --color-gold:#e6a817;
+  --color-correct:#2a9d5c;
+  --color-wrong:#c0392b;
+  --color-muted:#6b7280;
+  --color-border:#dde3ed;
+  --color-helper:#f0f4ff;
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--color-bg);min-height:100vh;padding:20px}
+h1{color:var(--color-primary);font-size:1.4rem;font-weight:700;text-align:center;margin-bottom:4px}
+.subtitle{text-align:center;color:var(--color-muted);font-size:.85rem;margin-bottom:22px}
+.badge{display:inline-block;background:var(--color-primary);color:#fff;font-size:.75rem;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:.5px}
+.card{background:var(--color-card);border-radius:var(--radius);padding:28px;max-width:720px;margin:0 auto 18px;box-shadow:0 2px 12px rgba(0,0,0,.07)}
+/* START */
+#startScreen{text-align:center}
+#startScreen .icon{font-size:3rem;margin-bottom:12px}
+#startScreen p{color:var(--color-muted);margin-bottom:20px;line-height:1.6}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--color-primary);color:#fff}
+.btn-primary:hover{background:#254f7a}
+.btn-accent{background:var(--color-accent);color:#fff}
+.btn-accent:hover{background:#236b8a}
+.btn-sm{padding:8px 16px;font-size:.85rem}
+/* PROGRESS */
+.progress-wrap{max-width:720px;margin:0 auto 14px}
+.progress-meta{display:flex;justify-content:space-between;font-size:.82rem;color:var(--color-muted);margin-bottom:5px}
+.progress-bar{height:8px;background:#dde3ed;border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:var(--color-accent);transition:width .4s}
+/* QUESTION */
+.q-number{font-size:.8rem;font-weight:600;color:var(--color-accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.cn-sentence{font-family:'Noto Serif TC',serif;color:#4a3060;font-size:.92rem;line-height:1.7;margin-bottom:16px;padding:10px 14px;background:#faf5ff;border-left:3px solid #9b59b6;border-radius:6px}
+.en-sentence{font-size:1.05rem;line-height:1.75;margin-bottom:20px;color:#1c1c1c}
+.en-sentence mark{background:none;font-weight:700;color:var(--color-accent)}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+@media(max-width:500px){.choices{grid-template-columns:1fr}}
+.choice{padding:12px 16px;border:2px solid var(--color-border);border-radius:10px;background:#fff;font-size:.95rem;cursor:pointer;transition:all .18s;text-align:left;font-family:inherit}
+.choice:hover:not(:disabled){border-color:var(--color-accent);background:#eef6fb}
+.choice.correct{border-color:var(--color-correct);background:#eafaf1;color:var(--color-correct);font-weight:600}
+.choice.wrong{border-color:var(--color-wrong);background:#fdecea;color:var(--color-wrong);font-weight:600}
+.choice:disabled{cursor:default}
+/* WORD HELPER */
+#wordHelper{background:var(--color-helper);border:1px solid var(--color-border);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:none}
+#wordHelper.active{display:block}
+.helper-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+#helperWordText{font-size:1.1rem;font-weight:700;color:var(--color-primary)}
+#helperPos{font-size:.8rem;color:var(--color-muted)}
+#helperTtsBtn{background:none;border:none;color:var(--color-accent);cursor:pointer;font-size:1rem;padding:2px 4px}
+#helperTtsBtn.speaking{color:var(--color-gold);animation:pulse .6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+#helperDef{font-size:.88rem;line-height:1.55;color:#333}
+.helper-loader{color:var(--color-muted);font-size:.85rem}
+/* FEEDBACK */
+#feedback{margin-bottom:14px;font-size:.93rem;line-height:1.6;display:none}
+#feedback.show{display:block}
+.fb-correct{color:var(--color-correct);font-weight:600}
+.fb-wrong{color:var(--color-wrong);font-weight:600}
+.fb-def{margin-top:6px;padding:8px 12px;background:#f8f9fa;border-radius:8px;font-size:.87rem}
+.fb-def .en-def{color:#1c1c1c;display:block;margin-bottom:3px}
+.fb-def .cn-def{font-family:'Noto Serif TC',serif;color:#6a4c93;font-size:.85rem}
+/* CLUES */
+.clue-row{margin-bottom:14px}
+.clue-label{font-size:.78rem;color:var(--color-muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.clue-chips{display:flex;flex-wrap:wrap;gap:6px}
+.clue-chip{padding:4px 10px;background:#eef2ff;border-radius:20px;font-size:.8rem;color:#3b5bdb;cursor:pointer;transition:background .15s}
+.clue-chip:hover{background:#dde4ff}
+/* ACTIONS */
+.action-row{display:flex;gap:10px;flex-wrap:wrap}
+/* END */
+#endScreen{text-align:center;display:none}
+.score-circle{width:120px;height:120px;border-radius:50%;background:var(--color-primary);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 18px;font-size:2rem;font-weight:700}
+.score-circle span{font-size:.8rem;font-weight:400;opacity:.8}
+.wrong-list{text-align:left;margin:14px 0}
+.wrong-item{padding:8px 12px;border-left:3px solid var(--color-wrong);margin-bottom:8px;background:#fff7f7;border-radius:0 8px 8px 0;font-size:.88rem}
+.wrong-item strong{color:var(--color-wrong)}
+/* NAME */
+.name-group{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+#studentName{padding:10px 14px;border:2px solid var(--color-border);border-radius:10px;font-size:.95rem;width:220px;font-family:inherit}
+#studentName:focus{outline:none;border-color:var(--color-accent)}
+/* HIDDEN */
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<div style="text-align:center;margin-bottom:10px">
+  <span class="badge">Personalized Pricing · Pages 1–5 · Vocabulary Quiz</span>
+</div>
+<h1>Personalized Pricing Vocabulary Quiz</h1>
+<p class="subtitle">30 academic words from pages 1–5 &nbsp;|&nbsp; Fill in the blank</p>
+
+<!-- START SCREEN -->
+<div class="card" id="startScreen">
+  <div class="icon">📊</div>
+  <h2 style="margin-bottom:10px;color:var(--color-primary)">Ready to begin?</h2>
+  <p>You'll see an English sentence with a blank. Choose the correct academic word from four options.<br>
+  <strong>30 questions</strong> — all words tested once.</p>
+  <div class="name-group">
+    <input type="text" id="studentName" placeholder="Your name (optional)"/>
+    <button class="btn btn-primary" onclick="startQuiz()"><i class="fas fa-play"></i> Start Quiz</button>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap hidden" id="progressWrap">
+  <div class="progress-meta">
+    <span id="progressLabel">Question 1 / 30</span>
+    <span id="scoreLabel">Score: 0</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<!-- QUESTION CARD -->
+<div class="card hidden" id="quizCard">
+  <div class="q-number" id="qNumber">Question 1</div>
+  <div class="cn-sentence" id="cnSentence"></div>
+  <div class="en-sentence" id="enSentence"></div>
+
+  <div class="clue-row" id="clueRow">
+    <div class="clue-label"><i class="fas fa-lightbulb"></i> Click a word to look it up</div>
+    <div class="clue-chips" id="clueChips"></div>
+  </div>
+
+  <div class="choices" id="choices"></div>
+  <div id="feedback"></div>
+  <div id="wordHelper">
+    <div class="helper-row">
+      <span id="helperWordText"></span>
+      <span id="helperPos"></span>
+      <button id="helperTtsBtn" title="Pronounce"><i class="fas fa-volume-up"></i></button>
+    </div>
+    <div id="helperDef"></div>
+  </div>
+  <div class="action-row" id="actionRow"></div>
+</div>
+
+<!-- END SCREEN -->
+<div class="card" id="endScreen">
+  <div class="score-circle" id="scoreCircle">
+    <span id="pctText">0%</span>
+    <span>score</span>
+  </div>
+  <h2 style="margin-bottom:8px;color:var(--color-primary)">Quiz Complete!</h2>
+  <p id="endMsg" style="color:var(--color-muted);margin-bottom:18px"></p>
+
+  <div class="name-group">
+    <input type="text" id="submitName" placeholder="Name for score sheet"/>
+    <button class="btn btn-accent btn-sm" onclick="submitResults()"><i class="fas fa-paper-plane"></i> Submit Score</button>
+  </div>
+  <p id="submitStatus" style="font-size:.82rem;color:var(--color-muted);margin-bottom:12px"></p>
+
+  <div class="wrong-list" id="wrongList"></div>
+  <button class="btn btn-primary" onclick="restartQuiz()"><i class="fas fa-redo"></i> Try Again</button>
+</div>
+
+<script>
+// ── 1. CONFIG ─────────────────────────────────────────────────────────────
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzJFmp-g1dyVSuy-sj4x8yjUrYkvnu4Wjo-m05TE5TGH_ziSZlGf9lnnzWc1VlbhQvu/exec";
+
+// ── 2. DEFS ───────────────────────────────────────────────────────────────
+const DEFS = {
+  "transformative": { pos:"(adj.)", cat:"adj", en:"causing a major positive change to something or someone", cn:"具顛覆性的；徹底改變的", ex:"The implementation of generative AI has had a transformative effect on how digital platforms conduct personalized marketing today." },
+  "emanation": { pos:"(n.)", cat:"n", en:"something that comes from or is produced by a particular source", cn:"發源；湧現；散發物", ex:"The sudden emanation of advanced machine learning techniques has completely reshaped the landscape of business intelligence." },
+  "augment": { pos:"(v.)", cat:"v", en:"to increase the size or value of something by adding to it", cn:"擴大；增加；加強", ex:"To stay competitive, modern retail enterprises must augment their traditional pricing strategies with deep learning algorithms." },
+  "paradigm": { pos:"(n.)", cat:"n", en:"a typical example or pattern; a model", cn:"範例；典範", ex:"The shift from mass customization to hyper-personalization represents a completely new paradigm in consumer relationship management." },
+  "optimize": { pos:"(v.)", cat:"v", en:"to make something as good or effective as possible", cn:"使最佳化；優化", ex:"By analyzing vast amounts of behavioral data, algorithms can optimize price points to maximize overall revenue without alienating loyal customers." },
+  "incorporate": { pos:"(v.)", cat:"v", en:"to include something as part of something larger", cn:"包含；將...納入", ex:"It is highly recommended that future economic models incorporate consumer privacy preferences when designing algorithmic pricing structures." },
+  "unprecedented": { pos:"(adj.)", cat:"adj", en:"never having happened or existed in the past", cn:"史無前例的；空前的", ex:"The era of artificial intelligence has granted tech giants an unprecedented ability to track and predict individual purchasing behaviors." },
+  "proliferation": { pos:"(n.)", cat:"n", en:"a rapid increase in number or amount", cn:"激增；擴散", ex:"The recent proliferation of smart devices has provided companies with an endless stream of real-time data required for dynamic pricing." },
+  "empirical": { pos:"(adj.)", cat:"adj", en:"based on what is experienced or seen rather than on theory", cn:"經驗主義的；以實證為依據的", ex:"Although theoretical models suggest increased profits, more empirical evidence is required to prove the long-term viability of this algorithm." },
+  "undertake": { pos:"(v.)", cat:"v", en:"to commit oneself to and begin an enterprise or responsibility", cn:"承擔；著手進行", ex:"To maintain market leadership, the tech firm must undertake a comprehensive overhaul of its existing automated pricing mechanisms." },
+  "radical": { pos:"(adj.)", cat:"adj", en:"relating to the most important parts of something; complete or extreme", cn:"根本的；徹底的；激進的", ex:"Implementing a hyper-personalized pricing model requires a radical departure from the traditional uniform pricing methods used in retail." },
+  "successive": { pos:"(adj.)", cat:"adj", en:"happening one after the other without any break", cn:"連續的；接連的", ex:"After several successive industrial revolutions, the integration of cyber-physical systems has fundamentally altered modern market dynamics." },
+  "inscrutable": { pos:"(adj.)", cat:"adj", en:"impossible to understand or interpret", cn:"高深莫測的；難以理解的", ex:"Because deep neural networks are often inscrutable, business executives hesitate to deploy them for critical personalized pricing decisions." },
+  "obfuscate": { pos:"(v.)", cat:"v", en:"to make something less clear and harder to understand", cn:"使模糊；使困惑", ex:"Critics argue that highly complex machine learning algorithms intentionally obfuscate the decision-making process, making it impossible to audit for fairness." },
+  "tractable": { pos:"(adj.)", cat:"adj", en:"easy to control, influence, or solve", cn:"易處理的；可控制的", ex:"By simplifying the black-box model into a decision tree, the revenue optimization problem becomes mathematically tractable for the retail managers." },
+  "forgo": { pos:"(v.)", cat:"v", en:"to decide not to have or do something you would like to have", cn:"放棄；摒絕", ex:"In order to maintain interpretability and regulatory compliance, the data science team had to forgo a slight increase in predictive accuracy." },
+  "latent": { pos:"(adj.)", cat:"adj", en:"present but needing particular conditions to become active or obvious", cn:"潛在的；隱含的", ex:"Uncovering latent consumer preferences from historical transaction data allows companies to offer prices that perfectly match individual valuations." },
+  "prescriptive": { pos:"(adj.)", cat:"adj", en:"telling people exactly how something should be done", cn:"規範的；指示性的", ex:"Unlike descriptive analytics that merely summarize past sales, prescriptive models directly recommend the optimal personalized price to maximize profits." },
+  "delineate": { pos:"(v.)", cat:"v", en:"to describe or mark the edge of something clearly", cn:"描繪；劃定", ex:"The new algorithm can accurately delineate different customer segments based on their unique willingness to pay for premium services." },
+  "salient": { pos:"(adj.)", cat:"adj", en:"most noticeable or important", cn:"顯著的；突出的", ex:"When building a transparent pricing strategy, the system extracts only the most salient features that strongly influence consumer purchasing behavior." },
+  "disparate": { pos:"(adj.)", cat:"adj", en:"different in every way", cn:"截然不同的；迥異的", ex:"The data distillation method successfully unified several disparate pricing strategies into a single, cohesive framework that is easy to interpret." },
+  "efficacy": { pos:"(n.)", cat:"n", en:"the ability to produce the intended or desired result", cn:"功效；效力", ex:"The researchers conducted extensive field experiments to demonstrate the efficacy of their newly developed tree-based pricing model." },
+  "substantiate": { pos:"(v.)", cat:"v", en:"to show something to be true, or to support a claim with facts", cn:"證實；證明", ex:"Before adopting the dynamic pricing software, the corporation must substantiate its claims of achieving higher revenue without alienating loyal customers." },
+  "underlie": { pos:"(v.)", cat:"v", en:"to be a hidden cause of or strong influence on something", cn:"構成...的基礎；成為...的原因", ex:"The complex mathematical theories that underlie these personalized pricing algorithms are often too advanced for the general public to grasp completely." },
+  "stochastic": { pos:"(adj.)", cat:"adj", en:"randomly determined; having a random probability distribution", cn:"隨機的；機率性的", ex:"To accurately model the unpredictable nature of consumer behavior, researchers must employ stochastic optimization frameworks rather than deterministic ones." },
+  "multifarious": { pos:"(adj.)", cat:"adj", en:"having many varied parts or aspects", cn:"各式各樣的；多面向的", ex:"The algorithmic pricing model must account for the multifarious factors that influence a customer's permanence in the financial fund over several years." },
+  "vagary": { pos:"(n.)", cat:"n", en:"an unexpected and inexplicable change in a situation or behavior", cn:"變幻莫測；奇想", ex:"Advanced adversarial risk models are specifically designed to protect corporate revenue streams against the every vagary of a highly volatile digital market." },
+  "concomitant": { pos:"(adj.)", cat:"adj", en:"naturally accompanying or associated with something", cn:"伴隨的；相伴而生的", ex:"The introduction of hyper-personalized pricing often brings a concomitant increase in regulatory scrutiny regarding data privacy and algorithmic fairness." },
+  "labyrinthine": { pos:"(adj.)", cat:"adj", en:"complicated and irregular; like a maze", cn:"迷宮般的；錯綜複雜的", ex:"Without explicit hypotheses to guide the risk analysis, the neural network's decision-making process remains a labyrinthine black box that executives cannot trust." },
+  "inimical": { pos:"(adj.)", cat:"adj", en:"tending to obstruct or harm; showing hostility", cn:"有害的；具敵意的", ex:"Hackers routinely generate synthetic data profiles that are inimical to the machine learning classifier, intending to force the system into offering unauthorized discounts." }
+};
+
+// ── 3. QUESTION_POOL ──────────────────────────────────────────────────────
+const QUESTION_POOL = [
+  ["transformative","The implementation of generative AI has had a __________ effect on how digital platforms conduct personalized marketing today.","生成式人工智慧的導入，對於現今數位平台如何進行個人化行銷產生了具顛覆性的影響。",["generative","AI","digital","personalized","marketing"]],
+  ["emanation","The sudden __________ of advanced machine learning techniques has completely reshaped the landscape of business intelligence.","先進機器學習技術的突然湧現，徹底重塑了商業智能的版圖。",["sudden","machine learning","reshaped","business intelligence"]],
+  ["augment","To stay competitive, modern retail enterprises must __________ their traditional pricing strategies with deep learning algorithms.","為了保持競爭力，現代零售企業必須用深度學習演算法加強其傳統的定價策略。",["competitive","retail","traditional","pricing","deep learning"]],
+  ["paradigm","The shift from mass customization to hyper-personalization represents a completely new __________ in consumer relationship management.","從大眾客製化到超級個人化的轉變，代表了消費者關係管理中一個全新的典範。",["shift","hyper-personalization","consumer","relationship","management"]],
+  ["optimize","By analyzing vast amounts of behavioral data, algorithms can __________ price points to maximize overall revenue without alienating loyal customers.","透過分析大量行為數據，演算法能夠優化價格點，在不疏遠忠實顧客的情況下最大化整體收入。",["behavioral data","price points","revenue","alienating","customers"]],
+  ["incorporate","It is highly recommended that future economic models __________ consumer privacy preferences when designing algorithmic pricing structures.","強烈建議未來的經濟模型在設計演算法定價結構時，應將消費者隱私偏好納入其中。",["economic models","privacy","preferences","algorithmic","pricing"]],
+  ["unprecedented","The era of artificial intelligence has granted tech giants an __________ ability to track and predict individual purchasing behaviors.","人工智慧時代賦予了科技巨頭一項史無前例的能力，得以追蹤並預測個人的購買行為。",["artificial intelligence","tech giants","track","predict","purchasing"]],
+  ["proliferation","The recent __________ of smart devices has provided companies with an endless stream of real-time data required for dynamic pricing.","智慧型裝置在近期的激增，為企業提供了進行動態定價所需的源源不絕的即時數據。",["smart devices","real-time data","dynamic pricing","companies"]],
+  ["empirical","Although theoretical models suggest increased profits, more __________ evidence is required to prove the long-term viability of this algorithm.","儘管理論模型顯示利潤會增加，但仍需要更多以實證為依據的證據來證明這種演算法的長期可行性。",["theoretical models","profits","evidence","long-term","viability"]],
+  ["undertake","To maintain market leadership, the tech firm must __________ a comprehensive overhaul of its existing automated pricing mechanisms.","為了維持市場領導地位，這家科技公司必須著手進行一項針對其現有自動化定價機制的全面改革。",["market leadership","comprehensive","overhaul","automated","pricing"]],
+  ["radical","Implementing a hyper-personalized pricing model requires a __________ departure from the traditional uniform pricing methods used in retail.","實施超級個人化定價模型需要對零售業中使用的傳統統一定價方法進行徹底的改變。",["hyper-personalized","departure","traditional","uniform","retail"]],
+  ["successive","After several __________ industrial revolutions, the integration of cyber-physical systems has fundamentally altered modern market dynamics.","在經歷了幾次連續的工業革命之後，網宇實體系統的整合從根本上改變了現代市場動態。",["industrial revolutions","cyber-physical","fundamentally","market dynamics"]],
+  ["inscrutable","Because deep neural networks are often __________, business executives hesitate to deploy them for critical personalized pricing decisions.","因為深度神經網絡通常是難以理解的，企業高管在將其部署於關鍵的個人化定價決策時會猶豫不決。",["neural networks","executives","hesitate","deploy","pricing"]],
+  ["obfuscate","Critics argue that highly complex machine learning algorithms intentionally __________ the decision-making process, making it impossible to audit for fairness.","批評人士認為，高度複雜的機器學習演算法故意使決策過程模糊，導致無法對其公平性進行審計。",["complex","algorithms","decision-making","audit","fairness"]],
+  ["tractable","By simplifying the black-box model into a decision tree, the revenue optimization problem becomes mathematically __________ for the retail managers.","透過將黑盒子模型簡化為決策樹，對於零售經理而言，收入優化問題在數學上變得易處理的。",["black-box","decision tree","revenue","optimization","mathematically"]],
+  ["forgo","In order to maintain interpretability and regulatory compliance, the data science team had to __________ a slight increase in predictive accuracy.","為了維持可解釋性與監管合規性，數據科學團隊不得不放棄預測準確度上些微的提升。",["interpretability","regulatory","compliance","predictive","accuracy"]],
+  ["latent","Uncovering __________ consumer preferences from historical transaction data allows companies to offer prices that perfectly match individual valuations.","從歷史交易數據中發掘出潛在的消費者偏好，使得企業能夠提供與個人估值完美匹配的價格。",["uncovering","historical","transaction","valuations","preferences"]],
+  ["prescriptive","Unlike descriptive analytics that merely summarize past sales, __________ models directly recommend the optimal personalized price to maximize profits.","不同於僅僅總結過去銷售狀況的描述性分析，規範的模型會直接建議最佳的個人化價格以最大化利潤。",["descriptive analytics","sales","recommend","optimal","personalized"]],
+  ["delineate","The new algorithm can accurately __________ different customer segments based on their unique willingness to pay for premium services.","這個新演算法能夠根據顧客對優質服務獨特的支付意願，準確地劃定不同的客戶群體。",["algorithm","customer segments","willingness to pay","premium"]],
+  ["salient","When building a transparent pricing strategy, the system extracts only the most __________ features that strongly influence consumer purchasing behavior.","在建立透明的定價策略時，系統只會提取對消費者購買行為有強烈影響的最顯著的特徵。",["transparent","pricing","features","influence","purchasing"]],
+  ["disparate","The data distillation method successfully unified several __________ pricing strategies into a single, cohesive framework that is easy to interpret.","這種數據提煉方法成功地將幾種截然不同的定價策略統整為一個單一、具凝聚力且易於解釋的框架。",["distillation","unified","cohesive","framework","interpret"]],
+  ["efficacy","The researchers conducted extensive field experiments to demonstrate the __________ of their newly developed tree-based pricing model.","研究人員進行了廣泛的實地實驗，以證明他們新開發的樹狀定價模型的效力。",["researchers","field experiments","demonstrate","tree-based","model"]],
+  ["substantiate","Before adopting the dynamic pricing software, the corporation must __________ its claims of achieving higher revenue without alienating loyal customers.","在採用動態定價軟體之前，該公司必須證實其能夠在不疏遠忠實顧客的情況下實現更高收入的主張。",["dynamic pricing","corporation","claims","revenue","alienating"]],
+  ["underlie","The complex mathematical theories that __________ these personalized pricing algorithms are often too advanced for the general public to grasp completely.","構成這些個人化定價演算法基礎的複雜數學理論，對一般大眾來說往往過於深奧而無法完全掌握。",["mathematical theories","personalized","algorithms","advanced","public"]],
+  ["stochastic","To accurately model the unpredictable nature of consumer behavior, researchers must employ __________ optimization frameworks rather than deterministic ones.","為了準確模擬消費者行為的不可預測性，研究人員必須採用隨機的最佳化框架，而非確定性框架。",["unpredictable","consumer behavior","optimization","deterministic"]],
+  ["multifarious","The algorithmic pricing model must account for the __________ factors that influence a customer's permanence in the financial fund over several years.","該演算法定價模型必須將影響顧客在金融基金中停留數年的各式各樣的因素納入考量。",["algorithmic","factors","influence","financial fund","years"]],
+  ["vagary","Advanced adversarial risk models are specifically designed to protect corporate revenue streams against the every __________ of a highly volatile digital market.","先進的對抗性風險模型專為保護企業收入來源而設計，以抵禦高度波動的數位市場中每一次的變幻莫測。",["adversarial","revenue","volatile","digital market","protect"]],
+  ["concomitant","The introduction of hyper-personalized pricing often brings a __________ increase in regulatory scrutiny regarding data privacy and algorithmic fairness.","引入極度個人化的定價，通常會帶來對數據隱私與演算法公平性方面伴隨的監管審查增加。",["hyper-personalized","regulatory scrutiny","data privacy","algorithmic","fairness"]],
+  ["labyrinthine","Without explicit hypotheses to guide the risk analysis, the neural network's decision-making process remains a __________ black box that executives cannot trust.","若沒有明確的假設來引導風險分析，神經網路的決策過程仍將是一個高管們無法信任的、錯綜複雜的黑盒子。",["hypotheses","risk analysis","neural network","black box","executives"]],
+  ["inimical","Hackers routinely generate synthetic data profiles that are __________ to the machine learning classifier, intending to force the system into offering unauthorized discounts.","駭客經常生成對機器學習分類器有害的合成數據配置，企圖迫使系統提供未經授權的折扣。",["hackers","synthetic","machine learning","classifier","unauthorized discounts"]]
+];
+
+// ── 4. UTILITIES ──────────────────────────────────────────────────────────
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+// ── 5. SYNONYMS ───────────────────────────────────────────────────────────
+const SYNONYMS = {
+  "transformative": new Set([]),
+  "emanation": new Set([]),
+  "augment": new Set(["incorporate"]),
+  "paradigm": new Set([]),
+  "optimize": new Set([]),
+  "incorporate": new Set(["augment"]),
+  "unprecedented": new Set([]),
+  "proliferation": new Set([]),
+  "empirical": new Set([]),
+  "undertake": new Set([]),
+  "radical": new Set([]),
+  "successive": new Set([]),
+  "inscrutable": new Set(["labyrinthine"]),
+  "obfuscate": new Set([]),
+  "tractable": new Set([]),
+  "forgo": new Set([]),
+  "latent": new Set([]),
+  "prescriptive": new Set([]),
+  "delineate": new Set([]),
+  "salient": new Set([]),
+  "disparate": new Set([]),
+  "efficacy": new Set([]),
+  "substantiate": new Set([]),
+  "underlie": new Set([]),
+  "stochastic": new Set([]),
+  "multifarious": new Set([]),
+  "vagary": new Set([]),
+  "concomitant": new Set([]),
+  "labyrinthine": new Set(["inscrutable"]),
+  "inimical": new Set([])
+};
+
+// ── 6. getDistractors ─────────────────────────────────────────────────────
+function getDistractors(correctKey, count) {
+  var cat  = DEFS[correctKey] ? DEFS[correctKey].cat : "";
+  var syns = SYNONYMS[correctKey] || new Set();
+
+  var pool = QUESTION_POOL.filter(function(q) {
+    var k = q[0];
+    if (k === correctKey) return false;
+    if (!DEFS[k] || DEFS[k].cat !== cat) return false;
+    if (syns.has(k)) return false;
+    if ((SYNONYMS[k] || new Set()).has(correctKey)) return false;
+    return true;
+  });
+
+  var picked = shuffle(pool).slice(0, count).map(function(q) { return q[0]; });
+
+  if (picked.length < count) {
+    var fallback = shuffle(QUESTION_POOL.filter(function(q) {
+      var k = q[0];
+      return k !== correctKey && picked.indexOf(k) === -1 &&
+             !syns.has(k) && !(SYNONYMS[k] || new Set()).has(correctKey);
+    }));
+    while (picked.length < count && fallback.length)
+      picked.push(fallback.pop()[0]);
+  }
+  return picked;
+}
+
+// ── 7. STOP_WORDS ─────────────────────────────────────────────────────────
+const STOP_WORDS = new Set(["the","a","an","is","are","was","were","be","been","being","have","has","had","do","does","did","will","would","could","should","may","might","shall","can","to","of","in","on","at","for","with","by","from","as","that","this","these","those","it","its","they","their","he","she","we","you","i","not","no","or","and","but","so","if","when","which","who","how","what","where","than","into","about","after","before","more","most","also","just","all","any","each","one","two","three","only","up","out","such","both","very","rather"]);
+
+// ── 8. DOMContentLoaded ───────────────────────────────────────────────────
+var poolCount;
+document.addEventListener("DOMContentLoaded", function() {
+  poolCount = QUESTION_POOL.length;
+  document.getElementById("progressLabel").textContent = "Question 1 / " + poolCount;
+});
+
+// ── 9. Quiz state & logic ─────────────────────────────────────────────────
+var questions = [], current = 0, score = 0, wrongWords = [], lookedUp = new Set();
+var answered = false;
+
+function startQuiz() {
+  questions = shuffle(QUESTION_POOL.slice());
+  current = 0; score = 0; wrongWords = []; lookedUp = new Set(); answered = false;
+  document.getElementById("startScreen").classList.add("hidden");
+  document.getElementById("progressWrap").classList.remove("hidden");
+  document.getElementById("quizCard").classList.remove("hidden");
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  document.getElementById("feedback").className = "";
+  document.getElementById("feedback").style.display = "none";
+  document.getElementById("wordHelper").classList.remove("active");
+
+  var q = questions[current];
+  var key = q[0], sentence = q[1], cnSent = q[2], clues = q[3];
+
+  document.getElementById("qNumber").textContent = "Question " + (current + 1) + " of " + questions.length;
+  document.getElementById("progressLabel").textContent = "Question " + (current + 1) + " / " + questions.length;
+  document.getElementById("scoreLabel").textContent = "Score: " + score;
+  document.getElementById("progressFill").style.width = (current / questions.length * 100) + "%";
+
+  document.getElementById("cnSentence").textContent = cnSent;
+  document.getElementById("enSentence").innerHTML = sentence.replace("__________", '<mark>__________</mark>');
+
+  // clue chips
+  var chips = document.getElementById("clueChips");
+  chips.innerHTML = "";
+  clues.forEach(function(c) {
+    var span = document.createElement("span");
+    span.className = "clue-chip";
+    span.textContent = c;
+    span.dataset.word = c;
+    span.onclick = function() { lookupWord(this); };
+    chips.appendChild(span);
+  });
+
+  // choices
+  var distractors = getDistractors(key, 3);
+  var opts = shuffle([key].concat(distractors));
+  var choicesDiv = document.getElementById("choices");
+  choicesDiv.innerHTML = "";
+  opts.forEach(function(opt) {
+    var btn = document.createElement("button");
+    btn.className = "choice";
+    btn.textContent = opt;
+    btn.onclick = function() { handleAnswer(opt, key, btn); };
+    choicesDiv.appendChild(btn);
+  });
+
+  // action row
+  document.getElementById("actionRow").innerHTML = "";
+}
+
+// ── 12. handleAnswer & friends ────────────────────────────────────────────
+function handleAnswer(chosen, correct, btn) {
+  if (answered) return;
+  answered = true;
+
+  var allBtns = document.getElementById("choices").querySelectorAll(".choice");
+  allBtns.forEach(function(b) { b.disabled = true; });
+
+  var fb = document.getElementById("feedback");
+  fb.style.display = "block";
+
+  if (chosen === correct) {
+    score++;
+    btn.classList.add("correct");
+    fb.innerHTML = '<span class="fb-correct"><i class="fas fa-check-circle"></i> Correct!</span>' + buildFeedback(correct);
+  } else {
+    btn.classList.add("wrong");
+    allBtns.forEach(function(b) { if (b.textContent === correct) b.classList.add("correct"); });
+    wrongWords.push(correct);
+    fb.innerHTML = '<span class="fb-wrong"><i class="fas fa-times-circle"></i> Incorrect. The answer is <strong>' + correct + '</strong>.</span>' + buildFeedback(correct);
+  }
+  fb.className = "show";
+
+  document.getElementById("scoreLabel").textContent = "Score: " + score;
+
+  var ar = document.getElementById("actionRow");
+  var nextBtn = document.createElement("button");
+  nextBtn.className = "btn btn-primary btn-sm";
+  nextBtn.innerHTML = current < questions.length - 1 ? '<i class="fas fa-arrow-right"></i> Next' : '<i class="fas fa-flag-checkered"></i> Finish';
+  nextBtn.onclick = nextQuestion;
+  ar.innerHTML = "";
+  ar.appendChild(nextBtn);
+}
+
+function buildFeedback(key) {
+  var d = DEFS[key];
+  if (!d) return "";
+  return '<div class="fb-def">' +
+    '<span class="en-def"><strong>' + key + '</strong> ' + d.pos + ' — ' + d.en + '</span>' +
+    '<span class="cn-def">' + d.cn + '</span>' +
+    '</div>';
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) { showEndScreen(); return; }
+  renderQuestion();
+}
+
+function showEndScreen() {
+  document.getElementById("progressWrap").classList.add("hidden");
+  document.getElementById("quizCard").classList.add("hidden");
+  document.getElementById("endScreen").style.display = "block";
+
+  var pct = Math.round(score / questions.length * 100);
+  document.getElementById("pctText").textContent = pct + "%";
+  document.getElementById("scoreCircle").style.background =
+    pct >= 80 ? "var(--color-correct)" : pct >= 60 ? "var(--color-accent)" : "var(--color-wrong)";
+
+  var msgs = ["Great job — keep reviewing!", "Good effort! Review the missed words.", "Almost there — practice makes perfect!"];
+  document.getElementById("endMsg").textContent =
+    score + " / " + questions.length + " correct  (" + pct + "%)  — " +
+    (pct >= 80 ? msgs[0] : pct >= 60 ? msgs[1] : msgs[2]);
+
+  var wl = document.getElementById("wrongList");
+  wl.innerHTML = "";
+  if (wrongWords.length) {
+    var h = document.createElement("h3");
+    h.textContent = "Words to review:";
+    h.style.cssText = "margin-bottom:10px;color:var(--color-primary)";
+    wl.appendChild(h);
+    wrongWords.forEach(function(w) {
+      var d = DEFS[w];
+      var div = document.createElement("div");
+      div.className = "wrong-item";
+      div.innerHTML = '<strong>' + w + '</strong> ' + (d ? d.pos : "") +
+        (d ? ' — ' + d.en + '<br><span style="font-family:\'Noto Serif TC\',serif;color:#6a4c93;font-size:.82rem">' + d.cn + '</span>' : "");
+      wl.appendChild(div);
+    });
+  }
+
+  var sn = document.getElementById("submitName");
+  var existing = document.getElementById("studentName").value;
+  if (existing) sn.value = existing;
+}
+
+// ── 13. submitResults & restartQuiz ──────────────────────────────────────
+function submitResults() {
+  var name = document.getElementById("submitName").value.trim() || "Anonymous";
+  var pct = Math.round(score / questions.length * 100);
+  var status = document.getElementById("submitStatus");
+  status.textContent = "Submitting…";
+  var params = "?name=" + encodeURIComponent(name) +
+    "&score=" + encodeURIComponent(pct) +
+    "&wrong=" + encodeURIComponent(wrongWords.join(", ")) +
+    "&lookedUp=" + encodeURIComponent(Array.from(lookedUp).join(", ")) +
+    "&quiz=" + encodeURIComponent("Personalized Pricing Vocab P1-5");
+  fetch(SCRIPT_URL + params)
+    .then(function() { status.textContent = "✅ Score submitted!"; })
+    .catch(function() { status.textContent = "⚠️ Couldn't submit (check connection)."; });
+}
+
+function restartQuiz() {
+  document.getElementById("endScreen").style.display = "none";
+  startQuiz();
+}
+
+// ── 10. lookupWord ────────────────────────────────────────────────────────
+async function lookupWord(el) {
+  var raw = el.dataset.word;
+  lookedUp.add(raw);
+
+  var helper = document.getElementById("wordHelper");
+  helper.classList.add("active");
+  document.getElementById("helperWordText").textContent = raw;
+  document.getElementById("helperPos").textContent = "";
+  document.getElementById("helperDef").innerHTML =
+    '<span class="helper-loader"><i class="fas fa-spinner fa-spin"></i> Looking up…</span>';
+
+  var oldBtn = document.getElementById("helperTtsBtn");
+  var newBtn = oldBtn.cloneNode(true);
+  oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+  newBtn.addEventListener("click", function() {
+    newBtn.classList.add("speaking");
+    speakWordOnly(raw, function() { newBtn.classList.remove("speaking"); });
+  });
+
+  function showResult(posText, enText, cnText) {
+    document.getElementById("helperPos").textContent = posText;
+    document.getElementById("helperDef").innerHTML =
+      '<span style="color:#1c1c1c;display:block;margin-bottom:3px">' + enText + '</span>' +
+      '<span style="color:#6a4c93;font-family:\'Noto Serif TC\',serif;font-size:0.9rem">' + cnText + '</span>';
+  }
+
+  var cambridgeUrl = "https://dictionary.cambridge.org/dictionary/english/" + encodeURIComponent(raw);
+  var cambridgeBtn =
+    '<a href="' + cambridgeUrl + '" target="_blank" rel="noopener" ' +
+    'style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;' +
+    'padding:5px 12px;background:#1a3a5c;color:#fff;border-radius:6px;' +
+    'font-size:0.8rem;text-decoration:none;font-weight:600;">' +
+    '<i class="fas fa-book-open"></i> Open in Cambridge Dictionary</a>';
+
+  function showWithLink(posText, enText, cnText) {
+    document.getElementById("helperPos").textContent = posText;
+    document.getElementById("helperDef").innerHTML =
+      '<span style="color:#1c1c1c;display:block;margin-bottom:3px">' + enText + '</span>' +
+      '<span style="color:#6a4c93;font-family:\'Noto Serif TC\',serif;font-size:0.9rem;display:block">' + cnText + '</span>' +
+      cambridgeBtn;
+  }
+
+  function showLinkOnly() {
+    document.getElementById("helperPos").textContent = "";
+    document.getElementById("helperDef").innerHTML =
+      '<span style="color:var(--color-muted);font-size:0.85rem;display:block;margin-bottom:4px">' +
+      '自動查詢失敗，請點擊下方按鈕查詢完整字典：</span>' + cambridgeBtn;
+  }
+
+  function baseForm(w) {
+    if (/ied$/i.test(w))           return w.replace(/ied$/i, "y");
+    if (/ies$/i.test(w))           return w.replace(/ies$/i, "y");
+    if (/ves$/i.test(w))           return w.replace(/ves$/i, "f");
+    if (/(\w{4,})ness$/i.test(w))  return w.replace(/ness$/i, "");
+    if (/(\w{4,})tion$/i.test(w))  return w.replace(/tion$/i, "");
+    if (/(\w{4,})edly$/i.test(w))  return w.replace(/edly$/i, "e");
+    if (/(\w{4,})ing$/i.test(w))   return w.replace(/ing$/i, "");
+    if (/(\w{4,})ings$/i.test(w))  return w.replace(/ings$/i, "");
+    if (/(\w{4,})ed$/i.test(w))    return w.replace(/ed$/i, "");
+    if (/(\w{3,})ers?$/i.test(w))  return w.replace(/ers?$/i, "");
+    if (/(\w{4,})ment$/i.test(w))  return w.replace(/ment$/i, "");
+    if (/(\w{4,})ally$/i.test(w))  return w.replace(/ally$/i, "al");
+    if (/(\w{4,})ly$/i.test(w))    return w.replace(/ly$/i, "");
+    if (/(\w{3,})es$/i.test(w))    return w.replace(/es$/i, "");
+    if (/(\w{3,})s$/i.test(w))     return w.replace(/s$/i, "");
+    return w;
+  }
+
+  // Layer 1: DEFS
+  var defsKey = Object.keys(DEFS).find(function(k) {
+    return k.toLowerCase() === raw.toLowerCase() || k.toLowerCase().startsWith(raw.toLowerCase() + " ");
+  });
+  if (defsKey) {
+    showResult(DEFS[defsKey].pos, DEFS[defsKey].en, DEFS[defsKey].cn);
+    return;
+  }
+
+  // Layer 2: Google Translate
+  var lookupW = (baseForm(raw) !== raw) ? baseForm(raw) : raw;
+  var gtUrl = "https://translate.googleapis.com/translate_a/single" +
+              "?client=gtx&sl=en&tl=zh-TW&dt=t&dt=md&q=" + encodeURIComponent(lookupW);
+  try {
+    var res = await fetch(gtUrl);
+    if (res && res.ok) {
+      var data = await res.json();
+      var cn = "";
+      try { cn = (data[0] && data[0][0] && data[0][0][0]) ? data[0][0][0] : ""; } catch(e2) {}
+      if (cn && (cn.toLowerCase() === lookupW || /^[\x00-\x7F\s]+$/.test(cn))) cn = "";
+      var pos = "", en = "";
+      try {
+        if (data[12] && data[12][0]) {
+          pos = data[12][0][0] ? "(" + data[12][0][0] + ")" : "";
+          if (data[12][0][1] && data[12][0][1][0]) en = data[12][0][1][0][0] || "";
+        }
+      } catch(e3) {}
+      if (cn || en) {
+        var enShow = en || '<em style="font-size:0.82rem">（英文定義請展開字典）</em>';
+        var cnShow = cn || '<em style="font-size:0.82rem">（中文翻譯請展開字典）</em>';
+        showWithLink(pos, enShow, cnShow);
+        return;
+      }
+    }
+  } catch(e) { /* fall through */ }
+
+  // Layer 3: Free Dictionary API
+  try {
+    var fdUrl = "https://api.dictionaryapi.dev/api/v2/entries/en/" + encodeURIComponent(lookupW);
+    var fdRes = await fetch(fdUrl);
+    if (fdRes && fdRes.ok) {
+      var fdData = await fdRes.json();
+      if (fdData && fdData[0] && fdData[0].meanings && fdData[0].meanings[0]) {
+        var m   = fdData[0].meanings[0];
+        var def = (m.definitions && m.definitions[0] && m.definitions[0].definition) || "";
+        if (def) {
+          var fdPos = m.partOfSpeech ? "(" + m.partOfSpeech + ")" : "";
+          showWithLink(fdPos, def, '<em style="font-size:0.82rem">（中文翻譯請展開字典）</em>');
+          return;
+        }
+      }
+    }
+  } catch(e) { /* fall through */ }
+
+  // Layer 4: Cambridge button
+  showLinkOnly();
+}
+
+// ── 11. TTS ───────────────────────────────────────────────────────────────
+function speakWordOnly(word, cb) {
+  if (!window.speechSynthesis) { if (cb) cb(); return; }
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(word);
+  u.lang = "en-US"; u.rate = 0.85;
+  u.onend = function() { if (cb) cb(); };
+  u.onerror = function() { if (cb) cb(); };
+  window.speechSynthesis.speak(u);
+}
+
+// ── 14. Init ──────────────────────────────────────────────────────────────
+poolCount = QUESTION_POOL.length;
+</script>
+</body>
+</html>
