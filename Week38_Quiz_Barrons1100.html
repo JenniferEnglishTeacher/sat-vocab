@@ -1204,17 +1204,20 @@ async function lookup(el) {
     return;
   }
 
-  // STEP 2: Other passage words — try free dictionary API
+  // STEP 2: Other passage words — try Datamuse (free, no key, reliable CORS)
   document.getElementById('helperPos').textContent = '';
-  document.getElementById('helperDef').innerHTML = '<span style="color:var(--muted);font-style:italic">Looking up “' + word + '”…</span>';
+  document.getElementById('helperDef').innerHTML = '<span style="color:var(--muted);font-style:italic">Looking up "' + word + '"…</span>';
   try {
-    const res = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + word);
+    const res = await fetch('https://api.datamuse.com/words?sp=' + encodeURIComponent(word) + '&md=dp&max=1', { signal: AbortSignal.timeout(5000) });
     if (!res.ok) throw 0;
     const data = await res.json();
-    const m = data[0]?.meanings?.[0];
-    if (m) {
-      document.getElementById('helperPos').textContent = m.partOfSpeech;
-      document.getElementById('helperDef').textContent = m.definitions[0]?.definition || 'No definition found.';
+    const raw = data[0] && data[0].defs && data[0].defs[0];
+    if (raw) {
+      const tab = raw.indexOf('\t');
+      const posAbbr = tab > -1 ? raw.slice(0, tab) : '';
+      const defText = (tab > -1 ? raw.slice(tab + 1) : raw).trim();
+      document.getElementById('helperPos').textContent = posAbbr;
+      document.getElementById('helperDef').textContent = defText;
     } else throw 0;
   } catch {
     document.getElementById('helperDef').innerHTML = '<em style="color:var(--muted)">Definition not found — try another word.</em>';
@@ -1381,18 +1384,17 @@ async function expandPassageCard(id, word) {
   if (icon) icon.className = 'fas fa-chevron-up';
   detail.innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:0.8rem"><i class="fas fa-spinner fa-spin"></i> Looking up...</div>';
   try {
-    const res = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + word);
+    const res = await fetch('https://api.datamuse.com/words?sp=' + encodeURIComponent(word) + '&md=dp&max=1', { signal: AbortSignal.timeout(5000) });
     if (!res.ok) throw 0;
     const data = await res.json();
-    const m = data[0]?.meanings?.[0];
-    const def = m?.definitions?.[0]?.definition || 'No definition found.';
-    const pos = m?.partOfSpeech || '';
-    const ex = m?.definitions?.[0]?.example || '';
-    const safe = (word + '. ' + def + (ex ? '. ' + ex : '')).replace(/'/g,"\'");
+    const raw = data[0] && data[0].defs && data[0].defs[0];
+    if (!raw) throw 0;
+    const tab = raw.indexOf('\t');
+    const pos = tab > -1 ? raw.slice(0, tab) : '';
+    const def = (tab > -1 ? raw.slice(tab + 1) : raw).trim();
     detail.innerHTML = `
       <div class="rc-pos">${pos}</div>
-      <div class="rc-en">${def}</div>
-      ${ex ? `<div class="rc-ex"><button class="rc-tts" data-tts="${word}" onclick="event.stopPropagation();rcSpeak(this)"><i class="fas fa-volume-high"></i></button><span class="rc-ex-text">${ex}</span></div>` : ''}`;
+      <div class="rc-en">${def}</div>`;
   } catch {
     detail.innerHTML = '<div style="color:var(--muted);font-style:italic;font-size:0.8rem">Definition not found.</div>';
   }
